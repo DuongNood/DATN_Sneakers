@@ -5,7 +5,8 @@ import Login from "../pages/Login";
 import Layout from "../layouts/MainLayout";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
-import NotFoud from "../pages/NotFoud";
+import NotFound from "../pages/NotFound";
+import News from "../pages/News";
 
 export default function AppRoutes() {
   return (
@@ -15,7 +16,8 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="*" element={<NotFoud />} />
+        <Route path="/news" element={<News />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );

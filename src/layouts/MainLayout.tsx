@@ -10,7 +10,6 @@ export default function Layout() {
       <div className="flex-grow pt-[30px]">
         <Outlet />
       </div>
-
       <Footer />
     </div>
   );
