@@ -26,6 +26,8 @@ class CategoryController extends Controller
     public function create()
     {
         //
+        $title = "Category";
+        return view('admin.category.create',compact('title'));
     }
 
     /**
@@ -34,6 +36,20 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         //
+       
+        $params = $request->validate([
+            'category_name'=> 'required|max:255|unique:categories',
+        ]);
+        $params['status'] = $request->status ? 1 : 0;
+        
+        if($request->hasFile('image')){
+                $params['image'] =$request->file('image')->store('uploads/category', 'public');
+        }else{
+                $params['image'] =null;
+        }
+        Category::create($params);
+        return redirect()->route('categories.index')->with('success', 'Add new Success List!');
+
     }
 
     /**
@@ -50,6 +66,9 @@ class CategoryController extends Controller
     public function edit(string $id)
     {
         //
+        $title = "Category";
+        $category = Category::find($id);
+        return view('admin.category.edit',compact('title','category'));
     }
 
     /**
@@ -58,6 +77,29 @@ class CategoryController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        
+        $category = Category::find($id);
+
+        if (!$category) {
+            return redirect()->route('categories.index')->with('error', 'Category Does Not Exist!');
+        }
+
+        
+        $param = $request->validate([
+            'category_name' => 'required|max:255|unique:categories,category_name,'. $category->id,           
+            'status' => 'required|in:0,1'
+        ]);
+        if($request->hasFile('image')){
+                $param['image'] =$request->file('image')->store('uploads/category', 'public');
+        }else{
+                $param['image'] =null;
+        }
+        $param['status'] = $request->status ? 1 : 0;
+
+        
+        $category->update($param);
+
+        return redirect()->route('categories.index')->with('success', 'Update List Successfully!');
     }
 
     /**
@@ -66,5 +108,15 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         //
+        $category = Category::find($id);
+        if (!$category) {
+            return redirect()->route('categories.index')->with('error', 'Danh Mục Không Tồn Tại!');
+        }
+        // if (Category::find($id)->products->count() > 0) {
+        //     return redirect()->route('categories.index')
+        //         ->with('error', 'Category được sử dụng trong các sản phẩm. Bạn không thể xóa nó.');
+        // }
+        $category->delete();
+        return redirect()->route('categories.index')->with('success', 'Xóa Danh Mục Thành Công!');
     }
 }

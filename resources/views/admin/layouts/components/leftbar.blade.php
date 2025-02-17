@@ -117,7 +117,7 @@
                
                 <li>
                     <a class='tp-link' href='{{route('categories.index')}}'>
-                        <i data-feather="calendar"></i>
+                        <i data-feather="package"></i>
                         <span> Category </span>
                     </a>
                 </li>
