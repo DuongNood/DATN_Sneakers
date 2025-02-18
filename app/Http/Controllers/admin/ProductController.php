@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -13,6 +14,9 @@ class ProductController extends Controller
     public function index()
     {
         //
+        $title = "Product";
+        $listProduct = Product::where('status', true)->get();
+        return view('admin.product.index',compact('title','listProduct'));
     }
 
     /**
@@ -21,6 +25,8 @@ class ProductController extends Controller
     public function create()
     {
         //
+        $title = "Product";
+        return view('admin.product.create',compact('title'));
     }
 
     /**

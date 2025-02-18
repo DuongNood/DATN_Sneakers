@@ -21,4 +21,11 @@ class Product extends Model
         'status'=>'boolean', 
         'is_show_home'=>'boolean', 
     ];
+     public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+    public function imageProduct(){
+        return $this->hasMany(Imageproduct::class);
+    }
 }

@@ -25,7 +25,11 @@
                                     @method('PUT')
                                     <div class="mb-3">
                                         <label for="simpleinput" class="form-label">Category name</label>
-                                        <input type="text" id="simpleinput" class="form-control" name="category_name" value="{{$category->category_name}}">
+                                        <input type="text" id="simpleinput" class="form-control @error('category_name')
+                                        is-invalid @enderror" name="category_name" value="{{$category->category_name}}">
+                                        @error('category_name')
+                                            <p>{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label for="example-email" class="form-label">Image</label>

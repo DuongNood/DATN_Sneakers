@@ -24,30 +24,18 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label for="simpleinput" class="form-label">Category name</label>
-                                    <input type="text" id="simpleinput" class="form-control" name="category_name">
+                                    <input type="text" id="simpleinput" class="form-control mb-1 @error('category_name')
+                                    is-invalid @enderror" value="{{ old('category_name') }}"name="category_name">
+                                    @error('category_name')
+                                        <p class="text-danger">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label for="example-email" class="form-label">Image</label>
                                     <input type="file" id="example-email" name="image" class="form-control" onchange="showIamge(event)">
                                     <img id="img_category" alt="hinh anh" style="width:150px; display: none">
                                 </div>
-                                <div class="mb-3">
-                                    <label for="status" class="form-label ">Trạng Thái</label>
-                                    <div class="col-sm-10 mb-3 d-flex gap-2">
-                                        <div class="form-check">
-                                            <input class="status" type="radio" name="status" id="gridRadios1" value="1">
-                                            <label class="form-check-label" for="gridRadios1">
-                                                Hiển Thị
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="status" type="radio" name="status" id="gridRadios2" value="0">
-                                            <label class="form-check-label" for="gridRadios2">
-                                                Ẩn
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
                         </div>                 
