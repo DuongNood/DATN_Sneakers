@@ -14,136 +14,155 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <form>
-                                    <div class="mb-3">
-                                        <label for="simpleinput" class="form-label">Product code</label>
-                                        <input type="text" id="simpleinput" class="form-control" name="product_code">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="example-email" class="form-label">Product name</label>
-                                        <input type="email" id="example-email" name="example-email" class="form-control" name="product_name">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-password" class="form-label">Password</label>
-                                        <input type="password" id="example-password" class="form-control" value="password">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-palaceholder" class="form-label">Placeholder</label>
-                                        <input type="text" id="example-palaceholder" class="form-control"
-                                            placeholder="placeholder">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-textarea" class="form-label">Text area</label>
-                                        <textarea class="form-control" id="example-textarea" rows="5"
-                                            spellcheck="false"></textarea>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-disable" class="form-label">Readonly</label>
-                                        <input class="form-control" type="text" value="Readonly input here..."
-                                            aria-label="readonly input example" readonly>
-                                    </div>
-
-                                    <div>
-                                        <label for="example-disable" class="form-label">Disabled</label>
-                                        <input type="text" class="form-control" id="example-disable" disabled=""
-                                            value="Disabled value">
-                                    </div>
-
-                                </form>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <form>
-                                    <div class="mb-3">
-                                        <label for="example-select" class="form-label">Input Select</label>
-                                        <select class="form-select" id="example-select">
-                                            <option>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                            <option>4</option>
-                                            <option>5</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="simpleinput" class="form-label">Disabled</label>
-                                        <select id="simpleinput" class="form-select" aria-label="Default select example">
-                                            <option selected>Select Menu</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="exampleColorInput" class="form-label">Color picker</label>
-                                        <input type="color" id="exampleColorInput" value="#563d7c" title="Choose your color"
-                                            class="form-control form-control-color">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-date" class="form-label">Date</label>
-                                        <input type="date" id="example-date" class="form-control" name="date">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-multiselect" class="form-label">Multiple Select</label>
-                                        <select id="example-multiselect" multiple class="form-control">
-                                            <option>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                            <option>4</option>
-                                            <option>5</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-custom" class="form-label">Button With Dropdowns</label>
-                                        <div class="input-group mb-3">
-                                            <input type="text" class="form-control" id="example-custom"
-                                                aria-label="Text input with dropdown button">
-                                            <button class="btn btn-primary dropdown-toggle" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="#">Action</a></li>
-                                                <li><a class="dropdown-item" href="#">Another action</a></li>
-                                                <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li><a class="dropdown-item" href="#">Separated link</a></li>
-                                            </ul>
+                        <form action="{{route('products.store')}}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row">
+                                <div class="col-lg-6">                              
+                                        <div class="mb-3">
+                                            <label for="simpleinput" class="form-label">Product code</label>
+                                            <input type="text" id="simpleinput" class="form-control" name="product_code">
                                         </div>
-                                    </div>
+                                        <div class="mb-3">
+                                            <label for="example-email" class="form-label">Product name</label>
+                                            <input type="text" id="example-email"  class="form-control" name="product_name">
+                                        </div>
 
-                                    <div>
-                                        <label for="exampleDataList" class="form-label">Datalist example</label>
-                                        <input class="form-control" list="datalistOptions" id="exampleDataList"
-                                            placeholder="Type to search...">
-                                        <datalist id="datalistOptions">
-                                            <option value="San Francisco">
-                                            <option value="New York">
-                                            <option value="Seattle">
-                                            <option value="Los Angeles">
-                                            <option value="Chicago">
-                                        </datalist>
-                                    </div>
+                                        <div class="mb-3">
+                                            <label for="example-password" class="form-label">Category</label>
+                                            <select class="form-select" aria-label="Default select example" name="category_id">
+                                                
+                                                @foreach ($listCategories as $item)
+                                                    <option value="{{$item->id}}">{{$item->category_name}}</option> 
+                                                @endforeach                                                                                    
+                                            </select>
+                                        </div>
 
-                                </form>
+                                        <div class="mb-3">
+                                            <label for="example-password" class="form-label">Is show home</label>
+                                            <select class="form-select" aria-label="Default select example" name="is_show_home">
+                                                <option value="1">Display</option>
+                                                <option value="0">Hide</option>
+                                            </select>
+                                        </div>                                                               
+                                </div>
+
+                                <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label for="mo_ta_ngan" class="form-label">Mô Tả</label> <br>
+                                            <div id="quill-editor" style="height: 400px;">
+
+                                            </div>
+                                            <textarea name="description" id="editor_content" class="d-none"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="image" class="form-label">hinh anh</label>
+                                            <input type="file" id="image" name="image" class="form-control" onchange="showIamge(event)">
+                                            <img id="img_product" alt="hinh anh" style="width:150px; display: none">
+                                        </div>   
+                                        <div class="mb-3">
+                                            <label for="hinh_anh" class="form-label">Album hinh anh</label>
+                                            <i id="add-row" class="mdi mdi-plus text-muted fs-18 rounded-2 border ms-3 p-1" style="cursor: pointer"></i>
+                                            <table class="table align-middle table-nowrap mb-0">
+                                                <tbody id="image-table-body">
+                                                    <tr>
+                                                        <td class="d-flex align-items-center">
+                                                            <img id="preview_0"
+                                                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Wr3oWsq6KobkPqznhl09Wum9ujEihaUT4Q&s"
+                                                                alt="hinh anh" style="width:50px" class="me-3">
+                                                            <input type="file" id="hinh_anh" name="list_image[id_0]" class="form-control"
+                                                                onchange="previewImage(this,0)">
+                                                        </td>
+                                                        <td class="">
+                                                            <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1" style="cursor: pointer"
+                                                                onclick="removeRow(this)"></i>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>                                    
+                              </div>
                             </div>
-                        </div>
+                            <div class="d-flex"><button type="submit" class="btn btn-primary">Thêm moi</button>
+                        </form>        
                     </div>
 
                 </div>
             </div>
         </div>       
     </div> <!-- container-fluid -->
+@endsection
+@section('js')
+    <script src="{{asset('admins/libs/quill/quill.core.js')}}"></script>
+    <script src="{{asset('admins/libs/quill/quill.min.js')}}"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                    var quill = new Quill("#quill-editor", {
+                        theme: "snow",
+                    })
+
+                    // Hiển thị nội dung cũ 
+                    var old_content = `{!! old('description') !!}`;
+                    quill.root.innerHTML = old_content
+
+                    // Cập nhật lại textarea ẩn khi nội dung của  quill-editor thay đổi
+                    quill.on('text-change', function () {
+                        var html = quill.root.innerHTML;
+                        document.getElementById('editor_content').value = html
+                    })
+                })
+
+        </script>
+
+        <script>
+            function showIamge(event) {
+                const img_product = document.getElementById('img_product');
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function () {
+                    img_product.src = reader.result;
+                    img_product.style.display = 'block';
+                }
+                if (file) {
+                    reader.readAsDataURL(file)
+                }
+            }
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var rowCount = 1;
+                document.getElementById('add-row').addEventListener('click', function () {
+                    var tableBody = document.getElementById('image-table-body')
+                    var newRow = document.createElement('tr');
+                    newRow.innerHTML = ` 
+                            <td class="d-flex align-items-center">
+                                <img id="preview_${rowCount}" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Wr3oWsq6KobkPqznhl09Wum9ujEihaUT4Q&s" alt="hinh anh"
+                                    style="width:50px" class="me-3">
+                                <input type="file" id="hinh_anh" name="list_image[id_${rowCount}]"
+                                    class="form-control" onchange="previewImage(this,${rowCount})">                                                            
+                            </td>
+                            <td class="">
+                                <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1" 
+                                style="cursor: pointer" onclick="removeRow(this)"></i>
+                            </td>
+                            `;
+                    tableBody.appendChild(newRow);
+                    rowCount++;
+                });
+            })
+
+            function previewImage(input, rowIndex) {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById(`preview_${rowIndex}`).setAttribute('src', e.target.result)
+                    }
+                    reader.readAsDataURL(input.files[0])
+                }
+            }
+            function removeRow(item) {
+                var row = item.closest('tr');
+                row.remove();
+            }
+        </script>
 @endsection

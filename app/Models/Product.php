@@ -15,7 +15,8 @@ class Product extends Model
         'description',
         'image',
         'status',
-        'is_show_home'
+        'is_show_home',
+        'category_id'
     ];
     protected $casts =[
         'status'=>'boolean', 
