@@ -58,7 +58,38 @@ class NewsController extends Controller
     }
 
     public function update(Request $request , News $news){
+        $data = $request->validate([
+            'title' => 'required',
+            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
+            'content' => 'required'
+        ]);
+        try {
+            if ($request->hasFile('image')) {
+                $data['image'] = Storage::put('news', $request->file('image'));
+            }
 
+            $currentimage = $news->image;
+
+            News::query()->update($data);
+
+            if (
+                $request->hasFile('image')
+                && !empty($currentimage)
+                && Storage::exists($currentimage)
+            ) {
+                Storage::delete($currentimage);
+            }
+
+            return back()->with('success', true);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            if (!empty($data['image']) && Storage::exists($data['image'])) {
+                Storage::delete($data['image']);
+            }
+
+            return back()->with('error', $th->getMessage());
+        }
     }
 
     public function destroy(News $news)
