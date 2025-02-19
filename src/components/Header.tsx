@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+import logo from "../assets/logo.png";
+
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -24,13 +26,15 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="w-full bg-white text-white fixed top-0 left-0 z-50 ">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold relative overflow-hidden">
-          <Link to="/" className="relative block text-black">
-            PoleSneaker
-          </Link>
-        </h1>
+    <header className="w-full bg-white text-white fixed top-0 left-0 z-50 shadow-md">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex justify-between items-center">
+        <Link to="/" className="flex items-center">
+          <img
+            src={logo}
+            className="h-18 w-auto sm:h-24 md:h-28 lg:h-32 xl:h-25 transition-all duration-300"
+            alt="Logo LoleSneaker"
+          />
+        </Link>
 
         <nav className="hidden lg:flex space-x-6">
           <Link to="/" className="hover:text-blue-400 transition text-black">
@@ -85,56 +89,12 @@ const Header = () => {
               )}
             </AnimatePresence>
           </div>
-
-          <div
-            className="relative group"
-            onMouseEnter={() => setNewsDropdownOpen(true)}
-            onMouseLeave={() => setNewsDropdownOpen(false)}
+          <Link
+            to="/contact"
+            className="hover:text-blue-400 transition text-black"
           >
-            <button className="flex items-center hover:text-blue-400 transition text-black">
-              Tin tức
-              <FaChevronDown
-                className={`ml-1 transform ${
-                  newsDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            <AnimatePresence>
-              {newsDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute bg-gray-800 mt-2 rounded-lg shadow-lg w-48"
-                >
-                  <Link
-                    to="/tin-chinh-tri"
-                    className="block px-4 py-2 hover:bg-gray-700 text-white"
-                  >
-                    Giày mới ra
-                  </Link>
-                  <Link
-                    to="*"
-                    className="block px-4 py-2 hover:bg-gray-700 text-white"
-                  >
-                    ádasd
-                  </Link>
-                  <Link
-                    to=""
-                    className="block px-4 py-2 hover:bg-gray-700 text-white"
-                  >
-                    đâs
-                  </Link>
-                  <Link
-                    to=""
-                    className="block px-4 py-2 hover:bg-gray-700 text-white"
-                  >
-                    Tin xã hội
-                  </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+            Tin tức
+          </Link>
 
           <Link
             to="/contact"
@@ -151,13 +111,14 @@ const Header = () => {
           >
             <FaSearch />
           </button>
-
+          <div className="h-6 w-[1px] bg-black"></div>
           <Link
             to="/profile"
             className="flex items-center text-xl text-black hover:text-blue-400 transition"
           >
             <FaUser />
           </Link>
+          <div className="h-6 w-[1px] bg-black"></div>
 
           <Link
             to="/cart"
