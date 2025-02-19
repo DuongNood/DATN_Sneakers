@@ -157,4 +157,12 @@ class ProductController extends Controller
     {
         //
     }
+
+    public function productDiscontinued()
+    {
+        //
+        $title = "Product";
+        $listProduct = Product::where('status', false)->get();
+        return view('admin.product.productDiscontinued',compact('title','listProduct'));
+    }
 }

@@ -44,6 +44,14 @@
                                             <option value="0">Hide</option>
                                         </select>
                                     </div>
+
+                                    <div class="mb-3">
+                                        <label for="example-password" class="form-label">Status</label>
+                                        <select class="form-select" aria-label="Default select example" name="status">
+                                            <option value="1">active</option>
+                                            <option value="0">inactive</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="col-lg-6">
@@ -86,7 +94,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex"><button type="submit" class="btn btn-primary">Thêm moi</button>
+                            <div class="d-flex"><button type="submit" class="btn btn-primary">Update</button>
                         </form>
                     </div>
 
