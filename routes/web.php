@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\CategoryController;
+use App\Http\Controllers\admin\NewsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +30,7 @@ use App\Http\Controllers\admin\CategoryController;
             Route::get('category-by-product/{id}', [CategoryController::class, 'categoryByProduct'])->name('categoryByProduct');
         });          
 // });
+
+Route::resource('news', NewsController::class);
+// Route::resource('comments', NewsController::class);
+
