@@ -15,25 +15,7 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        Sanctum::currentApplicationUrlWithPort()
-    ))),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Sanctum Guards
-    |--------------------------------------------------------------------------
-    |
-    | This array contains the authentication guards that will be checked when
-    | Sanctum is trying to authenticate a request. If none of these guards
-    | are able to authenticate the request, Sanctum will use the bearer
-    | token that's present on an incoming request for authentication.
-    |
-    */
-
-    'guard' => ['web'],
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1,::1')),
 
     /*
     |--------------------------------------------------------------------------
@@ -46,38 +28,99 @@ return [
     |
     */
 
-    'expiration' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Token Prefix
-    |--------------------------------------------------------------------------
-    |
-    | Sanctum can prefix new tokens in order to take advantage of numerous
-    | security scanning initiatives maintained by open source platforms
-    | that notify developers if they commit tokens into repositories.
-    |
-    | See: https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning
-    |
-    */
-
-    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
+    'expiration' => null, // Để null nếu muốn token không hết hạn, hoặc đặt số phút (e.g., 60)
 
     /*
     |--------------------------------------------------------------------------
     | Sanctum Middleware
     |--------------------------------------------------------------------------
     |
-    | When authenticating your first-party SPA with Sanctum you may need to
+    | When authenticating your first-party SPA with Sanctum, you may need to
     | customize some of the middleware Sanctum uses while processing the
     | request. You may change the middleware listed below as required.
     |
     */
 
     'middleware' => [
-        'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
-        'encrypt_cookies' => App\Http\Middleware\EncryptCookies::class,
-        'verify_csrf_token' => App\Http\Middleware\VerifyCsrfToken::class,
+        'verify_csrf_token' => \App\Http\Middleware\VerifyCsrfToken::class,
+        'encrypt_cookies' => \App\Http\Middleware\EncryptCookies::class,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Guard to Use for Authentication
+    |--------------------------------------------------------------------------
+    |
+    | This value controls the authentication guard Sanctum will use while
+    | authenticating requests. This value should typically be "web" as
+    | Sanctum uses the web guard to manage user sessions.
+    |
+    */
+
+    'guard' => ['web'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expiration of "Remember Me" Tokens
+    |--------------------------------------------------------------------------
+    |
+    | This value controls the number of minutes until a "Remember Me" token
+    | will be considered expired. These tokens are long-lived but can be
+    | invalidated by the user at any time via the application's UI.
+    |
+    */
+
+    'remember' => env('SANCTUM_REMEMBER_MINUTES', 43200), // 30 ngày (60 phút * 24 giờ * 30 ngày)
+
+    /*
+    |--------------------------------------------------------------------------
+    | Single Device Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Sanctum may allow the use of single device authentication. When this is
+    | enabled, each user may only authenticate with one device at a time.
+    | This feature is useful for preventing multiple device logins.
+    |
+    */
+
+    'single_device' => false, // Nếu muốn chỉ cho phép 1 thiết bị đăng nhập, đổi thành true
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sanctum Model
+    |--------------------------------------------------------------------------
+    |
+    | When using the "HasApiTokens" trait from Sanctum, we need to know which
+    | model should be used to retrieve your application's API tokens. You
+    | may use your own model as long as it extends the Sanctum model.
+    |
+    */
+
+    'model' => Sanctum::personalAccessTokenModel(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Prefix
+    |--------------------------------------------------------------------------
+    |
+    | When issuing tokens using Sanctum, you may specify a prefix that will
+    | be applied to the token's abilities. This is useful when you have
+    | multiple environments sharing the same authentication server.
+    |
+    */
+
+    'prefix' => env('SANCTUM_PREFIX', 'Bearer'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sanctum Routes Prefix / Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the route prefix and middleware for Sanctum's
+    | endpoints. You can modify the prefix and middleware here as needed.
+    |
+    */
+
+    'prefix' => 'sanctum',
+    'middleware' => ['web'],
 ];
