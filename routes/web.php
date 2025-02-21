@@ -16,4 +16,15 @@ use App\Http\Controllers\BannerController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('banners', BannerController::class);
+Route::resource('banners')
+->as('banners.')
+->group(function(){
+    Route::get('/', [BannerController::class, 'index'])->name('index');
+    Route::get('create', [BannerController::class, 'create'])->name('create');
+    Route::post('store', [BannerController::class, 'store'])->name('store');
+    Route::get('{id}/edit', [BannerController::class, 'edit'])->name('edit');
+    Route::put('update/{id}', [BannerController::class, 'update'])->name('update');
+    Route::delete('destroy/{id}', [BannerController::class, 'destroy'])->name('destroy');
+});
+Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+//
