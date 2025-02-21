@@ -4,7 +4,7 @@
 
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4>
+                {{-- <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4> --}}
             </div>
             <a href="{{ route('news.create') }}" class="btn btn-success ">Create news</a>
         </div>
@@ -36,24 +36,16 @@
                                                         width="100px">
                                                 @endif
                                             </td>
-                                            {{-- <td>{{$news->content}}</td> --}}
+                                            
                                             <td>
-                                                <a class="btn btn-primary me-3 mb-3"
-                                                    href="{{ route('news.show', $news) }}" role="button">
-                                                    <i class="fa fa-eye"></i>
+                                                <a href="{{ route('news.edit', $news) }}">
+                                                    <i class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i>
                                                 </a>
-                                                <a class="btn btn-warning  mb-3"
-                                                    href="{{ route('news.edit', $news) }}" role="button">
-                                                    <i class="fa fa-pencil-square-o"></i>
-                                                </a>
-
-                                                <form action="{{ route('news.destroy', $news) }}" method="post">
+                                                <form action="{{ route('news.destroy', $news) }}" method="POST" class="d-inline me-2">
                                                     @csrf
                                                     @method('DELETE')
-
-                                                    <button type="submit" onclick="return confirm('co chac chan muon xoa')"
-                                                        class="btn btn-danger mb-3">
-                                                        <i class="fa fa-trash-o"></i>
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                                        <i class="mdi mdi-delete text-muted fs-14"></i>
                                                     </button>
                                                 </form>
                                             </td>

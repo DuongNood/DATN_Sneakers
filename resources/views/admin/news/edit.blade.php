@@ -4,7 +4,7 @@
 
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4>
+                {{-- <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4> --}}
             </div>
         </div>
 
@@ -53,6 +53,9 @@
                                     </div>
 
                                     <button type="submit" class="btn btn-primary">Submit</button>
+                                    <a href="{{ route('news.index') }}" class="btn btn-light">
+                                        Quay lại
+                                    </a>
                                 </form>
                             </div>
                         </div>

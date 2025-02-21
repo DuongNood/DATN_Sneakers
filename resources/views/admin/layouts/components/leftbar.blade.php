@@ -7,32 +7,19 @@
             <div class="logo-box">
                 <a class='logo logo-light' href='index.html'>
                     <span class="logo-sm">
-<<<<<<< HEAD
-                        <img src="/admin/assets/images/logo-sm.png" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="/admin/assets/images/logo-light.png" alt="" height="24">
-=======
+
                         <img src="{{ asset('admins/images/logo-sm.png')}}" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ asset('admins/images/logo-light.png')}}" alt="" height="24">
->>>>>>> d3922f709ccb303cf9c8bd2eca087ad63d98bd1d
                     </span>
                 </a>
                 <a class='logo logo-dark' href='index.html'>
                     <span class="logo-sm">
-<<<<<<< HEAD
-                        <img src="/admin/assets/images/logo-sm.png" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="/admin/assets/images/logo-dark.png" alt="" height="24">
-=======
                         <img src="{{ asset('admins/images/logo-sm.png')}}" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ asset('admins/images/logo-dark.png')}}" alt="" height="24">
->>>>>>> d3922f709ccb303cf9c8bd2eca087ad63d98bd1d
                     </span>
                 </a>
             </div>

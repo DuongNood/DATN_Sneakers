@@ -9,7 +9,7 @@ use Storage;
 
 class NewsController extends Controller
 {
-    const PATH_VIEW = "admin.news";
+    const PATH_VIEW = "admin.news.";
 
     public function index(){
 
@@ -33,17 +33,20 @@ class NewsController extends Controller
 
         try {
             if ($request->hasFile('image')) {
-                $data['image'] = Storage::put('news', $request->file('image'));
+                // $data['image'] = Storage::put('news', $request->file('image'));
+                $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
+
             }
 
             News::query()->create($data);
+            // dd($data);
 
-            return redirect()->route('news.index')->with('success', 'create successfully');
+            return redirect()->route('news.index')->with('success', 'create news successfully');
 
         } catch (\Throwable $th) {
             //throw $th;
             if (!empty($data['image']) && Storage::exists($data['image'])) {
-                Storage::delete($data['image']);
+                Storage::dick('public')->delete($data['image']);
             }
 
             return back()->with('error', $th->getMessage());
@@ -66,7 +69,7 @@ class NewsController extends Controller
         ]);
         try {
             if ($request->hasFile('image')) {
-                $data['image'] = Storage::put('news', $request->file('image'));
+                $data['image'] =  Storage::disk('public')->put('news', $request->file('image'));
             }
 
             $currentimage = $news->image;
@@ -76,9 +79,9 @@ class NewsController extends Controller
             if (
                 $request->hasFile('image')
                 && !empty($currentimage)
-                && Storage::exists($currentimage)
+                && Storage::disk('public')->exists($currentimage)
             ) {
-                Storage::delete($currentimage);
+                Storage::disk('public')->delete($currentimage);
             }
 
             return back()->with('success', true);
@@ -86,7 +89,7 @@ class NewsController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
             if (!empty($data['image']) && Storage::exists($data['image'])) {
-                Storage::delete($data['image']);
+                Storage::disk('public')->delete($data['image']);
             }
 
             return back()->with('error', $th->getMessage());
@@ -99,7 +102,7 @@ class NewsController extends Controller
 
             $news->delete();
 
-            return redirect()->route('news.index')->with('success', 'Đã xóa thành công bản ghi');
+            return redirect()->route('news.index')->with('success', 'Đã xóa thành công tin tức!');
 
         } catch (\Throwable $th) {
             return back()

@@ -62,6 +62,7 @@
     <!-- END wrapper -->
 
     @include('admin.layouts.partials.js')
+    @yield('js')
 
 </body>
 

@@ -4,7 +4,7 @@
 
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4>
+                {{-- <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4> --}}
             </div>
         </div>
 
@@ -25,9 +25,7 @@
 
                                     <div class="mb-3">
                                         <label for="simpleinput" class="form-label">Title</label>
-                                        <input type="text" id="simpleinput"
-                                            class="form-control mb-1 @error('title')
-                                    is-invalid @enderror"
+                                        <input type="text" id="simpleinput" class="form-control mb-1 @error ('title') is-invalid @enderror "
                                             value="{{ old('title') }}"name="title">
                                         @error('title')
                                             <p class="text-danger">{{ $message }}</p>
@@ -36,9 +34,12 @@
 
                                     <div class="mb-3">
                                         <label for="example-email" class="form-label">Image</label>
-                                        <input type="file" id="example-email" name="image" class="form-control"
-                                            onchange="showIamge(event)">
+                                        <input type="file" id="example-email" name="image" class="form-control  @error ('title') is-invalid @enderror"
+                                            onchange="showIamge(event)" >
                                         <img id="img_news" alt="hinh anh" style="width:150px; display: none">
+                                        @error('image')
+                                            <p class="text-danger">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <div class="mb-3">
@@ -46,7 +47,10 @@
                                         <div id="quill-editor" style="height: 400px;">
 
                                         </div>
-                                        <textarea name="content" id="editor_content" class="d-none"></textarea>
+                                        <textarea name="content" id="editor_content" class="d-none @error ('title') is-invalid @enderror"></textarea>
+                                        @error('content')
+                                            <p class="text-danger">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <button type="submit" class="btn btn-primary">Submit</button>
