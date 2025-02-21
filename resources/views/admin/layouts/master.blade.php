@@ -28,11 +28,19 @@
 
 
         <!-- Topbar Start -->
+<<<<<<< HEAD
         @include('admin.layouts.components.topbar')
         <!-- end Topbar -->
 
         <!-- Left Sidebar Start -->
         @include('admin.layouts.components.leftbar')
+=======
+        @include('admin.layouts.componets.topbar')
+        <!-- end Topbar -->
+
+        <!-- Left Sidebar Start -->
+        @include('admin.layouts.componets.leftbar')
+>>>>>>> master
         <!-- Left Sidebar End -->
 
         <!-- ============================================================== -->
@@ -44,16 +52,26 @@
 
                 <!-- Start Content-->
                 @yield('content')
+<<<<<<< HEAD
                 
+=======
+>>>>>>> master
                 <!-- container-fluid -->
             </div> <!-- content -->
 
             <!-- Footer Start -->
+<<<<<<< HEAD
            
             <!-- end Footer -->
 
         </div>
         @include('admin.layouts.components.footer')
+=======
+           @include('admin.layouts.componets.footer')
+            <!-- end Footer -->
+
+        </div>
+>>>>>>> master
         <!-- ============================================================== -->
         <!-- End Page content -->
         <!-- ============================================================== -->
@@ -62,7 +80,10 @@
     <!-- END wrapper -->
 
     @include('admin.layouts.partials.js')
+<<<<<<< HEAD
     @yield('js')
+=======
+>>>>>>> master
 
 </body>
 
