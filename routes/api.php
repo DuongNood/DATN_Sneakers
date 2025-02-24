@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -36,3 +37,4 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::resource('comments', CommentController::class);
+Route::resource('news', NewsController::class);
