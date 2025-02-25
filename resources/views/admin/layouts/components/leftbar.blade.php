@@ -119,6 +119,12 @@
                         <span> Category </span>
                     </a>
                 </li>
+                <li>
+                    <a class='tp-link' href='{{ route('users.index') }}'>
+                        <i data-feather="package"></i>
+                        <span> User </span>
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- End Sidebar -->

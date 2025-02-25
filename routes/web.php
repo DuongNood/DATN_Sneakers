@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\CategoryController;
+use App\Http\Controllers\admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +30,10 @@ use App\Http\Controllers\admin\CategoryController;
             Route::get('category-by-product/{id}', [CategoryController::class, 'categoryByProduct'])->name('categoryByProduct');
         });          
 // });
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::resource('users', UserController::class);
+Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
