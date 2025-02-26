@@ -32,4 +32,13 @@ class User extends Authenticatable
      public function oder(){
         return $this->hasMany(Oder::class);
     }
+    public function isAdmin()
+{
+    return $this->role === 'admin';
+}
+
+public function isStaff()
+{
+    return $this->role === 'staff';
+}
 }

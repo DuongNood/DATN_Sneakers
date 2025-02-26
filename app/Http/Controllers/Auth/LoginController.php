@@ -36,4 +36,15 @@ class LoginController extends Controller
             'user' => $user
         ], 200);
     }
+    /**
+     * Đăng xuất người dùng
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Đăng xuất thành công!',
+        ], 200);
+    }
 }
