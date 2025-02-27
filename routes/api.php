@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\ProductController;
+
 use Illuminate\Support\Facades\Route;
 
 // Đăng ký tài khoản
@@ -28,5 +30,8 @@ Route::get('/reset-password/{token}', function ($token) {
 
 // Xử lý đặt lại mật khẩu
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+//danh sách sản phẩmphẩm
+Route::get('/products', [ProductController::class, 'index']);
+
 
 

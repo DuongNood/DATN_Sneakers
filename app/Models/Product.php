@@ -21,4 +21,16 @@ class Product extends Model
         'status'=>'boolean', 
         'is_show_home'=>'boolean', 
     ];
+    
+    // 🔗 Liên kết với `ProductVariant`
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
+    }
+
+    // 🔗 Liên kết với `Category`
+    public function category()  
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
 }

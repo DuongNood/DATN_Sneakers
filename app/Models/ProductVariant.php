@@ -19,4 +19,8 @@ class ProductVariant extends Model
     protected $casts =[
         'status'=>'boolean' 
     ];
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
