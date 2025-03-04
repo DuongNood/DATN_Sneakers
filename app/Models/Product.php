@@ -28,5 +28,14 @@ class Product extends Model
     }
     public function imageProduct(){
         return $this->hasMany(Imageproduct::class);
+    
     }
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
+    }
+
+    // 🔗 Liên kết với `Category`
+    
+    
 }

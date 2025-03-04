@@ -6,7 +6,7 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>              
             </div>
-            <a href="{{route('categories.create')}}" class="btn btn-success col-1">Create</a>
+            <a href="{{route('product_variants.create')}}" class="btn btn-success col-1">Create</a>
         </div>
 
         <!-- start row -->
@@ -37,11 +37,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($category as $item)
+                                    @foreach ($productVariant as $item)
                                         <tr>
                                             <th scope="row">{{$item->id}}</th>
                                             <td>{{$item->sku}}</td>
-                                            <td>{{$item->product_id}}</td>
+                                            <td>{{$item->product->product_name}}</td>
                                             <td>{{$item->price}}</td>
                                             <td>{{$item->promotional_price}}</td>
                                             <td>{{$item->quantity}}</td>                                          
