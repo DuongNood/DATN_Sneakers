@@ -4,17 +4,17 @@
 
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>              
+                <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
             </div>
             <a href="{{route('product_variants.create')}}" class="btn btn-success col-1">Create</a>
-            <a href="{{route('product_variants.variantDiscontinued')}}" class="btn btn-danger m-lg-1">variant discontinued</a>
+            <a href="{{route('product_variants.variantDiscontinued')}}" class="btn btn-primary m-lg-1">variant</a>
         </div>
 
         <!-- start row -->
-        <div class="row">   
+        <div class="row">
 
             <div class="col-xl-12 ">
-                <div class="card">                   
+                <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
                             @if (session('success'))
@@ -38,30 +38,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($productVariant as $item)
+                                    @foreach ($listVariant as $item)
                                         <tr>
                                             <th scope="row">{{$item->id}}</th>
                                             <td>{{$item->sku}}</td>
                                             <td>{{$item->product->product_name}}</td>
                                             <td>{{$item->price}}</td>
                                             <td>{{$item->promotional_price}}</td>
-                                            <td>{{$item->quantity}}</td>                                          
+                                            <td>{{$item->quantity}}</td>
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
                                             </td>
                                             <td>
                                                 <a href="{{ route('product_variants.edit', $item->id) }}"><i
-                                                    class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>                                         
+                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
                                             </td>
-                                        </tr> 
+                                        </tr>
                                     @endforeach
 
                                 </tbody>
                             </table>
-                        </div> 
+                        </div>
                     </div>
                 </div>
-            </div>                         
+            </div>
         </div><!-- end row -->
 
 

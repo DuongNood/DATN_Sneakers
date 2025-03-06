@@ -22,10 +22,17 @@
                                     <div class="mb-3">
                                         <label for="simpleinput" class="form-label">Product code</label>
                                         <input type="text" id="simpleinput" class="form-control" name="product_code" value="{{$product->product_code}}">
+                                        @error('product_code')
+                                            <p class="text-danger">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label for="example-email" class="form-label">Product name</label>
-                                        <input type="text" id="example-email" class="form-control" name="product_name" value="{{$product->product_name}}">
+                                        <input type="text" id="example-email" class="form-control  @error('product_name')
+                                        is-invalid @enderror" name="product_name" value="{{$product->product_name}}">
+                                        @error('product_name')
+                                            <p class="text-danger">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <div class="mb-3">
@@ -40,16 +47,16 @@
                                     <div class="mb-3">
                                         <label for="example-password" class="form-label">Is show home</label>
                                         <select class="form-select" aria-label="Default select example" name="is_show_home">
-                                            <option value="1">Display</option>
-                                            <option value="0">Hide</option>
+                                            <option value="1" {{ $item->is_show_home == 1 ? 'selected' : '' }}>Display</option>
+                                            <option value="0" {{ $item->is_show_home == 0 ? 'selected' : '' }}>Hide</option>
                                         </select>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="example-password" class="form-label">Status</label>
                                         <select class="form-select" aria-label="Default select example" name="status">
-                                            <option value="1">active</option>
-                                            <option value="0">inactive</option>
+                                            <option value="1" {{ $item->status == 1 ? 'selected' : '' }}>active</option>
+                                            <option value="0" {{ $item->status == 0 ? 'selected' : '' }}>inactive</option>
                                         </select>
                                     </div>
                                 </div>
@@ -58,7 +65,6 @@
                                     <div class="mb-3">
                                         <label for="mo_ta_ngan" class="form-label">Description</label> <br>
                                         <div id="quill-editor" style="height: 400px;">
-
                                         </div>
                                         <textarea name="description" id="editor_content" class="d-none">{{$product->description}}</textarea>
                                     </div>

@@ -35,9 +35,13 @@
                                             @csrf
                                             <div id="variant-table">                                              
                                             <div class="variant-row row align-items-end mb-3">
-                                                <div class="col-md-2">
+                                                <div class="col-md-2 ">
                                                     <label for="simpleinput" class="form-label">variant name</label>
-                                                    <input type="text" class="form-control" name="product_variants[0][sku]" required placeholder="variant name">
+                                                    <input type="text" class="form-control" name="product_variants[0][sku]"  placeholder="variant name"
+                                                    value="{{ old('product_variants.0.sku') }}">
+                                                    @error('product_variants.0.sku')
+                                                        <p class="text-danger position-absolute">{{ $message }}</p>
+                                                    @enderror
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label for="simpleinput" class="form-label">Product name</label>
@@ -49,12 +53,19 @@
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label for="simpleinput" class="form-label">Price</label>
-                                                    <input type="number" class="form-control" name="product_variants[0][price]" step="0.01" required
-                                                        placeholder="Price">
+                                                    <input type="number" class="form-control" name="product_variants[0][price]" step="0.01" 
+                                                        placeholder="Price" value="{{ old('product_variants.0.price') }}">
+                                                        @error('product_variants.0.price')
+                                                            <p class="text-danger position-absolute">{{ $message }}</p>
+                                                        @enderror
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label for="simpleinput" class="form-label">quantity</label>
-                                                    <input type="number" class="form-control" name="product_variants[0][quantity]" required placeholder="quantity">
+                                                    <input type="number" class="form-control" name="product_variants[0][quantity]"  placeholder="quantity"
+                                                    value="{{ old('product_variants.0.quantity') }}">
+                                                    @error('product_variants.0.quantity')
+                                                        <p class="text-danger position-absolute">{{ $message }}</p>
+                                                    @enderror
                                                 </div>
                                                 <div class="col-md-2">
                                                     <button type="button" class="remove-row btn btn-danger">Xóa</button>
@@ -91,20 +102,24 @@
                 let newRow = `
             <div class="variant-row row align-items-end mb-3">
                 <div class="col-md-2">
-                    <input type="text" class="form-control" name="product_variants[${index}][sku]" required placeholder="SKU">
+                    <input type="text" class="form-control" name="product_variants[${index}][sku]"  placeholder="SKU"
+                    value="{{ old('product_variants.${index}.sku') }}">
+                    @error('product_variants.${index}.sku')
+                        <p class="text-danger position-absolute">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" name="product_variants[${index}][product_id]" required>
+                    <select class="form-select" name="product_variants[${index}][product_id]" >
                         @foreach ($product as $item)
                             <option value="{{ $item->id }}">{{ $item->product_name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <input type="number" class="form-control" name="product_variants[${index}][price]" step="0.01" required placeholder="Giá">
+                    <input type="number" class="form-control" name="product_variants[${index}][price]" step="0.01"  placeholder="Giá">
                 </div>
                 <div class="col-md-2">
-                    <input type="number" class="form-control" name="product_variants[${index}][quantity]" required placeholder="Số lượng">
+                    <input type="number" class="form-control" name="product_variants[${index}][quantity]"  placeholder="Số lượng">
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="remove-row btn btn-danger">Xóa</button>

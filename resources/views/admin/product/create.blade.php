@@ -29,8 +29,7 @@
 
                                         <div class="mb-3">
                                             <label for="example-password" class="form-label">Category</label>
-                                            <select class="form-select" aria-label="Default select example" name="category_id">
-                                                
+                                            <select class="form-select" aria-label="Default select example" name="category_id">                                               
                                                 @foreach ($listCategories as $item)
                                                     <option value="{{$item->id}}">{{$item->category_name}}</option> 
                                                 @endforeach                                                                                    

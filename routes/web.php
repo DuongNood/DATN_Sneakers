@@ -49,6 +49,7 @@ use App\Http\Controllers\admin\ProductVariantController;
             Route::post('store', [ProductVariantController::class, 'store'])->name('store');
             Route::get('{id}/edit', [ProductVariantController::class, 'edit'])->name('edit');
             Route::put('update/{id}', [ProductVariantController::class, 'update'])->name('update');
-            Route::delete('destroy/{id}', [ProductVariantController::class, 'destroy'])->name('destroy');          
+            Route::delete('destroy/{id}', [ProductVariantController::class, 'destroy'])->name('destroy');  
+            Route::get('variant_discontinued',[ProductVariantController::class, 'variantDiscontinued'])->name('variantDiscontinued');        
         });                     
 // });

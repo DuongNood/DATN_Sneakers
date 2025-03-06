@@ -37,7 +37,7 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
         //
         
@@ -93,62 +93,74 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductRequest $request, string $id)
     {
-        //
-         $params = $request->except('_token','_method');
+       
+        // Lấy tất cả dữ liệu trừ `_token` và `_method`
+        $params = $request->except('_token', '_method');
 
-           
+        // Tìm sản phẩm theo ID
+        $product = Product::findOrFail($id);
 
-            $product =Product::find($id);
-
-            if($request->hasFile('image')){
-                if($product->image && Storage::disk('public')->exists($product->image)){
-                    Storage::disk('public')->delete($product->image);
-                }
-                $params['image'] =$request->file('image')->store('uploads/product', 'public');
-            }else{
-                $params['image'] =$product->image;
+        // Xử lý ảnh đại diện
+        if ($request->hasFile('image')) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
             }
-            
-           
-                $currentImages= $product->imageProduct()->pluck('id')->toArray();
-                $arrayCombine = array_combine($currentImages, $currentImages);
-                foreach($arrayCombine as $key => $values){
-                    if(!array_key_exists($key, $request->list_image)){
-                        $hinhAnhSp = ImageProduct::query()->find($key);
-                        if($hinhAnhSp->image_product && Storage::disk('public')->exists($hinhAnhSp->image_product)){
-                            Storage::disk('public')->delete($hinhAnhSp->image_product);
-                            $hinhAnhSp->delete();
-                        }
-                    }
-                }
+            $params['image'] = $request->file('image')->store('uploads/product', 'public');
+        } else {
+            $params['image'] = $product->image;
+        }
 
-                foreach($request->list_image as $key=>$image){
-                    if(!array_key_exists($key, $arrayCombine)){
-                        if($request->hasFile("list_image.$key")){
-                            $path = $image->store('uploads/ablum_product/id_'.$id, 'public');
-                            $product->imageProduct()->create([
-                                'san_pham_id'=>$id,
-                                'image_product'=>$path
-                            ]);
-                        }
-                    }else if(is_file($image) && $request->hasFile("list_image.$key")){
-                        $hinhAnhSp = ImageProduct::query()->find($key);
-                        if($hinhAnhSp && Storage::disk('public')->exists($hinhAnhSp->image_product)){
-                            Storage::disk('public')->delete($hinhAnhSp->image_product);
-                        }
-                        $path= $image->store('uploads/ablum_product/id_'.$id, 'public');
-                        $hinhAnhSp->update([
-                                'image_product'=>$path
-                            ]);
-                    }            
-                }
+        // Xử lý ảnh album (list_image)
+        $currentImages = $product->imageProduct()->pluck('id')->toArray();
+        $arrayCombine = array_combine($currentImages, $currentImages);
 
-            
-            $product->update($params);
-            return redirect()->route('products.index')->with('success', 'Successfully updated product');
-    }
+        // Kiểm tra nếu `list_image` không tồn tại trong request, gán thành mảng rỗng để tránh lỗi
+        $listImages = $request->list_image ?? [];
+
+        // Xóa ảnh không còn trong danh sách `list_image`
+        foreach ($arrayCombine as $key => $value) {
+            if (!array_key_exists($key, $listImages)) {
+                $hinhAnhSp = ImageProduct::find($key);
+                if ($hinhAnhSp && Storage::disk('public')->exists($hinhAnhSp->image_product)) {
+                    Storage::disk('public')->delete($hinhAnhSp->image_product);
+                }
+                if ($hinhAnhSp) {
+                    $hinhAnhSp->delete();
+                }
+            }
+        }
+
+        // Thêm hoặc cập nhật ảnh mới vào album
+        foreach ($listImages as $key => $image) {
+            if (!array_key_exists($key, $arrayCombine)) { 
+                // Nếu là ảnh mới
+                if ($request->hasFile("list_image.$key")) {
+                    $path = $image->store('uploads/ablum_product/id_'.$id, 'public');
+                    $product->imageProduct()->create([
+                        'san_pham_id' => $id,
+                        'image_product' => $path
+                    ]);
+                }
+            } elseif (is_file($image) && $request->hasFile("list_image.$key")) {
+                // Nếu là ảnh đã tồn tại và cần cập nhật
+                $hinhAnhSp = ImageProduct::find($key);
+                if ($hinhAnhSp && Storage::disk('public')->exists($hinhAnhSp->image_product)) {
+                    Storage::disk('public')->delete($hinhAnhSp->image_product);
+                }
+                $path = $image->store('uploads/ablum_product/id_'.$id, 'public');
+                $hinhAnhSp->update([
+                    'image_product' => $path
+                ]);
+            }
+        }
+
+        // Cập nhật sản phẩm
+        $product->update($params);
+        return redirect()->route('products.index')->with('success', 'Successfully updated product');
+}
+
 
     /**
      * Remove the specified resource from storage.
