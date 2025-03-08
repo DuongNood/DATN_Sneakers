@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\CategoryController;
+
 use App\Http\Controllers\admin\UserController;
 
 use App\Http\Controllers\admin\CategoryController;
@@ -9,6 +10,11 @@ use App\Http\Controllers\admin\NewsController;
 
 
 use App\Http\Controllers\BannerController;
+
+use App\Http\Controllers\admin\ProductController;
+use App\Http\Controllers\admin\ProductVariantController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +41,7 @@ use App\Http\Controllers\BannerController;
             Route::get('{id}/edit', [CategoryController::class, 'edit'])->name('edit');
             Route::put('update/{id}', [CategoryController::class, 'update'])->name('update');
             Route::delete('destroy/{id}', [CategoryController::class, 'destroy'])->name('destroy');
+
             Route::get('category-by-product/{id}', [CategoryController::class, 'categoryByProduct'])->name('categoryByProduct');
         });          
 // });
@@ -67,4 +74,29 @@ Route::get('/', function () {
 
 Route::resource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
+
+        }); 
+         Route::prefix('products')
+        ->as('products.')
+        ->group(function(){
+            Route::get('/', [ProductController::class, 'index'])->name('index');
+            Route::get('create', [ProductController::class, 'create'])->name('create');
+            Route::post('store', [ProductController::class, 'store'])->name('store');
+            Route::get('{id}/edit', [ProductController::class, 'edit'])->name('edit');
+            Route::put('update/{id}', [ProductController::class, 'update'])->name('update');
+            Route::delete('destroy/{id}', [ProductController::class, 'destroy'])->name('destroy');
+            Route::get('product_discontinued',[ProductController::class, 'productDiscontinued'])->name('productDiscontinued');
+        });
+        Route::prefix('product_variants')
+        ->as('product_variants.')
+        ->group(function(){
+            Route::get('/', [ProductVariantController::class, 'index'])->name('index');
+            Route::get('create', [ProductVariantController::class, 'create'])->name('create');
+            Route::post('store', [ProductVariantController::class, 'store'])->name('store');
+            Route::get('{id}/edit', [ProductVariantController::class, 'edit'])->name('edit');
+            Route::put('update/{id}', [ProductVariantController::class, 'update'])->name('update');
+            Route::delete('destroy/{id}', [ProductVariantController::class, 'destroy'])->name('destroy');  
+            Route::get('variant_discontinued',[ProductVariantController::class, 'variantDiscontinued'])->name('variantDiscontinued');        
+        });                     
+// });
 

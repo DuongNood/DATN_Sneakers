@@ -10,6 +10,7 @@
 <!-- Icons -->
 <link href="{{ asset('admins/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
 
+
 <!-- Quill css -->
 <link href="{{ asset('admins/libs/quill/quill.core.js')}}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('admins/libs/quill/quill.snow.css')}}" rel="stylesheet" type="text/css" />
@@ -30,4 +31,10 @@
 
 
 <link href="{{ asset('admins/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
+
+
+<!-- Quill css -->
+<link href="{{ asset('admins/libs/quill/quill.core.js')}}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('admins/libs/quill/quill.snow.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('admins/libs/quill/quill.bubble.css')}}" rel="stylesheet" type="text/css" />
 

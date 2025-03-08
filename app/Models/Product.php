@@ -16,20 +16,37 @@ class Product extends Model
         'description',
         'image',
         'status',
-        'is_show_home','name', 'price', 'stock'
+
+        'is_show_home','name', 'price', 'stock',
+
+        'is_show_home',
+        'category_id'
+
     ];
     protected $casts =[
         'status'=>'boolean', 
         'is_show_home'=>'boolean', 
     ];
+
     
     // 🔗 Liên kết với `ProductVariant`
+
+     public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+    public function imageProduct(){
+        return $this->hasMany(Imageproduct::class);
+    
+    }
+
     public function variants()
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
     }
 
     // 🔗 Liên kết với `Category`
+
     public function category()  
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -42,4 +59,8 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
 
     }
+
+    
+    
+
 }

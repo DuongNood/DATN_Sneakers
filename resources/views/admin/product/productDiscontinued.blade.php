@@ -7,7 +7,7 @@
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
             </div>
             <a href="{{route('products.create')}}" class="btn btn-success ">Create product</a>
-            <a href="{{route('products.productDiscontinued')}}" class="btn btn-danger m-lg-1">product discontinued</a>
+            <a href="{{route('products.index')}}" class="btn btn-danger m-lg-1">products being traded</a>
         </div>
 
         <!-- start row -->
@@ -34,7 +34,7 @@
                                         <th scope="col">description</th>
                                         <th scope="col">Category_id</th>
                                         <th scope="col">Status</th>
-                                        <th scope="col">Is_show_home</th>                                       
+                                        <th scope="col">Is_show_home</th>
                                         <th scope="col">Act</th>
                                     </tr>
                                 </thead>
@@ -55,7 +55,7 @@
                                             </td>
                                             <td>
                                                 <a href="{{ route('products.edit', $item->id) }}"><i
-                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>                                             
+                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>                                              
                                             </td>
                                         </tr>
                                     @endforeach

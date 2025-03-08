@@ -132,10 +132,10 @@
                     <div class="collapse" id="sidebarError">
                         <ul class="nav-second-level">
                             <li>
-                                <a class='tp-link' href='error-404.html'>Error 404</a>
+                                <a class='tp-link' href='{{route('products.index')}}'>List Product</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='error-500.html'>Error 500</a>
+                                <a class='tp-link' href='{{route('product_variants.index')}}'>Product variants</a>
                             </li>
                             <li>
                                 <a class='tp-link' href='error-503.html'>Error 503</a>
