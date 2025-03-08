@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\admin\CategoryController;
+use App\Http\Controllers\admin\UserController;
 
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\NewsController;
@@ -20,6 +22,7 @@ use App\Http\Controllers\BannerController;
 */
 
 
+
 // Route::prefix('admins.')
 // ->as('admins.')
 // ->group(function(){
@@ -35,6 +38,7 @@ use App\Http\Controllers\BannerController;
             Route::get('category-by-product/{id}', [CategoryController::class, 'categoryByProduct'])->name('categoryByProduct');
         });          
 // });
+
 
 Route::resource('news', NewsController::class);
 // Route::resource('comments', NewsController::class);
@@ -55,4 +59,12 @@ Route::resource('banners')
 });
 Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 //
+
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::resource('users', UserController::class);
+Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
 

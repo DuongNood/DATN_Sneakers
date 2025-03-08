@@ -7,33 +7,46 @@
             <div class="logo-box">
                 <a class='logo logo-light' href='index.html'>
                     <span class="logo-sm">
-<<<<<<< HEAD
+
 
                         <img src="{{ asset('admins/images/logo-sm.png')}}" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ asset('admins/images/logo-light.png')}}" alt="" height="24">
-=======
+
                         <img src="assets/images/logo-sm.png" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="assets/images/logo-light.png" alt="" height="24">
->>>>>>> master
+
+
+                        <img src="{{ asset('admins/images/logo-sm.png') }}" alt="" height="22">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="{{ asset('admins/images/logo-light.png') }}" alt="" height="24">
+
                     </span>
                 </a>
                 <a class='logo logo-dark' href='index.html'>
                     <span class="logo-sm">
-<<<<<<< HEAD
+
+
                         <img src="{{ asset('admins/images/logo-sm.png')}}" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ asset('admins/images/logo-dark.png')}}" alt="" height="24">
-=======
+
                         <img src="assets/images/logo-sm.png" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="assets/images/logo-dark.png" alt="" height="24">
->>>>>>> master
+
+
+                        <img src="{{ asset('admins/images/logo-sm.png') }}" alt="" height="22">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="{{ asset('admins/images/logo-dark.png') }}" alt="" height="24">
+
                     </span>
                 </a>
             </div>
@@ -105,11 +118,15 @@
                 <li>
                     <a href="#sidebarError" data-bs-toggle="collapse">
                         <i data-feather="alert-octagon"></i>
-<<<<<<< HEAD
+
+
                         <span> Product </span>
-=======
+
                         <span> Error Pages </span>
->>>>>>> master
+
+
+                        <span> Product </span>
+
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarError">
@@ -133,7 +150,8 @@
                     </div>
                 </li>
 
-<<<<<<< HEAD
+
+
                
                 <li>
                     <a class='tp-link' href='{{route('categories.index')}}'>
@@ -143,139 +161,22 @@
                 </li>
 
                                 
-=======
-                <li>
-                    <a href="#sidebarExpages" data-bs-toggle="collapse">
-                        <i data-feather="file-text"></i>
-                        <span> Utility </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarExpages">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='pages-starter.html'>Starter</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-profile.html'>Profile</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-pricing.html'>Pricing</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-timeline.html'>Timeline</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-invoice.html'>Invoice</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-faqs.html'>FAQs</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-gallery.html'>Gallery</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-maintenance.html'>Maintenance</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='pages-coming-soon.html'>Coming Soon</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+
+
 
                 <li>
-                    <a class='tp-link' href='calendar.html'>
-                        <i data-feather="calendar"></i>
-                        <span> Calendar </span>
-                    </a>
-                </li>
-
-                <li class="menu-title mt-2">General</li>
-
-                <li>
-                    <a href="#sidebarBaseui" data-bs-toggle="collapse">
+                    <a class='tp-link' href='{{ route('categories.index') }}'>
                         <i data-feather="package"></i>
-                        <span> Components </span>
-                        <span class="menu-arrow"></span>
+                        <span> Category </span>
                     </a>
-                    <div class="collapse" id="sidebarBaseui">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='ui-accordions.html'>Accordions</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-alerts.html'>Alerts</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-badges.html'>Badges</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-breadcrumb.html'>Breadcrumb</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-buttons.html'>Buttons</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-cards.html'>Cards</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-collapse.html'>Collapse</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-dropdowns.html'>Dropdowns</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-video.html'>Embed Video</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-grid.html'>Grid</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-images.html'>Images</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-list.html'>List Group</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-modals.html'>Modals</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-placeholders.html'>Placeholders</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-pagination.html'>Pagination</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-popovers.html'>Popovers</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-progress.html'>Progress</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-scrollspy.html'>Scrollspy</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-spinners.html'>Spinners</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-tabs.html'>Tabs</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-tooltips.html'>Tooltips</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='ui-typography.html'>Typography</a>
-                            </li>
-                        </ul>
-                    </div>
+                </li>
+                <li>
+                    <a class='tp-link' href='{{ route('users.index') }}'>
+                        <i data-feather="package"></i>
+                        <span> User </span>
+                    </a>
                 </li>
 
-                <li>
-                    <a class='tp-link' href='widgets.html'>
-                        <i data-feather="aperture"></i>
-                        <span> Widgets </span>
-                    </a>
-                </li>
 
                 <li>
                     <a href="#sidebarAdvancedUI" data-bs-toggle="collapse">
@@ -445,9 +346,10 @@
                     </div>
                 </li>
 
->>>>>>> master
-            </ul>
 
+
+
+            </ul>
         </div>
         <!-- End Sidebar -->
 
