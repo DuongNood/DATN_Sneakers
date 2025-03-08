@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ProductController;
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\StatisticsController;
 
 // Đăng ký tài khoản
 Route::post('/register', [RegisterController::class, 'register'])->name('api.register');
@@ -35,3 +36,10 @@ Route::get('/products', [ProductController::class, 'index']);
 
 
 
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+Route::get('/statistics/total-revenue', [StatisticsController::class, 'totalRevenue']);
+Route::get('/statistics/total-orders', [StatisticsController::class, 'totalOrders']);
+Route::get('/statistics/best-selling-products', [StatisticsController::class, 'bestSellingProducts']);
+Route::get('/statistics/top-customers', [StatisticsController::class, 'topCustomers']);
