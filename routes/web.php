@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\NewsController;
@@ -32,5 +33,5 @@ use App\Http\Controllers\admin\NewsController;
 // });
 
 Route::resource('news', NewsController::class);
-// Route::resource('comments', NewsController::class);
+Route::resource('comments', CommentController::class);
 
