@@ -28,62 +28,86 @@
 
 
         <!-- Topbar Start -->
-<<<<<<< HEAD
+
+
         @include('admin.layouts.components.topbar')
         <!-- end Topbar -->
 
         <!-- Left Sidebar Start -->
         @include('admin.layouts.components.leftbar')
-=======
+
         @include('admin.layouts.componets.topbar')
         <!-- end Topbar -->
 
         <!-- Left Sidebar Start -->
         @include('admin.layouts.componets.leftbar')
->>>>>>> master
+
+
+        @include('admin.layouts.components.topbar')
+        <!-- end Topbar -->
+
+        <!-- Left Sidebar Start -->
+        @include('admin.layouts.components.leftbar')
+
         <!-- Left Sidebar End -->
 
-        <!-- ============================================================== -->
+        <!-- ====== -->
         <!-- Start Page Content here -->
-        <!-- ============================================================== -->
+        <!-- ====== -->
 
         <div class="content-page">
             <div class="content">
 
                 <!-- Start Content-->
                 @yield('content')
-<<<<<<< HEAD
+
+
                 
-=======
->>>>>>> master
+
+
+
+                
+
                 <!-- container-fluid -->
             </div> <!-- content -->
 
             <!-- Footer Start -->
-<<<<<<< HEAD
+
+
            
             <!-- end Footer -->
 
         </div>
         @include('admin.layouts.components.footer')
-=======
+
            @include('admin.layouts.componets.footer')
             <!-- end Footer -->
 
         </div>
->>>>>>> master
-        <!-- ============================================================== -->
+
+
+           
+            <!-- end Footer -->
+
+        </div>
+        @include('admin.layouts.components.footer')
+
+        <!-- ====== -->
         <!-- End Page content -->
-        <!-- ============================================================== -->
+        <!-- ====== -->
 
     </div>
     <!-- END wrapper -->
 
     @include('admin.layouts.partials.js')
-<<<<<<< HEAD
+
+
     @yield('js')
-=======
->>>>>>> master
+
+
+
+    @yield('js')
+
 
 </body>
 

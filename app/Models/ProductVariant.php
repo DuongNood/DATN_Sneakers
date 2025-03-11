@@ -19,4 +19,14 @@ class ProductVariant extends Model
     protected $casts =[
         'status'=>'boolean' 
     ];
+
+    public function orderDetails()
+    {
+        return $this->hasMany(OderDetail::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

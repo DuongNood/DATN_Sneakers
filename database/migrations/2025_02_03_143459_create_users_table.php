@@ -23,6 +23,8 @@ return new class extends Migration
             $table->foreignIdFor(Role::class)->constrained();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
