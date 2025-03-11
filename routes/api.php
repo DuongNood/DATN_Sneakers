@@ -9,6 +9,10 @@ use App\Http\Controllers\Auth\ProductController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\StatisticsController;
+use Illuminate\Http\Request;
+use App\Http\Controllers\BannerController;
+
+Route::resource('banners', BannerController::class);
 
 // Đăng ký tài khoản
 Route::post('/register', [RegisterController::class, 'register'])->name('api.register');

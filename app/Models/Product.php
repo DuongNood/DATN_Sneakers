@@ -31,10 +31,10 @@ class Product extends Model
     
     // 🔗 Liên kết với `ProductVariant`
 
-     public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
+    //  public function category()
+    // {
+    //     return $this->belongsTo(Category::class);
+    // }
     public function imageProduct(){
         return $this->hasMany(Imageproduct::class);
     

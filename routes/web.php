@@ -5,7 +5,7 @@ use App\Http\Controllers\admin\CategoryController;
 
 use App\Http\Controllers\admin\UserController;
 
-use App\Http\Controllers\admin\CategoryController;
+
 use App\Http\Controllers\admin\NewsController;
 
 
@@ -13,8 +13,7 @@ use App\Http\Controllers\BannerController;
 
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductVariantController;
-
-
+use App\Http\Controllers\StatisticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,10 +50,8 @@ Route::resource('news', NewsController::class);
 // Route::resource('comments', NewsController::class);
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::resource('banners')
+
+Route::prefix('banners')
 ->as('banners.')
 ->group(function(){
     Route::get('/', [BannerController::class, 'index'])->name('index');
@@ -67,15 +64,8 @@ Route::resource('banners')
 Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 //
 
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Route::resource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
-
-        }); 
          Route::prefix('products')
         ->as('products.')
         ->group(function(){

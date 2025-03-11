@@ -46,11 +46,6 @@ public function isStaff()
     return $this->role === 'staff';
 }
 
-    public function oder()
-    {
-        return $this->hasMany(Oder::class);
-    }
-
     public function role()
     {
         return $this->belongsTo(Role::class);
