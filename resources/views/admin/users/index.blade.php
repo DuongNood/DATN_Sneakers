@@ -56,10 +56,6 @@
                                             <td>{{ $user->created_at }}</td>
                                             <td>{{ $user->updated_at }}</td>
                                             <td>
-                                                <a class="btn btn-info"
-                                                    href="{{ route('users.show', $user) }}">SHOW</a>
-                                                <a class="btn btn-warning"
-                                                    href="{{ route('users.edit', $user) }}">EDIT</a>
                                                 <form action="{{ route('users.destroy', $user) }}" method="post">
                                                     @csrf
                                                     @method('DELETE')
@@ -68,8 +64,7 @@
                                                         onclick="return confirm('Bạn có chắc chắn muốn xóa không?')">XM</button>
                                                 </form>
 
-                                                <form action="{{ route('users.forceDestroy', $user) }}"
-                                                    method="post">
+                                                <form action="{{ route('users.forceDestroy', $user) }}" method="post">
                                                     @csrf
                                                     @method('DELETE')
 

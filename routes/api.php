@@ -47,7 +47,7 @@ Route::get('/reset-password/{token}', function ($token) {
 
 // Xử lý đặt lại mật khẩu
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
-//danh sách sản phẩmphẩm
+//danh sách sản phẩm
 Route::get('/products', [ProductController::class, 'index']);
 
 
