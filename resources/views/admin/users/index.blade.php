@@ -21,7 +21,6 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">Danh sách người dùng</h4>
             </div>
-            <a href="{{ route('users.create') }}" class="btn btn-success col-1">Create</a>
         </div>
 
         <div class="row">

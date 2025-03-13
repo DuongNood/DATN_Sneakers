@@ -33,22 +33,22 @@ class User extends Model
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-     public function oder(){
+    public function oder()
+    {
         return $this->hasMany(Oder::class);
     }
     public function isAdmin()
-{
-    return $this->role === 'admin';
-}
+    {
+        return $this->role === 'admin';
+    }
 
-public function isStaff()
-{
-    return $this->role === 'staff';
-}
+    public function isStaff()
+    {
+        return $this->role === 'staff';
+    }
 
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
-
 }

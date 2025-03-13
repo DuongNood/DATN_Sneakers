@@ -3,24 +3,20 @@
 
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\StatisticsController;
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
-
 use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\Auth\UserController;
-
-
-use Illuminate\Http\Request;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ProductController;
 
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\StatisticsController;
 
 use App\Http\Controllers\BannerController;
 
@@ -72,6 +68,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::resource('comments', CommentController::class);
 Route::resource('news', NewsController::class);
+
+// Quản lý User
+Route::apiResource('users', UserController::class);
+Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
 
 Route::get('/statistics/total-revenue', [StatisticsController::class, 'totalRevenue']);
 Route::get('/statistics/total-orders', [StatisticsController::class, 'totalOrders']);
