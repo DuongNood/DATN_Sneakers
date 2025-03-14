@@ -26,86 +26,41 @@
     <!-- Begin page -->
     <div id="app-layout">
 
-
         <!-- Topbar Start -->
-
-
         @include('admin.layouts.components.topbar')
         <!-- end Topbar -->
 
         <!-- Left Sidebar Start -->
         @include('admin.layouts.components.leftbar')
-
-        @include('admin.layouts.componets.topbar')
-        <!-- end Topbar -->
-
-        <!-- Left Sidebar Start -->
-        @include('admin.layouts.componets.leftbar')
-
-
-        @include('admin.layouts.components.topbar')
-        <!-- end Topbar -->
-
-        <!-- Left Sidebar Start -->
-        @include('admin.layouts.components.leftbar')
-
         <!-- Left Sidebar End -->
 
-        <!-- ====== -->
-        <!-- Start Page Content here -->
-        <!-- ====== -->
-
-        <div class="content-page">
+        <!-- ============================================================== -->
+         <!-- Start Page Content here -->
+         <!-- ============================================================== -->
+ 
+         <div class="content-page">
             <div class="content">
 
                 <!-- Start Content-->
                 @yield('content')
-
-
-                
-
-
-
-                
 
                 <!-- container-fluid -->
             </div> <!-- content -->
 
             <!-- Footer Start -->
 
-
-           
             <!-- end Footer -->
 
         </div>
         @include('admin.layouts.components.footer')
-
-           @include('admin.layouts.componets.footer')
-            <!-- end Footer -->
-
-        </div>
-
-
-           
-            <!-- end Footer -->
-
-        </div>
-        @include('admin.layouts.components.footer')
-
-        <!-- ====== -->
+        <!-- ============================================================== -->
         <!-- End Page content -->
-        <!-- ====== -->
+        <!-- ============================================================== -->
 
     </div>
     <!-- END wrapper -->
 
     @include('admin.layouts.partials.js')
-
-
-    @yield('js')
-
-
-
     @yield('js')
 
 
