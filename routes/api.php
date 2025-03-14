@@ -60,7 +60,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Lấy thông tin người dùng
     // Route::get('/user', [UserController::class, 'getUser'])->name('api.user');
 });
+
+// route cảu bình luận
 Route::resource('comments', CommentController::class);
+// lấy ra bình luận theo id sản phẩm 
+Route::get('getCmtByProductId/{Product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
+// route tin tức
 Route::resource('news', NewsController::class);
 
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -89,7 +90,26 @@ class CommentController extends Controller
             return response()->json([
                 'message' => 'KHông tồn tại cmt có id=' . $id
             ], 404);
-    
+        }
+        try {
+
+            $data['status'] ??= 0;
+
+            $comment->update($data);
+
+            return response()->json($comment);
+
+        } catch (\Throwable $th) {
+
+           Log::error(
+                __CLASS__ . '@' . __FUNCTION__,
+                ['error' => $th->getMessage()]
+            );
+
+            return response()->json([
+                'message' => 'Loi he thong ' . $th
+            ], 500);
+
         }
     }
 
@@ -102,5 +122,22 @@ class CommentController extends Controller
 
         return response()->json([], 204);
 
+    }
+    public function getCmtByProductId(Product $product){
+
+        $comments = Comment::where('product_id', $product->id)->get();
+
+        if (!$comments->isEmpty()) {
+            return response()->json([
+                'status' =>true,
+                'message' => 'Hiển thị thành công',
+                'data' => $comments
+            ]);
+        }
+        
+        return response()->json([
+            'status' => false,
+            'message' => 'không tìm thấy dữ liệu bản ghi có id sản phẩm = ' . $product->id
+        ], 404);
     }
 }
