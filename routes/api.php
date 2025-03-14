@@ -36,7 +36,6 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:san
 // Đổi mật khẩu khi đã đăng nhập
 Route::post('/change-password', [ChangePasswordController::class, 'changePassword'])
     ->middleware('auth:sanctum')->name('api.change-password');
-
 // Gửi email đặt lại mật khẩu
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 
@@ -55,9 +54,6 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-
-
 // Đăng nhập
 Route::post('/login', [LoginController::class, 'login'])->name('api.login');
 
@@ -65,14 +61,11 @@ Route::post('/login', [LoginController::class, 'login'])->name('api.login');
 Route::middleware('auth:sanctum')->group(function () {
     // Đăng xuất
     Route::post('/logout', [LogoutController::class, 'logout'])->name('api.logout');
- 
     // Lấy thông tin người dùng
     // Route::get('/user', [UserController::class, 'getUser'])->name('api.user');
 });
-
 Route::resource('comments', CommentController::class);
 Route::resource('news', NewsController::class);
-
 Route::get('/statistics/total-revenue', [StatisticsController::class, 'totalRevenue']);
 Route::get('/statistics/total-orders', [StatisticsController::class, 'totalOrders']);
 Route::get('/statistics/best-selling-products', [StatisticsController::class, 'bestSellingProducts']);

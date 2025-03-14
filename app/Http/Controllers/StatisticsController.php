@@ -19,7 +19,6 @@ class StatisticsController extends Controller
 
         
         $totalOrders = Order::count();
-
         
         $bestSellingProducts = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
             ->groupBy('product_id')

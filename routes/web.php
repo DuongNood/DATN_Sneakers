@@ -49,9 +49,6 @@ use App\Http\Controllers\StatisticsController;
 
 Route::resource('news', NewsController::class);
 Route::resource('comments', CommentController::class);
-
-
-
 Route::prefix('banners')
 ->as('banners.')
 ->group(function(){
@@ -63,8 +60,6 @@ Route::prefix('banners')
     Route::delete('destroy/{id}', [BannerController::class, 'destroy'])->name('destroy');
 });
 Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
-//
-
 Route::resource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
          Route::prefix('products')
