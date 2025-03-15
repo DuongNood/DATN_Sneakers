@@ -38,14 +38,20 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        User::destroy($id);
-        return response()->json([], 204);
+        
     }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
+    {
+        User::destroy($id);
+        
+        return response()->json([], 204);
+    }
+
+    public function forceDestroy(string $id)
     {
         $user = User::find($id);
 
