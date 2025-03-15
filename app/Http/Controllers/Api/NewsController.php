@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
@@ -27,7 +29,41 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required',
+            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
+            'content' => 'required'
+        ]);
+
+        try {
+            if ($request->hasFile('image')) {
+                $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
+
+            }
+
+            News::query()->create($data);
+            // dd($data);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Thêm mới tin tức thành công',
+                'data' => $data
+            ], 201);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            if (!empty($data['image']) && Storage::exists($data['image'])) {
+                Storage::dick('public')->delete($data['image']);
+            }
+            Log::error(
+                __CLASS__ . '@' . __FUNCTION__,
+                ['error' => $th->getMessage()]
+            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi hệ thống ' . $th 
+            ], 500);
+        }
     }
 
     /**
@@ -62,6 +98,8 @@ class NewsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        News::destroy($id);
+
+        return response()->json([], 204);
     }
 }

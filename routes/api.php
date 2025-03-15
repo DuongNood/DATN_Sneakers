@@ -64,7 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // route cảu bình luận
 Route::resource('comments', CommentController::class);
 // lấy ra bình luận theo id sản phẩm 
-Route::get('getCmtByProductId/{Product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
+Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
 // route tin tức
 Route::resource('news', NewsController::class);
 

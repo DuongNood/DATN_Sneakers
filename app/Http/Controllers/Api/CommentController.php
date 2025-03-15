@@ -31,8 +31,8 @@ class CommentController extends Controller
     {
         //
         $data = $request->validate([
-            'user_id' => 'required|exists:users,id',    
-            'product_id' => 'required|exists:products,id',    
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
             'content' => 'required',
             'status' => 'nullable|in:0,1'
         ]);
@@ -78,8 +78,8 @@ class CommentController extends Controller
     public function update(Request $request, string $id)
     {
         $data = $request->validate([
-            'user_id' => 'required|exists:users,id',    
-            'product_id' => 'required|exists:products,id',    
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
             'content' => 'required',
             'status' => 'nullable|in:0,1'
         ]);
@@ -93,7 +93,7 @@ class CommentController extends Controller
         }
         try {
 
-            $data['status'] ??= 0;
+            // $data['status'] ??= 0;
 
             $comment->update($data);
 
@@ -101,7 +101,7 @@ class CommentController extends Controller
 
         } catch (\Throwable $th) {
 
-           Log::error(
+            Log::error(
                 __CLASS__ . '@' . __FUNCTION__,
                 ['error' => $th->getMessage()]
             );
@@ -123,21 +123,30 @@ class CommentController extends Controller
         return response()->json([], 204);
 
     }
-    public function getCmtByProductId(Product $product){
+    public function getCmtByProductId(Product $product)
+    {
 
-        $comments = Comment::where('product_id', $product->id)->get();
+        try {
+            $comments = Comment::where('product_id', $product->id)->get();
 
-        if (!$comments->isEmpty()) {
+            if ($comments->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'không tìm thấy dữ liệu bản ghi có id sản phẩm = ' . $product->id
+                ], 404);
+            }
             return response()->json([
-                'status' =>true,
+                'status' => true,
                 'message' => 'Hiển thị thành công',
                 'data' => $comments
             ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi hệ thống: ' . $th->getMessage()
+            ], 500);
         }
-        
-        return response()->json([
-            'status' => false,
-            'message' => 'không tìm thấy dữ liệu bản ghi có id sản phẩm = ' . $product->id
-        ], 404);
+
     }
 }
