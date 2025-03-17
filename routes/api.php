@@ -29,7 +29,7 @@ Route::post('/register', [RegisterController::class, 'register'])->name('api.reg
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
 
-// Đổi mật khẩu khi đã đăng nhập
+// Đổi mật khẩu
 Route::post('/change-password', [ChangePasswordController::class, 'changePassword'])
     ->middleware('auth:sanctum')->name('api.change-password');
 // Gửi email đặt lại mật khẩu
@@ -50,16 +50,16 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-// Đăng nhập
-Route::post('/login', [LoginController::class, 'login'])->name('api.login');
+// // Đăng nhập
+// Route::post('/login', [LoginController::class, 'login'])->name('api.login');
 
-// Các route yêu cầu xác thực
-Route::middleware('auth:sanctum')->group(function () {
-    // Đăng xuất
-    Route::post('/logout', [LogoutController::class, 'logout'])->name('api.logout');
-    // Lấy thông tin người dùng
-    // Route::get('/user', [UserController::class, 'getUser'])->name('api.user');
-});
+// // Các route yêu cầu xác thực
+// Route::middleware('auth:sanctum')->group(function () {
+//     // Đăng xuất
+//     Route::post('/logout', [LogoutController::class, 'logout'])->name('api.logout');
+//     // Lấy thông tin người dùng
+//     // Route::get('/user', [UserController::class, 'getUser'])->name('api.user');
+// });
 
 // route cảu bình luận
 Route::resource('comments', CommentController::class);

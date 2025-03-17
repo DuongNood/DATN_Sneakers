@@ -13,39 +13,41 @@ use Illuminate\Validation\Rules;
 class RegisterController extends Controller
 {
     public function register(Request $request)
-    {
-        // Xác thực dữ liệu đầu vào
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'email_verified_at' => 'nullable|date',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'remember_token' => 'nullable|string|max:100',
-            'created_at' => 'nullable|date',
-            'updated_at' => 'nullable|date',
-        ]);
+{
+    // Xác thực dữ liệu đầu vào
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'email_verified_at' => 'nullable|date',
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        'role_id' => 'required|integer|exists:roles,id', // Thêm role_id
+        'remember_token' => 'nullable|string|max:100',
+        'created_at' => 'nullable|date',
+        'updated_at' => 'nullable|date',
+    ]);
+    
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Dữ liệu không hợp lệ',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        // Tạo user mới
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'email_verified_at' => $request->email_verified_at,
-            'password' => Hash::make($request->password),
-            'remember_token' => $request->remember_token ?? Str::random(10),
-            'created_at' => $request->created_at ?? now(),
-            'updated_at' => $request->updated_at ?? now(),
-        ]);
-
+    if ($validator->fails()) {
         return response()->json([
-            'message' => 'Đăng ký thành công!',
-            'user' => $user
-        ], 201);
+            'message' => 'Dữ liệu không hợp lệ',
+            'errors' => $validator->errors()
+        ], 422);
     }
+
+    // Tạo user mới
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'email_verified_at' => $request->email_verified_at,
+        'password' => Hash::make($request->password),
+        'role_id' => $request->role_id, // ✅ Thêm role_id
+        'remember_token' => Str::random(10),
+    ]);
+
+    return response()->json([
+        'message' => 'Đăng ký thành công!',
+        'user' => $user
+    ], 201);
+}
+
 }
