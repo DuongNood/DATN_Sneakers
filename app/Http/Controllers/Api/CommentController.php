@@ -91,6 +91,7 @@ class CommentController extends Controller
                 'message' => 'KHông tồn tại cmt có id=' . $id
             ], 404);
         }
+        
         try {
 
             // $data['status'] ??= 0;
@@ -132,7 +133,7 @@ class CommentController extends Controller
             if ($comments->isEmpty()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'không tìm thấy dữ liệu bản ghi có id sản phẩm = ' . $product->id
+                    'message' => 'không tìm thấy dữ liệu bản ghi có id bình luận  = ' . $product->id
                 ], 404);
             }
             return response()->json([

@@ -38,9 +38,7 @@ class NewsController extends Controller
         try {
             if ($request->hasFile('image')) {
                 $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
-
             }
-
             News::query()->create($data);
             // dd($data);
 
@@ -90,7 +88,57 @@ class NewsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required',
+            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
+            'content' => 'required'
+        ]);
+
+        $news = News::find($id);
+
+        if (!$news) {
+            return response()->json([
+                'message' => 'KHông tồn tại tin tức có id=' . $id
+            ], 404);
+        }
+
+        try {
+            if ($request->hasFile('image')) {
+                $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
+            }
+
+            $curentImage = $news->image;
+
+            News::query()->update($data);
+            // dd($data);
+            if (
+                $request->hasFile('image')
+                && !empty($curentImage)
+                && Storage::exists($curentImage)
+            ) {
+                Storage::delete($curentImage);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cập nhật tin tức thành công',
+                'data' => $news
+            ], 201);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            if (!empty($data['image']) && Storage::exists($data['image'])) {
+                Storage::dick('public')->delete($data['image']);
+            }
+            Log::error(
+                __CLASS__ . '@' . __FUNCTION__,
+                ['error' => $th->getMessage()]
+            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi hệ thống ' . $th 
+            ], 500);
+        }
     }
 
     /**
