@@ -32,7 +32,7 @@ const Header = () => {
             </div>
           </div>
 
-          <Link to='/sale' className='nav-link'>
+          <Link to='/product-sale' className='nav-link'>
             Sale
           </Link>
           <Link to='/ho-tro' className='nav-link'>
@@ -105,7 +105,7 @@ const Header = () => {
               )}
             </div>
 
-            <Link to='/sale' className='mobile-nav-link'>
+            <Link to='/product-sale' className='mobile-nav-link'>
               Sale
             </Link>
             <Link to='/ho-tro' className='mobile-nav-link'>

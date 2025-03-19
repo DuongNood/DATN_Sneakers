@@ -8,6 +8,10 @@ import ContactPage from '../components/contact'
 import Banner from '../components/Banner'
 import Legit from '../components/Letgit'
 import TitleWithEffect from '../components/TitleProduct'
+import ProductList from '../pages/ProductList'
+import TitleWithEffect1 from '../components/TitleProduct1'
+import ProductHot from '../pages/ProductHot'
+import ProductSale from '../pages/ProductSale'
 
 const RoutesConfig = () => {
   return (
@@ -16,10 +20,14 @@ const RoutesConfig = () => {
       <Banner />
       <Legit />
       <TitleWithEffect />
+      <ProductList />
+      <TitleWithEffect1 />
+      <ProductHot />
       <Routes>
         <Route path='/' />
-        <Route path='/product' element={<h1>Sản phẩm</h1>} />
+        <Route path='/product-detail' element={<h1>Sản phẩm</h1>} />
         <Route path='/gioi-thieu' element={<h1>Giới thiệu</h1>} />
+        <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />

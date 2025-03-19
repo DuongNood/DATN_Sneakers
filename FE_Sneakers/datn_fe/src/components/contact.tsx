@@ -25,9 +25,8 @@ const ContactPage = () => {
         transition={{ duration: 0.8, ease: 'easeInOut' }}
         className='flex flex-col md:flex-row bg-white shadow-lg rounded-xl overflow-hidden w-full max-w-5xl'
       >
-        {/* Form liên hệ */}
         <div className='w-full md:w-1/2 p-8 flex flex-col justify-center'>
-          <h2 className='text-3xl font-bold text-gray-900 mb-6 text-center'>Liên hệ với chúng tôi</h2>
+          <h2 className='text-3xl font-bold text-gray-900 mb-6 text-center'>Liên hệ với các bố</h2>
 
           <form onSubmit={handleSubmit} className='space-y-5'>
             <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
