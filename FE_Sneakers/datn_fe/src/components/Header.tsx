@@ -111,7 +111,7 @@ const Header = () => {
             <Link to='/ho-tro' className='mobile-nav-link'>
               Tin tức
             </Link>
-            <Link to='/lien-he' className='mobile-nav-link'>
+            <Link to='/contact' className='mobile-nav-link'>
               Liên hệ
             </Link>
 
