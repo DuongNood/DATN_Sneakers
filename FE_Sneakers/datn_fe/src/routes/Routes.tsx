@@ -6,12 +6,16 @@ import Login from '../pages/Login'
 import Cart from '../pages/Cart'
 import ContactPage from '../components/contact'
 import Banner from '../components/Banner'
+import Legit from '../components/Letgit'
+import TitleWithEffect from '../components/TitleProduct'
 
 const RoutesConfig = () => {
   return (
     <>
       <Header />
       <Banner />
+      <Legit />
+      <TitleWithEffect />
       <Routes>
         <Route path='/' />
         <Route path='/product' element={<h1>Sản phẩm</h1>} />
