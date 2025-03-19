@@ -87,3 +87,4 @@ Route::prefix('product_variants')
         Route::get('variant_discontinued', [ProductVariantController::class, 'variantDiscontinued'])->name('variantDiscontinued');
     });                     
 // });
+    
