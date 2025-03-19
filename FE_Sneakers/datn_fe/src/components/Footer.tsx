@@ -1,6 +1,30 @@
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const Footer = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    const email = event.target.elements.email.value
+
+    const formData = new URLSearchParams()
+    formData.append('entry.873095472', email)
+
+    fetch('https://docs.google.com/forms/d/e/1FAIpQLScPO7qu7vfekGcxPL2J3hgwU7XB3QQIfKW7y0hj0rPBbzG2Cw/formResponse', {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors'
+    })
+      .then(() => {
+        toast.success('Đăng ký nhận tin thành công!', {
+          autoClose: 1000
+        })
+      })
+      .catch((error) => {
+        console.error('Lỗi gửi dữ liệu:', error)
+      })
+
+    event.target.reset()
+  }
   return (
     <footer className='bg-gray-900 text-gray-300 py-12'>
       <div className='container mx-auto px-6 md:px-12'>
@@ -56,14 +80,21 @@ const Footer = () => {
             <h3 className='text-lg font-semibold text-white mb-4'>Đăng ký nhận tin</h3>
             <p className='text-sm mb-3'>Nhận thông tin mới nhất về sản phẩm & khuyến mãi.</p>
             <div className='flex'>
-              <input
-                type='email'
-                placeholder='Nhập email...'
-                className='w-full p-2 text-gray-900 rounded-l-md focus:outline-none'
-              />
-              <button className='bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-r-md transition'>
-                Gửi
-              </button>
+              <form className='flex' onSubmit={handleSubmit}>
+                <input
+                  type='email'
+                  name='email'
+                  required
+                  placeholder='Nhập email...'
+                  className='w-full p-2 text-gray-900 rounded-l-md focus:outline-none'
+                />
+                <button
+                  type='submit'
+                  className='bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-r-md transition'
+                >
+                  Gửi
+                </button>
+              </form>
             </div>
           </div>
         </div>

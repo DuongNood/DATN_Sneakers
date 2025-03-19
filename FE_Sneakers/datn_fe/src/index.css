@@ -27,3 +27,18 @@ body {
 .mobile-nav-link {
   @apply text-gray-600 font-medium text-lg transition-colors duration-300 hover:text-gray-900;
 }
+/* human ca rô u sel */
+/* App.css */
+/* App.css */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
