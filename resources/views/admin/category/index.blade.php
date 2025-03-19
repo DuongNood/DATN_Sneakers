@@ -43,9 +43,6 @@
                                         <th scope="col">Category_name</th>
                                         <th scope="col">image</th>
                                         <th scope="col">Status</th>
-
-                                        <th scope="col">act</th>
-
                                         <th scope="col">Act</th>
 
                                     </tr>
@@ -55,12 +52,7 @@
                                         <tr>
                                             <th scope="row">{{$item->id}}</th>
                                             <td>{{$item->category_name}}</td>
-
-                                            <td>{{$item->image}}</td>
-                                            <td>{{$item->status}}</td>
-                                            <td>{{$item->id}}</td>
-
-                                            <td><img src="{{Storage::url($item->image)}}" alt="" width="150px"></td>
+                                            <td><img src="{{Storage::url($item->image)}}" alt="" width="150px"></td>                                           
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
                                             </td>
