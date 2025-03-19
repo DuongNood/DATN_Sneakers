@@ -1,26 +1,26 @@
 <?php
 
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BannerController;
-use App\Http\Controllers\api\HomeController;
-
+use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\api\DetailController;
-
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Api\CommentController;
-use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\Auth\ProductController;
-
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Api\StatisticsController;
 
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
+
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\ProductController;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\OrderController;
+
 
 Route::resource('banners', BannerController::class);
 
@@ -81,6 +81,8 @@ Route::get('/statistics/total-orders', [StatisticsController::class, 'totalOrder
 Route::get('/statistics/best-selling-products', [StatisticsController::class, 'bestSellingProducts']);
 Route::get('/statistics/top-customers', [StatisticsController::class, 'topCustomers']);
 
-Route::get('/home-products', [HomeController::class, 'getHomeProducts'])->name('home-products');
-Route::get('/deatil-product/{id}', [DetailController::class, 'getProductDetail'])->name('deatil-product');
-
+// mua hàng
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/orders/buy/{variant_id}', [OrderController::class, 'buyProduct']);
+    Route::put('/orders/confirm/{order_id}', [OrderController::class, 'confirmOrder']);
+});
