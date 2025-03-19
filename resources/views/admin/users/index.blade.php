@@ -21,7 +21,6 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">Danh sách người dùng</h4>
             </div>
-            <a href="{{ route('users.create') }}" class="btn btn-success col-1">Create</a>
         </div>
 
         <div class="row">
@@ -56,10 +55,6 @@
                                             <td>{{ $user->created_at }}</td>
                                             <td>{{ $user->updated_at }}</td>
                                             <td>
-                                                <a class="btn btn-info"
-                                                    href="{{ route('users.show', $user) }}">SHOW</a>
-                                                <a class="btn btn-warning"
-                                                    href="{{ route('users.edit', $user) }}">EDIT</a>
                                                 <form action="{{ route('users.destroy', $user) }}" method="post">
                                                     @csrf
                                                     @method('DELETE')
@@ -68,8 +63,7 @@
                                                         onclick="return confirm('Bạn có chắc chắn muốn xóa không?')">XM</button>
                                                 </form>
 
-                                                <form action="{{ route('users.forceDestroy', $user) }}"
-                                                    method="post">
+                                                <form action="{{ route('users.forceDestroy', $user) }}" method="post">
                                                     @csrf
                                                     @method('DELETE')
 

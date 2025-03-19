@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -26,8 +27,10 @@ class CategoryController extends Controller
     public function create()
     {
         //
+
         $title = "Category";
         return view('admin.category.create',compact('title'));
+
     }
 
     /**
@@ -36,11 +39,14 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         //
+
        
         $params = $request->validate([
             'category_name'=> 'required|max:255|unique:categories',
         ]);
-        $params['status'] = $request->status ? 1 : 0;
+        if ($request->has('status')) {
+            $params['status'] = 1;
+        } 
         
         if($request->hasFile('image')){
                 $params['image'] =$request->file('image')->store('uploads/category', 'public');
@@ -49,6 +55,7 @@ class CategoryController extends Controller
         }
         Category::create($params);
         return redirect()->route('categories.index')->with('success', 'Add new Success List!');
+
 
     }
 
@@ -66,6 +73,7 @@ class CategoryController extends Controller
     public function edit(string $id)
     {
         //
+
         $title = "Category";
         $category = Category::find($id);
         return view('admin.category.edit',compact('title','category'));
@@ -77,6 +85,7 @@ class CategoryController extends Controller
     public function update(Request $request, string $id)
     {
         //
+
         
         $category = Category::find($id);
 
@@ -90,9 +99,12 @@ class CategoryController extends Controller
             'status' => 'required|in:0,1'
         ]);
         if($request->hasFile('image')){
-                $param['image'] =$request->file('image')->store('uploads/category', 'public');
+                if ($category->image && Storage::disk('public')->exists($category->image)) {
+                Storage::disk('public')->delete($category->image);
+            }
+            $param['image'] = $request->file('image')->store('uploads/category', 'public');
         }else{
-                $param['image'] =null;
+               $param['image'] = $category->image;
         }
         $param['status'] = $request->status ? 1 : 0;
 
@@ -100,6 +112,7 @@ class CategoryController extends Controller
         $category->update($param);
 
         return redirect()->route('categories.index')->with('success', 'Update List Successfully!');
+
     }
 
     /**
@@ -108,6 +121,7 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         //
+
         $category = Category::find($id);
         if (!$category) {
             return redirect()->route('categories.index')->with('error', 'Danh Mục Không Tồn Tại!');
@@ -118,5 +132,6 @@ class CategoryController extends Controller
         // }
         $category->delete();
         return redirect()->route('categories.index')->with('success', 'Xóa Danh Mục Thành Công!');
+
     }
 }

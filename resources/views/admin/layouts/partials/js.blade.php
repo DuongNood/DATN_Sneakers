@@ -1,4 +1,5 @@
 <!-- Vendor -->
+
 <script src="{{ asset('admins/libs/jquery/jquery.min.js')}}"></script>
 <script src="{{ asset('admins/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 <script src="{{ asset('admins/libs/simplebar/simplebar.min.js')}}"></script>
@@ -11,9 +12,10 @@
 <script src="{{ asset('admins/libs/apexcharts/apexcharts.min.js')}}"></script>
 
 <!-- for basic area chart -->
-<script src="../../../apexcharts.com/samples/assets/stock-prices.js"></script>
+<script src="../../../../apexcharts.com/samples/assets/stock-prices.js"></script>
 
 <!-- Widgets Init Js -->
+
 <script src="{{ asset('admins/js/pages/analytics-dashboard.init.js')}}"></script>
 
 <!-- App js-->

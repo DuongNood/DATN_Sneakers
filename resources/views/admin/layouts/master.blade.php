@@ -26,7 +26,6 @@
     <!-- Begin page -->
     <div id="app-layout">
 
-
         <!-- Topbar Start -->
         @include('admin.layouts.components.topbar')
         <!-- end Topbar -->
@@ -36,20 +35,20 @@
         <!-- Left Sidebar End -->
 
         <!-- ============================================================== -->
-        <!-- Start Page Content here -->
-        <!-- ============================================================== -->
-
-        <div class="content-page">
+         <!-- Start Page Content here -->
+         <!-- ============================================================== -->
+ 
+         <div class="content-page">
             <div class="content">
 
                 <!-- Start Content-->
                 @yield('content')
-                
+
                 <!-- container-fluid -->
             </div> <!-- content -->
 
             <!-- Footer Start -->
-           
+
             <!-- end Footer -->
 
         </div>
@@ -63,6 +62,7 @@
 
     @include('admin.layouts.partials.js')
     @yield('js')
+
 
 </body>
 

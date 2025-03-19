@@ -4,6 +4,18 @@
 
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
+
+                <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
+            </div>
+        </div>
+
+        <!-- start row -->
+        <div class="row">                     <!-- Basic Example -->
+            <div class="col-xl-12">
+                <div class="card">                   
+                    <div class="card-body">
+                        <div class="table-responsive">
+
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>              
             </div>
             <a href="{{route('categories.create')}}" class="btn btn-success col-1">Create</a>
@@ -23,6 +35,7 @@
                                     </button>
                                 </div>
                             @endif
+
                             <table class="table mb-0">
                                 <thead>
                                     <tr>
@@ -30,7 +43,11 @@
                                         <th scope="col">Category_name</th>
                                         <th scope="col">image</th>
                                         <th scope="col">Status</th>
+
+                                        <th scope="col">act</th>
+
                                         <th scope="col">Act</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,6 +55,11 @@
                                         <tr>
                                             <th scope="row">{{$item->id}}</th>
                                             <td>{{$item->category_name}}</td>
+
+                                            <td>{{$item->image}}</td>
+                                            <td>{{$item->status}}</td>
+                                            <td>{{$item->id}}</td>
+
                                             <td><img src="{{Storage::url($item->image)}}" alt="" width="150px"></td>
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
@@ -53,6 +75,7 @@
                                                         </button>
                                                     </form>
                                             </td>
+
                                         </tr> 
                                     @endforeach
 
