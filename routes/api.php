@@ -1,25 +1,27 @@
 <?php
 
 
-use App\Http\Controllers\Api\CommentController;
-use App\Http\Controllers\Api\NewsController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\StatisticsController;
-
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\LogoutController;
-
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ChangePasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\ProductController;
-
+use App\Http\Controllers\api\DetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\BannerController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\BannerController;
+
+use App\Http\Controllers\api\HomeController;
+use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\UserController;
+
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\ProductController;
+
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Api\StatisticsController;
+
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 
 Route::resource('banners', BannerController::class);
@@ -86,3 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/buy/{variant_id}', [OrderController::class, 'buyProduct']);
     Route::put('/orders/confirm/{order_id}', [OrderController::class, 'confirmOrder']);
 });
+Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
+Route::get('/deatil-product/{id}', [DetailController::class, 'getProductDetail']);
+Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
