@@ -176,7 +176,18 @@
                         <span> User </span>
                     </a>
                 </li>
-
+                <li>
+                    <a class='tp-link' href='{{ route('comments.index') }}'>
+                        <i data-feather="package"></i>
+                        <span> Comments </span>
+                    </a>
+                </li>
+                <li>
+                    <a class='tp-link' href='{{ route('news.index') }}'>
+                        <i data-feather="package"></i>
+                        <span> News </span>
+                    </a>
+                </li>
 
                 <li>
                     <a href="#sidebarAdvancedUI" data-bs-toggle="collapse">
