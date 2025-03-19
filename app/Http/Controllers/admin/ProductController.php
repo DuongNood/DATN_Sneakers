@@ -4,11 +4,12 @@ namespace App\Http\Controllers\admin;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ImageProduct;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
-use App\Models\ImageProduct;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductController extends Controller
 {
@@ -39,35 +40,44 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        //
+        $params = $request->except('_token');
         
-            $params = $request->except('_token');
-           
-            if ($request->has('status')) {
+        // Xử lý status
+         if ($request->has('status')) {
             $params['status'] = 1;
             } 
+        
 
-            if($request->hasFile('image')){
-                $params['image'] =$request->file('image')->store('uploads/product', 'public');
-            }else{
-                $params['image'] =null;
+        // 👉 Upload ảnh chính lên Cloudinary
+        if ($request->hasFile('image')) {
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            if ($uploadedFileUrl) {
+                $params['image'] = $uploadedFileUrl;
+            } else {
+                $params['image'] = null;
             }
-            
-            $product = Product::create($params);
-            //lay id sp vua create
-            $productID = $product->id;
-            if($request->has('list_image')){
-                foreach($request->file('list_image') as $image){
-                    if($image){
-                        $path = $image->store('uploads/ablum_product/id_'.$productID, 'public');
-                        $product->imageProduct()->create(
-                            ['product_id'=>$productID,
-                            'image_product'=>$path,]);
-                    }
+        }
+        
+        // Tạo sản phẩm mới
+        $product = Product::create($params);
+
+        // Lấy ID của sản phẩm vừa tạo
+        $productID = $product->id;
+
+        // 👉 Upload danh sách ảnh lên Cloudinary
+        if ($request->hasFile('list_image')) {
+            foreach ($request->file('list_image') as $image) {
+                if ($image) {
+                    $uploadedFileUrl = Cloudinary::upload($image->getRealPath())->getSecurePath();
+                    $product->imageProduct()->create([
+                        'product_id' => $productID,
+                        'image_product' => $uploadedFileUrl,
+                    ]);
                 }
             }
-            return redirect()->route('products.index')->with('success', 'Successfully added new product');
-        
+        }
+
+        return redirect()->route('products.index')->with('success', 'Successfully added new product');
     }
 
     /**
@@ -94,72 +104,79 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      */
     public function update(ProductRequest $request, string $id)
-    {
-       
-        // Lấy tất cả dữ liệu trừ `_token` và `_method`
-        $params = $request->except('_token', '_method');
+{
+    // Lấy tất cả dữ liệu trừ `_token` và `_method`
+    $params = $request->except('_token', '_method');
 
-        // Tìm sản phẩm theo ID
-        $product = Product::findOrFail($id);
+    // Tìm sản phẩm theo ID
+    $product = Product::findOrFail($id);
 
-        // Xử lý ảnh đại diện
-        if ($request->hasFile('image')) {
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $params['image'] = $request->file('image')->store('uploads/product', 'public');
-        } else {
-            $params['image'] = $product->image;
+    // Xử lý ảnh đại diện (upload lên Cloudinary)
+    if ($request->hasFile('image')) {
+        // Xóa ảnh cũ trên Cloudinary nếu có
+        if ($product->image) {
+            Cloudinary::destroy($product->image);
         }
 
-        // Xử lý ảnh album (list_image)
-        $currentImages = $product->imageProduct()->pluck('id')->toArray();
-        $arrayCombine = array_combine($currentImages, $currentImages);
+        // Upload ảnh mới lên Cloudinary
+        $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+        $params['image'] = $uploadedFileUrl;
+    } else {
+        $params['image'] = $product->image;
+    }
 
-        // Kiểm tra nếu `list_image` không tồn tại trong request, gán thành mảng rỗng để tránh lỗi
-        $listImages = $request->list_image ?? [];
+    // Xử lý ảnh album (list_image)
+    $currentImages = $product->imageProduct()->pluck('id')->toArray();
+    $arrayCombine = array_combine($currentImages, $currentImages);
 
-        // Xóa ảnh không còn trong danh sách `list_image`
-        foreach ($arrayCombine as $key => $value) {
-            if (!array_key_exists($key, $listImages)) {
-                $hinhAnhSp = ImageProduct::find($key);
-                if ($hinhAnhSp && Storage::disk('public')->exists($hinhAnhSp->image_product)) {
-                    Storage::disk('public')->delete($hinhAnhSp->image_product);
-                }
-                if ($hinhAnhSp) {
-                    $hinhAnhSp->delete();
-                }
+    // Kiểm tra nếu `list_image` không tồn tại trong request, gán thành mảng rỗng để tránh lỗi
+    $listImages = $request->list_image ?? [];
+
+    // Xóa ảnh không còn trong danh sách `list_image`
+    foreach ($arrayCombine as $key => $value) {
+        if (!array_key_exists($key, $listImages)) {
+            $hinhAnhSp = ImageProduct::find($key);
+            if ($hinhAnhSp) {
+                // Xóa ảnh trên Cloudinary nếu tồn tại
+                Cloudinary::destroy($hinhAnhSp->image_product);
+                $hinhAnhSp->delete();
             }
         }
+    }
 
-        // Thêm hoặc cập nhật ảnh mới vào album
-        foreach ($listImages as $key => $image) {
-            if (!array_key_exists($key, $arrayCombine)) { 
-                // Nếu là ảnh mới
-                if ($request->hasFile("list_image.$key")) {
-                    $path = $image->store('uploads/ablum_product/id_'.$id, 'public');
-                    $product->imageProduct()->create([
-                        'san_pham_id' => $id,
-                        'image_product' => $path
-                    ]);
-                }
-            } elseif (is_file($image) && $request->hasFile("list_image.$key")) {
-                // Nếu là ảnh đã tồn tại và cần cập nhật
-                $hinhAnhSp = ImageProduct::find($key);
-                if ($hinhAnhSp && Storage::disk('public')->exists($hinhAnhSp->image_product)) {
-                    Storage::disk('public')->delete($hinhAnhSp->image_product);
-                }
-                $path = $image->store('uploads/ablum_product/id_'.$id, 'public');
+    // Thêm hoặc cập nhật ảnh mới vào album
+    foreach ($listImages as $key => $image) {
+        if (!array_key_exists($key, $arrayCombine)) { 
+            // Nếu là ảnh mới
+            if ($request->hasFile("list_image.$key")) {
+                $uploadedFileUrl = Cloudinary::upload($request->file("list_image.$key")->getRealPath())->getSecurePath();
+                $product->imageProduct()->create([
+                    'product_id' => $id,
+                    'image_product' => $uploadedFileUrl
+                ]);
+            }
+        } elseif (is_file($image) && $request->hasFile("list_image.$key")) {
+            // Nếu là ảnh đã tồn tại và cần cập nhật
+            $hinhAnhSp = ImageProduct::find($key);
+            if ($hinhAnhSp) {
+                // Xóa ảnh cũ trên Cloudinary
+                Cloudinary::destroy($hinhAnhSp->image_product);
+
+                // Upload ảnh mới lên Cloudinary
+                $uploadedFileUrl = Cloudinary::upload($request->file("list_image.$key")->getRealPath())->getSecurePath();
                 $hinhAnhSp->update([
-                    'image_product' => $path
+                    'image_product' => $uploadedFileUrl
                 ]);
             }
         }
+    }
 
-        // Cập nhật sản phẩm
-        $product->update($params);
-        return redirect()->route('products.index')->with('success', 'Successfully updated product');
+    // Cập nhật sản phẩm
+    $product->update($params);
+
+    return redirect()->route('products.index')->with('success', 'Successfully updated product');
 }
+
 
 
     /**
