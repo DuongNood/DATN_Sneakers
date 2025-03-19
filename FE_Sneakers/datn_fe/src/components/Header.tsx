@@ -38,7 +38,7 @@ const Header = () => {
           <Link to='/ho-tro' className='nav-link'>
             Tin tức
           </Link>
-          <Link to='/lien-he' className='nav-link'>
+          <Link to='/contact' className='nav-link'>
             Liên hệ
           </Link>
         </nav>

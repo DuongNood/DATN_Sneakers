@@ -4,16 +4,19 @@ import Footer from '../components/Footer'
 import Register from '../pages/Register'
 import Login from '../pages/Login'
 import Cart from '../pages/Cart'
+import ContactPage from '../components/contact'
+import Banner from '../components/Banner'
 
 const RoutesConfig = () => {
   return (
     <>
       <Header />
+      <Banner />
       <Routes>
-        <Route path='/' element={<h1>Trang chủ</h1>} />
+        <Route path='/' />
         <Route path='/product' element={<h1>Sản phẩm</h1>} />
         <Route path='/gioi-thieu' element={<h1>Giới thiệu</h1>} />
-        <Route path='/lien-he' element={<h1>Liên hệ</h1>} />
+        <Route path='/contact' element={<ContactPage />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
