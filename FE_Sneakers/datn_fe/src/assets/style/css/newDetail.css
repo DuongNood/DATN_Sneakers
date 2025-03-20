@@ -1,0 +1,113 @@
+/* productDetail.css */
+.product-detail {
+    padding: 20px;
+  }
+
+  .main-product-image {
+    width: 100%; /* Chiếm toàn bộ chiều rộng container */
+    max-width: 100%; /* Đảm bảo không vượt quá container */
+    height: 600px; /* Chiều cao cố định */
+    object-fit: contain; /* Giữ tỷ lệ ảnh */
+    border-radius: 8px;
+    border: 3px solid #0056b3;
+  }
+
+  .product-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .product-description {
+    font-size: 16px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .additional-images {
+    display: flex; /* Sử dụng flexbox để xếp ngang */
+    justify-content: space-between; /* Hai ảnh cách đều nhau */
+    gap: 10px; /* Khoảng cách giữa các ảnh */
+    margin-top: 20px;
+    flex-wrap: nowrap; /* Ngăn ảnh xuống dòng */
+  }
+
+  .additional-images img {
+    width: 48%; /* Mỗi ảnh chiếm 48% chiều rộng container để vừa hàng */
+    height: 400px; /* Chiều cao cố định */
+    object-fit: contain; /* Giữ tỷ lệ ảnh */
+    border-radius: 8px;
+    border: 2px solid #ddd;
+  }
+
+  .related-posts {
+    margin-top: 40px;
+  }
+
+  .related-posts .card {
+    border: none;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .related-posts .card:hover {
+    transform: translateY(-5px);
+  }
+
+  .related-posts .card img {
+    border-radius: 8px;
+  }
+
+  .related-posts .card-body {
+    padding: 15px;
+  }
+
+  .related-posts .card-title {
+    font-size: 16px;
+    color: #333;
+  }
+
+  .related-posts .card-text {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .comment-form {
+    margin-top: 40px;
+  }
+
+  .comment-form h4 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+
+  .comment-form .form-control {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+
+  .comment-form .form-control:focus {
+    border-color: #f4b400;
+    box-shadow: none;
+  }
+
+  .comment-form textarea {
+    resize: none;
+  }
+
+  .comment-form .btn-warning {
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #f4b400;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+
+  .comment-form .btn-warning:hover {
+    background-color: #e6a700;
+  }
