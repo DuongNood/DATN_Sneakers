@@ -5,7 +5,7 @@ use App\Http\Controllers\api\DetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\BannerController;
+use App\Http\Controllers\Api\BannerController;
 
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
@@ -24,7 +24,7 @@ use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
 
-Route::resource('banners', BannerController::class);
+Route::apiResource('banners', BannerController::class);
 
 // Đăng ký tài khoản
 Route::post('/register', [RegisterController::class, 'register'])->name('api.register');
