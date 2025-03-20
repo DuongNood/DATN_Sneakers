@@ -69,8 +69,6 @@ Route::resource('comments', CommentController::class);
 Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
 // route tin tức
 Route::resource('news', NewsController::class);
-
-
 // Quản lý User
 Route::apiResource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
@@ -83,6 +81,6 @@ Route::get('/statistics/top-customers', [StatisticsController::class, 'topCustom
 
 // mua hàng
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/orders/buy/{variant_id}', [OrderController::class, 'buyProduct']);
-    Route::put('/orders/confirm/{order_id}', [OrderController::class, 'confirmOrder']);
+    Route::post('/orders/buy/{product_id}', [OrderController::class, 'buyProduct']);
+    Route::post('/orders/confirm/{order_id}', [OrderController::class, 'confirmOrder']);
 });
