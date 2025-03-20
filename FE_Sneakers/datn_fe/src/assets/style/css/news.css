@@ -1,0 +1,123 @@
+.category-box, .recent-posts, .keywords {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .category-title, .recent-posts-title, .keywords-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .mt-5 {
+    margin-top: 5rem !important;
+}
+  
+  .category-line {
+    width: 50px;
+    height: 3px;
+    background-color: #f4b400;
+    margin-bottom: 10px;
+  }
+  
+  .list-group-item {
+    background: #f8f9fa;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .list-group-item:last-child {
+    border-bottom: none;
+  }
+  
+  .btn-outline-secondary {
+    border: none;
+    background: none;
+    color: #999;
+    padding: 0;
+  }
+  
+  .btn-outline-secondary:hover {
+    color: #333;
+  }
+  
+  .post-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .keyword-badge {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 5px;
+    font-size: 14px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+  }
+  
+  .keyword-badge:hover {
+    background: #f4b400;
+    color: white;
+    border-color: #f4b400;
+  }
+  .news-card {
+    border: none;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .news-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .news-card img {
+    border-radius: 8px;
+  }
+  
+  .news-card .card-body {
+    padding: 15px;
+  }
+  
+  .news-card .card-title {
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .news-card .card-text {
+    font-size: 14px;
+    color: #666;
+  }
+  /* Phân trang */
+.pagination-container {
+    margin-top: 20px;
+  }
+  
+  .pagination {
+    justify-content: flex-end;
+  }
+  
+  .pagination .page-item {
+    margin: 0 3px;
+  }
+  
+  .pagination .page-link {
+    border: 1px solid #ddd;
+    color: #333;
+  }
+  
+  .pagination .page-item.active .page-link {
+    background-color: #66bb6a;
+    color: white;
+    border-color: #66bb6a;
+  }
+  
+  .pagination .page-link:hover {
+    background-color: #f4f4f4;
+  }
