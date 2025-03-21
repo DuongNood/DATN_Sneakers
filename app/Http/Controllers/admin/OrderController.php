@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Oder;
 use App\Models\OderDetail;
 use App\Models\Product;
+use App\Models\ProductPromotion;
 use App\Models\ProductVariant;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
@@ -31,48 +32,40 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'recipient_name' => 'required|string|max:255',
             'recipient_phone' => 'required|string|max:20',
             'recipient_address' => 'required|string',
             'total_price' => 'required|numeric',
             'payment_method' => 'required|in:COD,Online',
             'products' => 'required|array',
-            'promotion_code' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $discountAmount = 0;
-            if ($request->promotion_code) {
-                $promotion = Promotion::where('code', $request->promotion_code)->first();
-                if ($promotion) {
-                    $discountAmount = $promotion->discount;
-                } else {
-                    return redirect()->back()->with('error', 'Mã giảm giá không hợp lệ!');
-                }
-            }
-
             $order = new Oder();
             $order->recipient_name = $request->recipient_name;
             $order->recipient_phone = $request->recipient_phone;
             $order->recipient_address = $request->recipient_address;
-            $order->total_price = $request->total_price - $discountAmount;
+            $order->total_price = $request->total_price;
             $order->payment_method = $request->payment_method;
             $order->payment_status = $request->payment_method == 'Online' ? 'Đã thanh toán' : 'Chưa thanh toán';
             $order->status = $request->payment_method == 'Online' ? 'Đang chuẩn bị' : 'Chờ xác nhận';
-            $order->promotion_code = $request->promotion_code;
-            $order->discount_amount = $discountAmount;
             $order->save();
 
             foreach ($request->products as $product) {
+                $promotion = ProductPromotion::where('product_variant_id', $product['id'])->first();
+                $discount = $promotion ? $promotion->promotion->discount_value : 0;
+                $total_price = ($product['price'] - $discount) * $product['quantity'];
+
                 OderDetail::create([
                     'oder_id' => $order->id,
-                    'product_id' => $product['id'],
+                    'product_variant_id' => $product['id'],
                     'quantity' => $product['quantity'],
                     'price' => $product['price'],
-                    'discount' => $product['discount'] ?? 0,
+                    'discount' => $discount,
+                    'total_price' => $total_price,
                 ]);
             }
 
@@ -116,11 +109,16 @@ class OrderController extends Controller
             }
 
             foreach ($request->products as $product) {
-                $orderDetail = OderDetail::where('oder_id', $order->id)->where('product_id', $product['id'])->first();
+                $orderDetail = OderDetail::where('oder_id', $order->id)->where('product_variant_id', $product['id'])->first();
                 if ($orderDetail) {
+                    $promotion = ProductPromotion::where('product_variant_id', $product['id'])->first();
+                    $discount = $promotion ? $promotion->promotion->discount_value : 0;
+                    $total_price = ($product['price'] - $discount) * $product['quantity'];
+
                     $orderDetail->quantity = $product['quantity'];
                     $orderDetail->price = $product['price'];
-                    $orderDetail->discount = $product['discount'] ?? 0;
+                    $orderDetail->discount = $discount;
+                    $orderDetail->total_price = $total_price;
                     $orderDetail->save();
                 }
             }
