@@ -33,7 +33,7 @@ const RoutesConfig = () => {
 
       <Routes>
         <Route path='/' />
-        <Route path='/product-detail' element={<h1>Sản phẩm</h1>} />
+        {/* <Route path='/product-detail' element={<DetailsProduct />} /> */}
         <Route path='/products/:id' element={<ProductList />} />
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
