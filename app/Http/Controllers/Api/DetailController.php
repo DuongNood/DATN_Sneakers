@@ -27,4 +27,19 @@ class DetailController extends Controller
             'data' => $product
         ]);
     }
+    public function getRelatedProducts($id)
+    {
+        $product = Product::findOrFail($id);
+
+        // Lấy các sản phẩm cùng danh mục (loại trừ sản phẩm hiện tại)
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->take(5) // Giới hạn số lượng sản phẩm liên quan
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $relatedProducts
+        ]);
+    }
 }
