@@ -65,7 +65,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     // Route::get('/user', [UserController::class, 'getUser'])->name('api.user');
 // });
 
-// route cảu bình luận
+// route bình luận
 Route::resource('comments', CommentController::class);
 // lấy ra bình luận theo id sản phẩm 
 Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
