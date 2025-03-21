@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Models\Oder;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,14 +14,14 @@ class StatisticsController extends Controller
   
     public function totalRevenue()
     {
-        $totalRevenue = Order::sum('total_price');
+        $totalRevenue = Oder::sum('total_price');
         return response()->json(['total_revenue' => $totalRevenue]);
     }
 
    
     public function totalOrders()
     {
-        $totalOrders = Order::count();
+        $totalOrders = Oder::count();
         return response()->json(['total_orders' => $totalOrders]);
     }
 
@@ -40,7 +40,7 @@ class StatisticsController extends Controller
   
     public function topCustomers()
     {
-        $topCustomers = Order::select('customer_id', DB::raw('COUNT(id) as total_orders'))
+        $topCustomers = Oder::select('customer_id', DB::raw('COUNT(id) as total_orders'))
             ->groupBy('customer_id')
             ->orderByDesc('total_orders')
             ->with('customer')
