@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('oder_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(ProductVariant::class)->constrained();
             $table->foreignIdFor(Oder::class)->constrained();
-            $table->double('price');
+            $table->foreignIdFor(ProductVariant::class)->constrained();
             $table->integer('quantity');
+            $table->double('price');
+            $table->double('discount')->default(0);
             $table->double('total_price');
             $table->timestamps();
         });

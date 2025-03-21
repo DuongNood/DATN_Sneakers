@@ -8,6 +8,8 @@ class Oder extends Model
 {
     use HasFactory;
 
+    protected $table = 'oders';
+
     protected $fillable = [
         'user_id',
         'recipient_name',
@@ -62,7 +64,7 @@ class Oder extends Model
     /**
      * Quan hệ với bảng order_details
      */
-    public function orderDetails()
+    public function oderDetails()
     {
         return $this->hasMany(OderDetail::class);
     }

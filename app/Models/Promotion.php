@@ -24,4 +24,9 @@ class Promotion extends Model
     ];
     const PHAN_TRAM= 'Giảm theo %';
     const SO_TIEN= 'Giảm số tiền';
+
+    public function productPromotions()
+    {
+        return $this->hasMany(ProductPromotion::class, 'promotion_id');
+    }
 }

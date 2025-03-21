@@ -21,7 +21,6 @@ class LoginController extends Controller
         ]);
 
         $user = User::where('email', $credentials['email'])->first();
-
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'message' => 'Email hoặc mật khẩu không chính xác!',
