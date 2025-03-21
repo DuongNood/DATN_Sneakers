@@ -90,26 +90,23 @@
                 <li>
                     <a href="#sidebarError" data-bs-toggle="collapse">
                         <i data-feather="alert-octagon"></i>
-                        <span> Product </span>
+                        <span> Sản phẩm </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarError">
                         <ul class="nav-second-level">
                             <li>
-                                <a class='tp-link' href='{{ route('products.index') }}'>List Product</a>
+                                <a class='tp-link' href='{{ route('products.index') }}'>Danh sách sản phẩm</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='{{ route('product_variants.index') }}'>Product variants</a>
+                                <a class='tp-link' href='{{ route('product_variants.index') }}'>biến thể sản phẩm</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='error-503.html'>Error 503</a>
+                                <a class='tp-link' href='{{route('products.productDiscontinued')}}'>Sản phẩm ngừng kinh doanh</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='error-429.html'>Error 429</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='offline-page.html'>Offline Page</a>
-                            </li>
+                                <a class='tp-link' href='{{route('product_variants.variantDiscontinued')}}'>Biến thể đã ngừng kinh doanh</a>
+                            </li>                          
                         </ul>
                     </div>
                 </li>

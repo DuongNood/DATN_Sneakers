@@ -19,7 +19,7 @@ class ProductController extends Controller
     public function index()
     {
         //
-        $title = "Product";
+        $title = "Sản phẩm";
         $listProduct = Product::where('status', true)->get();
         return view('admin.product.index',compact('title','listProduct'));
     }
@@ -110,6 +110,9 @@ class ProductController extends Controller
 
     // Tìm sản phẩm theo ID
     $product = Product::findOrFail($id);
+    if (!isset($params['is_show_home'])) {
+        $params['is_show_home'] = $product->is_show_home;
+    }
 
     // Xử lý ảnh đại diện (upload lên Cloudinary)
     if ($request->hasFile('image')) {
@@ -190,7 +193,7 @@ class ProductController extends Controller
     public function productDiscontinued()
     {
         //
-        $title = "Product";
+        $title = "Sản phẩm";
         $listProduct = Product::where('status', false)->get();
         return view('admin.product.productDiscontinued',compact('title','listProduct'));
     }

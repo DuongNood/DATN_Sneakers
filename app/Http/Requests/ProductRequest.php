@@ -37,15 +37,15 @@ class ProductRequest extends FormRequest
      public function messages(): array
     {
         return [
-        'product_code.required' => 'Product code is required.',
-        'product_code.max' => 'Product code must not exceed 10 characters.',
-        'product_code.unique' => 'Product code already exists. Please choose another one.',       
-        'product_name.required' => 'Product name is required.',
-        'product_name.max' => 'Product name must not exceed 255 characters.',        
-        'image.image' => 'The file must be an image.',
-        'image.mimes' => 'Image must be of type: png, jpg, or jpeg.',  
-        'category_id.required' => 'Please select a category for the product.',
-        'category_id.exists' => 'The selected category does not exist.',
+            'product_code.required' => 'Mã sản phẩm là bắt buộc.',
+            'product_code.max' => 'Mã sản phẩm không được vượt quá 10 ký tự.',
+            'product_code.unique' => 'Mã sản phẩm đã tồn tại. Vui lòng chọn mã khác.',       
+            'product_name.required' => 'Tên sản phẩm là bắt buộc.',
+            'product_name.max' => 'Tên sản phẩm không được vượt quá 255 ký tự.',        
+            'image.image' => 'Tệp phải là một hình ảnh.',
+            'image.mimes' => 'Hình ảnh phải có định dạng: png, jpg hoặc jpeg.',  
+            'category_id.required' => 'Vui lòng chọn danh mục cho sản phẩm.',
+            'category_id.exists' => 'Danh mục được chọn không tồn tại.',
         ];
     }
 }

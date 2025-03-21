@@ -6,8 +6,8 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>              
             </div>
-            <a href="{{route('product_variants.create')}}" class="btn btn-success col-1">Create</a>
-            <a href="{{route('product_variants.variantDiscontinued')}}" class="btn btn-danger m-lg-1">variant discontinued</a>
+            <a href="{{route('product_variants.create')}}" class="btn btn-success col-1">Thêm mới</a>
+            
         </div>
 
         <!-- start row -->
@@ -27,7 +27,7 @@
                             <table class="table mb-0">
                                 <thead>
                                     <tr>
-                                        <th scope="col">ID</th>
+                                        <th scope="col">STT</th>
                                         <th scope="col">Sku</th>
                                         <th scope="col">Product id</th>
                                         <th scope="col">price</th>
@@ -38,9 +38,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($productVariant as $item)
+                                    @foreach ($productVariant as $index=> $item)
                                         <tr>
-                                            <th scope="row">{{$item->id}}</th>
+                                            <th scope="row">{{$index+1}}</th>
                                             <td>{{$item->sku}}</td>
                                             <td>{{$item->product->product_name}}</td>
                                             <td>{{$item->price}}</td>
