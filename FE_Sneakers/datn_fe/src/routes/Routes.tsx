@@ -14,6 +14,9 @@ import ProductHot from '../pages/ProductHot'
 import ProductSale from '../pages/ProductSale'
 import NotFound from '../components/NotFound'
 import ForgotPassword from '../pages/ForgotPassword'
+import ProfilePage from '../components/Profile'
+import ChangePasswordPage from '../pages/ChangePasswordPage'
+import ProtectedRoute from '../components/ProtectedRoute'
 
 const RoutesConfig = () => {
   return (
@@ -37,6 +40,11 @@ const RoutesConfig = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
+        {/* bảo vệ router */}
+        <Route element={<ProtectedRoute />}>
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/change-password' element={<ChangePasswordPage />} />
+        </Route>
       </Routes>
       <Footer />
     </>

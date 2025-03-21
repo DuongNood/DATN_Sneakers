@@ -10,7 +10,7 @@ import axios from 'axios'
 
 const schema = yup.object().shape({
   email: yup.string().email('Email không hợp lệ').required('Vui lòng nhập email'),
-  password: yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự').required('Vui lòng nhập mật khẩu')
+  password: yup.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự').required('Vui lòng nhập mật khẩu')
 })
 
 const Login = () => {
@@ -18,19 +18,30 @@ const Login = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors }
   } = useForm({
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = async (email: string, password: string) => {
+  const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login', { email, password })
+      const response = await axios.post('http://127.0.0.1:8000/api/login', data)
+
       localStorage.setItem('token', response.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
+
       toast.success('Đăng nhập thành công!', { autoClose: 1000 })
-      setTimeout(() => navigate('/'), 1000)
-    } catch (error) {
-      toast.error('Lỗi,vui lòng thử lại.')
+      setTimeout(() => navigate('/'), 100)
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        setError('password', {
+          type: 'manual',
+          message: 'Sai tài khoản hoặc mật khẩu. Vui lòng thử lại!'
+        })
+      } else {
+        toast.error('Hệ thống đang bảo trì, vui lòng quay lại sau!', { autoClose: 2000 })
+      }
     }
   }
 
