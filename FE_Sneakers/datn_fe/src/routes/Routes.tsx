@@ -24,16 +24,20 @@ const RoutesConfig = () => {
     <>
       <Navbar />
       <Header />
-      <Banner />
-      <Legit />
-      <TitleWithEffect />
-      <ProductList />
-      <TitleWithEffect1 />
-      <ProductHot />
-
       <Routes>
-        <Route path='/' />
-        {/* <Route path='/product-detail' element={<DetailsProduct />} /> */}
+        <Route
+          path='/'
+          element={
+            <>
+              <Banner />
+              <Legit />
+              <TitleWithEffect />
+              <ProductList />
+              <TitleWithEffect1 />
+              <ProductHot />
+            </>
+          }
+        />
         <Route path='/products/:id' element={<ProductList />} />
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
@@ -42,7 +46,7 @@ const RoutesConfig = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
-        {/* bảo vệ router */}
+        {/* Bảo vệ router */}
         <Route element={<ProtectedRoute />}>
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/change-password' element={<ChangePasswordPage />} />

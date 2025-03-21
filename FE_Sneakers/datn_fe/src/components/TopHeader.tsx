@@ -9,9 +9,9 @@ const Navbar = () => {
 
   const changeLanguage = (lang) => {
     if (lang === 'vi') {
-      alert('Đã chuyển sang Tiếng Việt!')
+      console.log('Đã chuyển sang Tiếng Việt!')
     } else if (lang === 'en') {
-      alert('Switched to English!')
+      console.log('Switched to English!')
     }
     setIsOpen(false)
   }

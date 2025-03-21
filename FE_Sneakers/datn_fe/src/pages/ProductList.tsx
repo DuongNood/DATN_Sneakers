@@ -11,17 +11,12 @@ interface Product {
 }
 
 const ProductList = () => {
-  const location = useLocation()
-  const navigate = useNavigate() // Khởi tạo useNavigate
-
-  if (location.pathname !== '/') {
-    return null
-  }
+  const navigate = useNavigate()
 
   const [products, setProducts] = useState<Product[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
-  const itemsPerPage = 8
+  const itemsPerPage = 6
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -30,7 +25,6 @@ const ProductList = () => {
         const response = await fetch('http://localhost:8000/api/home-products')
         if (!response.ok) throw new Error('API không phản hồi')
         const data = await response.json()
-        console.log('Dữ liệu từ API:', data)
         setProducts(Array.isArray(data) ? data : data.data || [])
       } catch (error) {
         console.error('Lỗi khi fetch sản phẩm:', error)
@@ -56,7 +50,6 @@ const ProductList = () => {
   const indexOfLastProduct = currentPage * itemsPerPage
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage
   const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct)
-  console.log('Current Products:', currentProducts)
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
   const totalPages = Math.ceil(products.length / itemsPerPage)
