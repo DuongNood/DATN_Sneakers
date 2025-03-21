@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
@@ -6,6 +5,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
+import axios from 'axios'
 
 const schema = yup.object().shape({
   email: yup.string().email('Email không hợp lệ').required('Vui lòng nhập email'),
@@ -22,14 +23,15 @@ const Login = () => {
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = (data: any) => {
-    toast.success('Đăng nhập thành công!', {
-      autoClose: 1000
-    })
-
-    setTimeout(() => {
-      navigate('/')
-    })
+  const onSubmit = async (email: string, password: string) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/login', { email, password })
+      localStorage.setItem('token', response.data.token)
+      toast.success('Đăng nhập thành công!', { autoClose: 1000 })
+      setTimeout(() => navigate('/'), 1000)
+    } catch (error) {
+      toast.error('Lỗi,vui lòng thử lại.')
+    }
   }
 
   return (
@@ -75,10 +77,34 @@ const Login = () => {
           </motion.button>
         </form>
 
-        <p className='text-gray-600 mt-6 text-center text-sm'>
-          Chưa có tài khoản?{' '}
-          <Link to='/register' className='text-blue-500 hover:underline'>
-            Đăng ký
+        <div className='mt-4 flex flex-col items-center space-y-3'>
+          <SignedOut>
+            <SignInButton>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.3 }}
+                className='w-full bg-gray-200 text-gray-800 py-3 rounded-md font-semibold hover:bg-gray-300 transition'
+              >
+                Đăng nhập với tài khoản khác
+              </motion.button>
+            </SignInButton>
+          </SignedOut>
+
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </div>
+
+        <p className='text-gray-600 mt-6 text-center text-sm flex justify-between'>
+          <span>
+            Chưa có tài khoản?{' '}
+            <Link to='/register' className='text-blue-500 hover:underline'>
+              Đăng ký
+            </Link>
+          </span>
+          <Link to='/forgot-password' className='text-blue-500 hover:underline'>
+            Quên mật khẩu?
           </Link>
         </p>
       </motion.div>

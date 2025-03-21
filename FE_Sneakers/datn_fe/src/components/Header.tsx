@@ -1,20 +1,43 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { FiShoppingCart, FiUser, FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
 import { motion } from 'framer-motion'
+import { useAuth, UserButton, useUser } from '@clerk/clerk-react'
 
 const Header = () => {
   const [search, setSearch] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileProductOpen, setMobileProductOpen] = useState(false)
+  const { isSignedIn } = useAuth()
+  const { user } = useUser() // Lấy thông tin user từ Clerk
+  const navigate = useNavigate()
+
+  // Chuyển hướng về trang chủ ngay sau khi đăng nhập thành công
+  useEffect(() => {
+    if (isSignedIn && user) {
+      // Lưu user vào localStorage
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          id: user.id,
+          name: user.fullName,
+          email: user.primaryEmailAddress?.emailAddress,
+          avatar: user.imageUrl
+        })
+      )
+      navigate('/') // Chuyển về trang chủ
+    }
+  }, [isSignedIn, user, navigate])
 
   return (
     <header className='bg-white shadow-md sticky top-0 z-50'>
       <div className='container mx-auto px-6 md:px-20 py-4 flex justify-between items-center'>
+        {/* Logo */}
         <Link to='/' className='text-3xl font-bold text-gray-800 tracking-wide'>
           Pole
         </Link>
 
+        {/* Menu điều hướng */}
         <nav className='hidden md:flex space-x-8'>
           <Link to='/' className='nav-link'>
             Trang chủ
@@ -43,7 +66,9 @@ const Header = () => {
           </Link>
         </nav>
 
+        {/* Phần bên phải (Tìm kiếm, User, Giỏ hàng) */}
         <div className='flex items-center space-x-4 md:space-x-6'>
+          {/* Ô tìm kiếm */}
           <div className='relative hidden md:block'>
             <input
               type='text'
@@ -55,21 +80,29 @@ const Header = () => {
             />
           </div>
 
-          <Link to='/login' className='icon-link'>
-            <FiUser />
-          </Link>
+          {/* Hiển thị Avatar nếu đăng nhập, nếu không thì hiện icon user */}
+          {isSignedIn ? (
+            <UserButton afterSignOutUrl='/' />
+          ) : (
+            <Link to='/login' className='icon-link'>
+              <FiUser />
+            </Link>
+          )}
 
+          {/* Giỏ hàng */}
           <Link to='/cart' className='relative icon-link'>
             <FiShoppingCart />
             <span className='cart-badge'>3</span>
           </Link>
 
+          {/* Nút menu cho mobile */}
           <button onClick={() => setMenuOpen(!menuOpen)} className='md:hidden text-gray-600 text-2xl'>
             {menuOpen ? <FiX /> : <FiMenu />}
           </button>
         </div>
       </div>
 
+      {/* Menu Mobile */}
       {menuOpen && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -82,6 +115,7 @@ const Header = () => {
               Trang chủ
             </Link>
 
+            {/* Dropdown sản phẩm trên mobile */}
             <div>
               <button
                 onClick={() => setMobileProductOpen(!mobileProductOpen)}
@@ -115,6 +149,7 @@ const Header = () => {
               Liên hệ
             </Link>
 
+            {/* Ô tìm kiếm trên mobile */}
             <input
               type='text'
               value={search}

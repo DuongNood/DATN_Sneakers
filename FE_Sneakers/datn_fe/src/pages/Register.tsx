@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
@@ -6,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import axios from 'axios'
 
 const schema = yup.object().shape({
   name: yup.string().required('Vui lòng nhập họ và tên'),
@@ -27,14 +27,26 @@ const Register = () => {
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = (data: any) => {
-    toast.success('Đăng ký thành công!', {
-      autoClose: 1000
-    })
+  const onSubmit = async (data: any) => {
+    try {
+      await axios.post('http://localhost:8000/api/register', {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        password_confirmation: data.confirmPassword
+      })
 
-    setTimeout(() => {
-      navigate('/login')
-    }, 100)
+      toast.success('Đăng ký thành công!', { autoClose: 1000 })
+      setTimeout(() => navigate('/login'), 1000)
+    } catch (error: any) {
+      if (error.response && error.response.data.errors) {
+        Object.values(error.response.data.errors).forEach((message: any) => {
+          toast.error(message[0])
+        })
+      } else {
+        toast.error('Lỗi,vui lòng thử lại.')
+      }
+    }
   }
 
   return (
