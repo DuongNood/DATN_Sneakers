@@ -17,10 +17,12 @@ import ForgotPassword from '../pages/ForgotPassword'
 import ProfilePage from '../components/Profile'
 import ChangePasswordPage from '../pages/ChangePasswordPage'
 import ProtectedRoute from '../components/ProtectedRoute'
+import Navbar from '../components/TopHeader'
 
 const RoutesConfig = () => {
   return (
     <>
+      <Navbar />
       <Header />
       <Banner />
       <Legit />
@@ -32,7 +34,7 @@ const RoutesConfig = () => {
       <Routes>
         <Route path='/' />
         <Route path='/product-detail' element={<h1>Sản phẩm</h1>} />
-
+        <Route path='/products/:id' element={<ProductList />} />
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />

@@ -20,7 +20,7 @@ const Header = () => {
   }
 
   return (
-    <header className='bg-white shadow-md sticky top-0 z-50'>
+    <header className='bg-white shadow-md sticky top-0 z-50 p-2'>
       <div className='container mx-auto px-6 md:px-20 py-4 flex justify-between items-center'>
         <Link to='/' className='text-3xl font-bold text-gray-800 tracking-wide'>
           Pole
@@ -28,7 +28,7 @@ const Header = () => {
 
         <nav className='hidden md:flex space-x-8'>
           <Link to='/' className='nav-link'>
-            Trang chủ
+            Trang Chủ
           </Link>
           <div className='relative group hidden md:block'>
             <button className='nav-link'>Sản phẩm</button>
@@ -42,13 +42,13 @@ const Header = () => {
             </div>
           </div>
           <Link to='/product-sale' className='nav-link'>
-            Sale
+            Giảm Giá
           </Link>
           <Link to='/ho-tro' className='nav-link'>
-            Tin tức
+            Tin Tức
           </Link>
           <Link to='/contact' className='nav-link'>
-            Liên hệ
+            Liên Hệ
           </Link>
         </nav>
 

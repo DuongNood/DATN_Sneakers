@@ -28,7 +28,7 @@ Route::apiResource('banners', BannerController::class);
 
 // Đăng ký tài khoản
 Route::post('/register', [RegisterController::class, 'register'])->name('api.register');
-
+        
 // Đăng nhập và đăng xuất
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
@@ -89,5 +89,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/orders/confirm/{order_id}', [OrderController::class, 'confirmOrder']);
 });
 Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
-Route::get('/deatil-product/{id}', [DetailController::class, 'getProductDetail']);
+Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
