@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\admin\CommentController;
+use App\Http\Controllers\admin\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\CategoryController;
  
@@ -62,6 +63,8 @@ use App\Http\Controllers\StatisticsController;
  
  Route::resource('users', UserController::class);
  Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
+
+ Route::resource('orders', OrderController::class);
  
  Route::prefix('products')
      ->as('products.')
