@@ -29,7 +29,9 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
+
+
+        $news = $request->validate([
             'title' => 'required',
             'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
             'content' => 'required'
@@ -37,21 +39,32 @@ class NewsController extends Controller
 
         try {
             if ($request->hasFile('image')) {
-                $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
+<<<<<<< HEAD
+                $news['image'] = Storage::disk('public')->put('news', $request->file('image'));
             }
-            News::query()->create($data);
-            // dd($data);
+            News::query()->create($news);
+            // dd($news);
+master
 
             return response()->json([
                 'status' => true,
                 'message' => 'Thêm mới tin tức thành công',
+<<<<<<< HEAD
+                'news' => $news
+=======
                 'data' => $data
+>>>>>>> master
             ], 201);
 
         } catch (\Throwable $th) {
             //throw $th;
+<<<<<<< HEAD
+            if (!empty($news['image']) && Storage::exists($news['image'])) {
+                Storage::dick('public')->delete($news['image']);
+=======
             if (!empty($data['image']) && Storage::exists($data['image'])) {
                 Storage::dick('public')->delete($data['image']);
+>>>>>>> master
             }
             Log::error(
                 __CLASS__ . '@' . __FUNCTION__,
@@ -90,6 +103,36 @@ class NewsController extends Controller
     {
         $data = $request->validate([
             'title' => 'required',
+<<<<<<< HEAD
+            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
+            'content' => 'required'
+        ]);
+
+        $new = News::find($id);
+
+        if (!$new) {
+            return response()->json([
+                'message' => 'Không tồn tại tin tức có id=' . $id
+            ], 404);
+
+        }
+
+        try {
+            if ($request->hasFile('image')) {
+                $new['image'] = Storage::disk('public')->put('news', $request->file('image'));
+            }
+
+            $currentimage = $new->image;
+
+            $new->update($data);;
+
+            if (
+                $request->hasFile('image')
+                && !empty($currentimage)
+                && Storage::exists($currentimage)
+            ) {
+                Storage::disk('public')->delete($currentimage);
+=======
             'image' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048',
             'content' => 'required'
         ]);
@@ -118,11 +161,20 @@ class NewsController extends Controller
                 && Storage::disk('public')->exists($curentImage)
             ) {
                 Storage::disk('public')->delete($curentImage);
+>>>>>>> master
             }
 
             return response()->json([
                 'status' => true,
                 'message' => 'Cập nhật tin tức thành công',
+<<<<<<< HEAD
+                'news' => $new
+            ], 201);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            if (!empty($data['image']) && Storage::exists($data['image'])) {
+=======
                 'data' => $news
             ], 200);
 
@@ -131,6 +183,7 @@ class NewsController extends Controller
             if (!empty($data['image']) 
                 && Storage::disk('public')->exists($data['image'])) 
             {
+>>>>>>> master
                 Storage::disk('public')->delete($data['image']);
             }
             Log::error(

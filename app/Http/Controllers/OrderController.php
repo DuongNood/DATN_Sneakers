@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ProductVariant;
 use App\Models\Order; // Đảm bảo đúng tên Model với DB của bạn
-
+use App\Models\OrderDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -95,56 +95,59 @@ class OrderController extends Controller
     /**
      * Xác nhận đơn hàng (Trừ kho ngay sau khi xác nhận, cập nhật tổng tiền)
      */
-    public function confirmOrder($order_id)
-{
-    DB::beginTransaction();
 
-    try {
-        $order = Order::find($order_id); 
+    public function confirmOrder($id)
+    {
+        DB::beginTransaction();
+    
+        try {
+            $order = Order::with('oderDetails')->find($id); // Lấy đơn hàng kèm chi tiết đơn hàng
+    
+            if (!$order) {
+                return response()->json(['message' => 'Đơn hàng không tồn tại'], 404);
 
-        if (!$order) {
-            return response()->json(['message' => 'Đơn hàng không tồn tại'], 404);
-        }
-
-        if ($order->status !== 'cho_xac_nhan') {
-            return response()->json(['message' => 'Đơn hàng đã được xử lý trước đó'], 400);
-        }
-
-        // Lấy danh sách sản phẩm trong đơn hàng
-        $orderDetails = $order->orderDetails;
-
-        foreach ($orderDetails as $detail) {
-            $variant = ProductVariant::find($detail->product_variant_id);
-
-            if (!$variant) {
-                return response()->json(['message' => 'Sản phẩm không tồn tại'], 404);
             }
-
-            if ($variant->quantity < $detail->quantity) {
-                return response()->json(['message' => 'Kho không đủ hàng để xác nhận đơn'], 400);
+    
+            if ($order->status !== 'cho_xac_nhan') {
+                return response()->json(['message' => 'Đơn hàng đã được xử lý trước đó'], 400);
             }
-
-            // Cập nhật số lượng sản phẩm
-            $variant->quantity -= $detail->quantity;
-            $variant->save();
+    
+            if ($order->oderDetails->isEmpty()) {
+                return response()->json(['message' => 'Đơn hàng không có sản phẩm'], 400);
+            }
+    
+            foreach ($order->oderDetails as $detail) {
+                $variant = ProductVariant::find($detail->product_variant_id);
+    
+                if (!$variant) {
+                    return response()->json(['message' => 'Sản phẩm không tồn tại'], 404);
+                }
+    
+                if ($variant->quantity < $detail->quantity) {
+                    return response()->json(['message' => 'Kho không đủ hàng để xác nhận đơn'], 400);
+                }
+    
+                // Cập nhật số lượng sản phẩm
+                $variant->quantity -= $detail->quantity;
+                $variant->save();
+            }
+    
+            // Xóa tất cả chi tiết đơn hàng trước
+            OrderDetail::where('oder_id', $id)->delete();
+    
+            // Xóa đơn hàng
+            $order->delete();
+            DB::commit();
+    
+            return response()->json([
+                'message' => 'Đơn hàng đã được xác nhận và xóa thành công!',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Lỗi khi xác nhận đơn hàng', 'error' => $e->getMessage()], 500);
         }
-
-        // Cập nhật trạng thái đơn hàng
-        $order->status = 'da_xac_nhan';
-        $order->payment_status = 'da_thanh_toan';
-        $order->save();
-
-        DB::commit();
-
-        return response()->json([
-            'message' => 'Đơn hàng đã được xác nhận!',
-            'order' => $order
-        ], 200);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['message' => 'Lỗi khi xác nhận đơn hàng', 'error' => $e->getMessage()], 500);
     }
-}
+    
 
 
 }

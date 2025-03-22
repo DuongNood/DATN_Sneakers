@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Api\BannerController;
 
+
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\UserController;
@@ -16,7 +17,9 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
 
+
 use App\Http\Controllers\Auth\RegisterController;
+
 use App\Http\Controllers\Api\StatisticsController;
 
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -56,6 +59,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 // // Đăng nhập
 // Route::post('/login', [LoginController::class, 'login'])->name('api.login');
+
 
 // // Các route yêu cầu xác thực
 // Route::middleware('auth:sanctum')->group(function () {

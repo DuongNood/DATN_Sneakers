@@ -2,7 +2,11 @@
 
 
 use App\Http\Controllers\admin\CommentController;
+
+use App\Http\Controllers\StatisticsController;
+
 use App\Http\Controllers\admin\OrderController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\CategoryController;
 
@@ -16,9 +20,13 @@ use App\Http\Controllers\BannerController;
 
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductVariantController;
+
+
+
 use App\Http\Controllers\admin\PromotionController;
 use App\Http\Controllers\ProductPromotionController;
-use App\Http\Controllers\StatisticsController;
+
+
 
 /*
  |--------------------------------------------------------------------------
