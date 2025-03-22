@@ -44,30 +44,74 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            $order = new Oder();
-            $order->recipient_name = $request->recipient_name;
-            $order->recipient_phone = $request->recipient_phone;
-            $order->recipient_address = $request->recipient_address;
-            $order->total_price = $request->total_price;
-            $order->payment_method = $request->payment_method;
-            $order->payment_status = $request->payment_method == 'Online' ? 'Đã thanh toán' : 'Chưa thanh toán';
-            $order->status = $request->payment_method == 'Online' ? 'Đang chuẩn bị' : 'Chờ xác nhận';
-            $order->save();
+            // Tạo mã đơn hàng duy nhất
+            $orderCode = 'ODR' . time() . rand(1000, 9999);
 
-            foreach ($request->products as $product) {
-                $promotion = ProductPromotion::where('product_variant_id', $product['id'])->first();
-                $discount = $promotion ? $promotion->promotion->discount_value : 0;
-                $total_price = ($product['price'] - $discount) * $product['quantity'];
+            // Xác định trạng thái ban đầu
+            $paymentStatus = $request->payment_method == 'Online' ? 'Đã thanh toán' : 'Chưa thanh toán';
+            $shippingStatus = $request->payment_method == 'Online' ? 'Đang chuẩn bị' : 'Chờ xác nhận';
 
+            // Tạo đơn hàng
+            $order = Oder::create([
+                'order_code'       => $orderCode,
+                'recipient_name'   => $request->recipient_name,
+                'recipient_phone'  => $request->recipient_phone,
+                'recipient_address' => $request->recipient_address,
+                'total_price'      => 0,
+                'payment_method'   => $request->payment_method,
+                'payment_status'   => $paymentStatus,
+                'status'           => $shippingStatus,
+            ]);
+
+            $totalOrderPrice = 0;
+
+            foreach ($request->products as $productData) {
+                $variant = ProductVariant::findOrFail($productData['id']);
+
+                // Kiểm tra số lượng tồn kho
+                if ($variant->quantity < $productData['quantity']) {
+                    throw new \Exception("Sản phẩm {$variant->id} không đủ hàng trong kho.");
+                }
+
+                // Tìm khuyến mãi hợp lệ
+                $promotion = ProductPromotion::where('product_variant_id', $variant->id)
+                    ->whereHas('promotion', function ($query) {
+                        $query->where('start_date', '<=', now())->where('end_date', '>=', now());
+                    })
+                    ->first();
+
+                $discountedPrice = $variant->price;
+                $discount = 0;
+
+                if ($promotion) {
+                    $promo = $promotion->promotion;
+                    if ($promo->discount_type == Promotion::PHAN_TRAM) {
+                        $discount = min(($variant->price * $promo->discount_value / 100), $promo->max_discount_value);
+                    } elseif ($promo->discount_type == Promotion::SO_TIEN) {
+                        $discount = min($promo->discount_value, $promo->max_discount_value);
+                    }
+                    $discountedPrice = max($variant->price - $discount, 0);
+                }
+
+                $subtotal = $discountedPrice * $productData['quantity'];
+                $totalOrderPrice += $subtotal;
+
+                // Lưu chi tiết đơn hàng
                 OderDetail::create([
-                    'oder_id' => $order->id,
-                    'product_variant_id' => $product['id'],
-                    'quantity' => $product['quantity'],
-                    'price' => $product['price'],
-                    'discount' => $discount,
-                    'total_price' => $total_price,
+                    'oder_id'               => $order->id,
+                    'product_variant_id'    => $variant->id,
+                    'quantity'              => $productData['quantity'],
+                    'price'                 => $variant->price,
+                    'discount'              => $discount,
+                    'total_price'           => $subtotal,
                 ]);
+
+                // Trừ số lượng hàng tồn kho
+                $variant->decrement('quantity', $productData['quantity']);
             }
+
+            // Cập nhật tổng tiền đơn hàng
+            $order->update(['total_price' => $totalOrderPrice]);
 
             DB::commit();
             return redirect()
@@ -86,7 +130,7 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
-        $order = Oder::with('details.product')->findOrFail($id);
+        $order = Oder::with('details.productVariant.product')->findOrFail($id);
         $statusOptions = ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'];
         return view(self::PATH_VIEW . __FUNCTION__, compact('order', 'statusOptions'));
     }
@@ -100,31 +144,27 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            if ($order->payment_status !== 'Đã thanh toán') {
-                $order->payment_status = $request->payment_status;
-            }
-
-            if (!in_array($order->status, ['Đã giao hàng', 'Hủy đơn hàng'])) {
-                $order->status = $request->status;
-            }
-
-            foreach ($request->products as $product) {
-                $orderDetail = OderDetail::where('oder_id', $order->id)->where('product_variant_id', $product['id'])->first();
-                if ($orderDetail) {
-                    $promotion = ProductPromotion::where('product_variant_id', $product['id'])->first();
-                    $discount = $promotion ? $promotion->promotion->discount_value : 0;
-                    $total_price = ($product['price'] - $discount) * $product['quantity'];
-
-                    $orderDetail->quantity = $product['quantity'];
-                    $orderDetail->price = $product['price'];
-                    $orderDetail->discount = $discount;
-                    $orderDetail->total_price = $total_price;
-                    $orderDetail->save();
+            // Nếu đơn hàng bị hủy, hoàn lại số lượng hàng trong kho
+            if ($request->status === 'Hủy đơn hàng' && $order->status !== 'Hủy đơn hàng') {
+                foreach ($order->details as $detail) {
+                    $variant = ProductVariant::findOrFail($detail->product_variant_id);
+                    $variant->increment('quantity', $detail->quantity);
                 }
             }
 
-            $order->save();
+            // Chỉ cập nhật trạng thái nếu hợp lệ
+            if ($order->payment_status !== 'Đã thanh toán' && $request->payment_status === 'Đã thanh toán') {
+                $order->payment_status = 'Đã thanh toán';
+                if ($order->status === 'Chờ xác nhận') {
+                    $order->status = 'Đang chuẩn bị';
+                }
+            }
 
+            if ($request->status && $this->canUpdateShippingStatus($order->status, $request->status)) {
+                $order->status = $request->status;
+            }
+
+            $order->save();
             DB::commit();
             return redirect()
                 ->route(self::PATH_VIEW . 'index')
@@ -135,5 +175,16 @@ class OrderController extends Controller
                 ->back()
                 ->with('error', 'Có lỗi xảy ra khi cập nhật đơn hàng!');
         }
+    }
+
+    private function canUpdateShippingStatus($currentStatus, $newStatus)
+    {
+        $validTransitions = [
+            'Chờ xác nhận'    => ['Đang chuẩn bị', 'Đang vận chuyển', 'Hủy đơn hàng'],
+            'Đang chuẩn bị'   => ['Đang vận chuyển', 'Hủy đơn hàng'],
+            'Đang vận chuyển' => ['Đã giao hàng'],
+        ];
+
+        return isset($validTransitions[$currentStatus]) && in_array($newStatus, $validTransitions[$currentStatus]);
     }
 }
