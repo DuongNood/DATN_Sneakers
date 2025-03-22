@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('oders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
+            $table->string('order_code')->unique();
             $table->string('recipient_name');
             $table->string('recipient_phone');
             $table->string('recipient_address');
