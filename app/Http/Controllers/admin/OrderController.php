@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Oder;
-use App\Models\OderDetail;
+use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductPromotion;
 use App\Models\ProductVariant;
@@ -22,7 +22,7 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = Oder::with('user')->orderBy('created_at', 'desc')->get();
+        $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
 
         return view(self::PATH_VIEW . __FUNCTION__, compact('orders'));
     }
@@ -52,7 +52,7 @@ class OrderController extends Controller
             $shippingStatus = $request->payment_method == 'Online' ? 'Đang chuẩn bị' : 'Chờ xác nhận';
 
             // Tạo đơn hàng
-            $order = Oder::create([
+            $order = Order::create([
                 'order_code'       => $orderCode,
                 'recipient_name'   => $request->recipient_name,
                 'recipient_phone'  => $request->recipient_phone,
@@ -97,8 +97,8 @@ class OrderController extends Controller
                 $totalOrderPrice += $subtotal;
 
                 // Lưu chi tiết đơn hàng
-                OderDetail::create([
-                    'oder_id'               => $order->id,
+                OrderDetail::create([
+                    'order_id'               => $order->id,
                     'product_variant_id'    => $variant->id,
                     'quantity'              => $productData['quantity'],
                     'price'                 => $variant->price,
@@ -130,7 +130,7 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
-        $order = Oder::with('details.productVariant.product')->findOrFail($id);
+        $order = Order::with('details.productVariant.product')->findOrFail($id);
         $statusOptions = ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'];
         return view(self::PATH_VIEW . __FUNCTION__, compact('order', 'statusOptions'));
     }
@@ -140,7 +140,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $order = Oder::findOrFail($id);
+        $order = Order::findOrFail($id);
 
         DB::beginTransaction();
         try {

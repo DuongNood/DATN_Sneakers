@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Oder;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('oders', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
             $table->string('order_code')->unique();
@@ -23,8 +23,8 @@ return new class extends Migration
             $table->double('total_price');
             $table->double('shipping_fee');
             $table->enum('payment_method',['COD', 'Online'])->nullable();
-            $table->string('payment_status')->default(Oder::CHUA_THANH_TOAN);
-            $table->string('status')->default(Oder::CHO_XAC_NHAN);
+            $table->string('payment_status')->default(Order::CHUA_THANH_TOAN);
+            $table->string('status')->default(Order::CHO_XAC_NHAN);
             $table->timestamps();
         });
     }
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('oders');
+        Schema::dropIfExists('orders');
     }
 };

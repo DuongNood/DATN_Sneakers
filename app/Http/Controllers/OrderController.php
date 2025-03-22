@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ProductVariant;
-use App\Models\Oder; // Đảm bảo đúng tên Model với DB của bạn
+use App\Models\Order; // Đảm bảo đúng tên Model với DB của bạn
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +42,7 @@ class OrderController extends Controller
         $totalPrice = $price * $quantityToBuy;
 
         // Tạo đơn hàng trong bảng 'orders'
-        $order = Oder::create([
+        $order = Order::create([
             'user_id' => Auth::id(),
             'recipient_name' => $request->input('recipient_name'),
             'recipient_phone' => $request->input('recipient_phone'),
@@ -55,9 +55,9 @@ class OrderController extends Controller
         ]);
 
         // Lưu chi tiết đơn hàng vào bảng 'order_details'
-        DB::table('oder_details')->insert([
+        DB::table('order_details')->insert([
             'product_variant_id' => $variant->id,
-            'oder_id' => $order->id,
+            'order_id' => $order->id,
             'price' => $price,
             'quantity' => $quantityToBuy,
             'total_price' => $totalPrice,
@@ -69,7 +69,7 @@ class OrderController extends Controller
 
         return response()->json([
             'message' => 'Đơn hàng đã được đặt, chờ xác nhận!',
-            'oder' => $order,
+            'order' => $order,
             'product_variant' => [
                 'id' => $variant->id,
                 'sku' => $variant->sku,
@@ -100,7 +100,7 @@ class OrderController extends Controller
     DB::beginTransaction();
 
     try {
-        $order = Oder::find($order_id); 
+        $order = Order::find($order_id); 
 
         if (!$order) {
             return response()->json(['message' => 'Đơn hàng không tồn tại'], 404);

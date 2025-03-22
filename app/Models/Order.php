@@ -4,11 +4,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Oder extends Model
+class Order extends Model
 {
     use HasFactory;
 
-    protected $table = 'oders';
+    protected $table = 'orders';
 
     protected $fillable = [
         'user_id',
@@ -36,7 +36,6 @@ class Oder extends Model
     // Trạng thái đơn hàng
     const ORDER_STATUS = [
         'cho_xac_nhan' => 'Chờ xác nhận',
-        'da_xac_nhan' => 'Đã xác nhận',
         'dang_chuan_bi' => 'Đang chuẩn bị',
         'dang_van_chuyen' => 'Đang vận chuyển',
         'da_giao_hang' => 'Đã giao hàng',
@@ -45,7 +44,6 @@ class Oder extends Model
 
     // Định nghĩa trạng thái
     const CHO_XAC_NHAN = 'cho_xac_nhan';
-    const DA_XAC_NHAN = 'da_xac_nhan';
     const DANG_CHUAN_BI = 'dang_chuan_bi';
     const DANG_VAN_CHUYEN = 'dang_van_chuyen';
     const DA_GIAO_HANG = 'da_giao_hang';
@@ -64,9 +62,9 @@ class Oder extends Model
     /**
      * Quan hệ với bảng order_details
      */
-    public function oderDetails()
+    public function orderDetails()
     {
-        return $this->hasMany(OderDetail::class);
+        return $this->hasMany(OrderDetail::class);
     }
 
     /**

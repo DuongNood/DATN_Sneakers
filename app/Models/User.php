@@ -33,7 +33,7 @@ class User extends Authenticatable
 
     public function orders()
     {
-        return $this->hasMany(Oder::class);
+        return $this->hasMany(Order::class);
     }
 
     public function role()
