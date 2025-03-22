@@ -86,7 +86,7 @@
             </table>
 
             <div class="mb-4">
-                <a class="btn btn-secondary" href="{{ route('orders.index') }}">Quay lại</a>
+                <a href="{{ route('ordersorders.index') }}" class="ml-4 text-blue-500">Quay lại</a>
                 <button type="submit" class="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Cập nhật</button>
             </div>
         </form>
