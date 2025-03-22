@@ -36,7 +36,7 @@ const RoutesConfig = () => {
               <ProductList />
               <TitleWithEffect1 />
               <ProductHot />
-              <ProductDetail />
+              {/* <ProductDetail /> */}
             </>
           }
         />
@@ -46,7 +46,7 @@ const RoutesConfig = () => {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/products-detail/:id' element={<ProductDetail />} />
+        <Route path='/detail-product/:id' element={<ProductDetail />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
         {/* Bảo vệ router */}

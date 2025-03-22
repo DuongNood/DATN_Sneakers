@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom' // Thêm useNavigate
-
+import { useNavigate } from 'react-router-dom'
 interface Product {
   id: number
   name: string
-  price: string
-  salePrice: string
+  original_price: string
+  discounted_price: string
   imageUrl: string
   rating: number
 }
@@ -36,15 +35,8 @@ const ProductList = () => {
     fetchProducts()
   }, [])
 
-  const calculateDiscount = (price: string, salePrice: string): string => {
-    const originalPrice = parseFloat(price.replace(/[^0-9.-]+/g, ''))
-    const discountedPrice = parseFloat(salePrice.replace(/[^0-9.-]+/g, ''))
-    const discountPercentage = ((originalPrice - discountedPrice) / originalPrice) * 100
-    return discountPercentage.toFixed(0)
-  }
-
   const handleProductClick = (id: number) => {
-    navigate(`/product_detail/${id}`)
+    navigate(`/detail-product/${id}`)
   }
 
   const indexOfLastProduct = currentPage * itemsPerPage
@@ -70,11 +62,14 @@ const ProductList = () => {
                   className='bg-white shadow-lg rounded-lg p-4 text-center relative cursor-pointer hover:shadow-xl transition-shadow duration-300'
                   onClick={() => handleProductClick(product.id)}
                 >
-                  {product.salePrice && (
-                    <div className='absolute top-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-tr-md z-10'>
-                      -{calculateDiscount(product.price, product.salePrice)}%
-                    </div>
-                  )}
+                  <div className='absolute top-0 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-tr-md z-10'>
+                    <p className='text-sm text-white-500'>
+                      -
+                      {Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100)}
+                      %
+                    </p>
+                  </div>
+
                   <div className='relative group'>
                     <img
                       src={product.image}
@@ -83,10 +78,18 @@ const ProductList = () => {
                     />
                     <div className='absolute inset-0 bg-gradient-to-r from-transparent to-transparent group-hover:from-white group-hover:to-white opacity-30 transition-all duration-300 ease-in-out z-0' />
                   </div>
-                  <h3 className='text-xl font-semibold mb-2'>{product.product_name}</h3>
+                  <h3 className='text-sm mb-2'>{product.product_name}</h3>
                   <div className='flex justify-center items-center mb-2'>
-                    <p className='text-gray-500 line-through text-sm mr-2'>{product.price}</p>
-                    <p className='text-sm font-semibold text-red-500'>{product.salePrice}</p>
+                    <p className='text-gray-500 line-through text-sm mr-2'>
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                        product.original_price
+                      )}
+                    </p>
+                    <p className='text-sm font-semibold text-red-500'>
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                        product.discounted_price
+                      )}
+                    </p>
                   </div>
                   <div className='my-2'>
                     {Array.from({ length: product.rating }, (_, index) => (
@@ -135,7 +138,7 @@ const ProductList = () => {
                 className='px-4 py-2 mx-1 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50'
                 disabled={currentPage === totalPages}
               >
-                Next
+                Next{' '}
               </button>
             </div>
           )}
