@@ -27,7 +27,6 @@ class RegisterController extends Controller
     
 
     $roleId = $request->role_id;
-
     if ($roleId === 1 || $roleId === 2) {
         // Kiểm tra xem role có tồn tại chưa
         $roleExists = \DB::table('roles')->where('id', $roleId)->exists();
