@@ -61,7 +61,7 @@ class ProductsTableSeeder extends Seeder
 
             // Giá khuyến mãi
             $discountPercentage = rand(5, 20);
-            $discountedPrice = (rand(0, 1)) ? $product[2] * (1 - $discountPercentage / 100) : $product[2];
+            $discountedPrice = round($product[2] * (1 - $discountPercentage / 100), -3);
 
             // Chèn sản phẩm vào bảng `products`
             $productId = DB::table('products')->insertGetId([
@@ -71,8 +71,8 @@ class ProductsTableSeeder extends Seeder
                 'original_price'  => $product[2],
                 'discounted_price' => $discountedPrice,
                 'status'          => rand(0, 1),
-                'is_show_home'    => rand(0, 1),
-                'description'     => Str::random(50),
+                'is_show_home'    => true,
+                'description'     => Str::random(100),
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ]);

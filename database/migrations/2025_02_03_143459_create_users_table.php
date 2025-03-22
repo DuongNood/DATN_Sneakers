@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->string('password');
+            $table->string('image_user')->nullable();
             $table->foreignIdFor(Role::class)->constrained();
             $table->rememberToken();
             $table->timestamps();
