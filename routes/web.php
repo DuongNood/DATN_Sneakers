@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\CommentController;
+use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\CategoryController;
 
@@ -14,7 +15,7 @@ use App\Http\Controllers\BannerController;
 
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductVariantController;
-use App\Http\Controllers\StatisticsController;
+
 
 /*
 |--------------------------------------------------------------------------

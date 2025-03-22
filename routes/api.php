@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\UserController;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
@@ -19,7 +20,9 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ProductController;
 
 
-use Illuminate\Support\Facades\Route;
+
+
+
 use App\Http\Controllers\Api\StatisticsController;
 
 use App\Http\Controllers\BannerController;
@@ -55,8 +58,6 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-
 
 // Đăng nhập
 Route::post('/login', [LoginController::class, 'login'])->name('api.login');

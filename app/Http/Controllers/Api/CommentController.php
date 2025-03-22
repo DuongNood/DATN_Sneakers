@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductRequest;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -61,7 +62,9 @@ class CommentController extends Controller
     {
         $comment = Comment::find($id);
 
-        if ($comment) {
+        $product = ProductRequest::all();
+
+        if ($comment['product_id'] === $product['id']) {
             return response()->json($comment);
         }
 
