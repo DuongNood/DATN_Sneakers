@@ -21,9 +21,10 @@ class RegisterController extends Controller
         'email' => 'required|string|email|max:255|unique:users',
         'phone' => 'nullable|string|max:15',
         'address' => 'nullable|string|max:255',
-        'password' => 'required|string|min:8',
+        'password' => ['required', 'string', 'min:8', 'confirmed'], // Thêm 'confirmed'
         'role_id' => 'nullable|integer',
     ]);
+    
 
     $roleId = $request->role_id;
 
