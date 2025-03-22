@@ -18,6 +18,7 @@ import ProfilePage from '../components/Profile'
 import ChangePasswordPage from '../pages/ChangePasswordPage'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Navbar from '../components/TopHeader'
+import ProductDetail from '../pages/DetailsProduct'
 
 const RoutesConfig = () => {
   return (
@@ -35,6 +36,7 @@ const RoutesConfig = () => {
               <ProductList />
               <TitleWithEffect1 />
               <ProductHot />
+              <ProductDetail />
             </>
           }
         />
@@ -44,6 +46,7 @@ const RoutesConfig = () => {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/products-detail/:id' element={<ProductDetail />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
         {/* Bảo vệ router */}

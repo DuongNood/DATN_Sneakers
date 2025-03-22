@@ -10,6 +10,11 @@ import axios from 'axios'
 const schema = yup.object().shape({
   name: yup.string().required('Vui lòng nhập họ và tên'),
   email: yup.string().email('Email không hợp lệ').required('Vui lòng nhập email'),
+  phone: yup
+    .string()
+    .matches(/^[0-9]{10}$/, 'Số điện thoại phải có 10 chữ số')
+    .required('Vui lòng nhập số điện thoại'),
+  address: yup.string().required('Vui lòng nhập địa chỉ'),
   password: yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự').required('Vui lòng nhập mật khẩu'),
   confirmPassword: yup
     .string()
@@ -32,6 +37,8 @@ const Register = () => {
       await axios.post('http://localhost:8000/api/register', {
         name: data.name,
         email: data.email,
+        phone: data.phone,
+        address: data.address,
         password: data.password,
         password_confirmation: data.confirmPassword
       })
@@ -44,7 +51,7 @@ const Register = () => {
           toast.error(message[0])
         })
       } else {
-        toast.error('Lỗi,vui lòng thử lại.')
+        toast.error('Hệ thống đang bảo trì, vui lòng quay lại sau!', { autoClose: 2000 })
       }
     }
   }
@@ -80,6 +87,28 @@ const Register = () => {
               placeholder='Nhập email của bạn'
             />
             {errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
+            <label className='block text-sm font-medium text-gray-700'>Số điện thoại</label>
+            <input
+              {...register('phone')}
+              type='text'
+              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
+              placeholder='Nhập số điện thoại (10 số)'
+            />
+            {errors.phone && <p className='text-red-500 text-sm'>{errors.phone.message}</p>}
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
+            <label className='block text-sm font-medium text-gray-700'>Địa chỉ</label>
+            <input
+              {...register('address')}
+              type='text'
+              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
+              placeholder='Nhập địa chỉ của bạn'
+            />
+            {errors.address && <p className='text-red-500 text-sm'>{errors.address.message}</p>}
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
