@@ -11,7 +11,15 @@ class ProductPromotion extends Model
     protected $fillable =[
         'product_variant_id',
         'Promotion_id',
-        
     ];
     
+    public function promotion()
+    {
+        return $this->belongsTo(Promotion::class, 'promotion_id');
+    }
+
+    public function productVariant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
 }

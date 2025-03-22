@@ -6,8 +6,6 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
             </div>
-            <a href="{{route('products.create')}}" class="btn btn-success ">Create product</a>
-            <a href="{{route('products.index')}}" class="btn btn-danger m-lg-1">products being traded</a>
         </div>
 
         <!-- start row -->

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
+use App\Models\Oder;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Customer;
@@ -15,11 +15,10 @@ class StatisticsController extends Controller
     public function index()
     {
         
-        $totalRevenue = Order::sum('total_price');
+        $totalRevenue = Oder::sum('total_price');
 
         
-        $totalOrders = Order::count();
-
+        $totalOrders = Oder::count();
         
         $bestSellingProducts = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
             ->groupBy('product_id')
@@ -29,7 +28,7 @@ class StatisticsController extends Controller
             ->get();
 
         
-        $topCustomers = Order::select('customer_id', DB::raw('COUNT(id) as total_orders'))
+        $topCustomers = Oder::select('customer_id', DB::raw('COUNT(id) as total_orders'))
             ->groupBy('customer_id')
             ->orderByDesc('total_orders')
             ->with('customer')

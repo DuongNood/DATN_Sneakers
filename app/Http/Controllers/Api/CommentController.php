@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Models\Comment;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -31,8 +32,8 @@ class CommentController extends Controller
     {
         //
         $data = $request->validate([
-            'user_id' => 'required|exists:users,id',    
-            'product_id' => 'required|exists:products,id',    
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
             'content' => 'required',
             'status' => 'nullable|in:0,1'
         ]);
@@ -80,8 +81,8 @@ class CommentController extends Controller
     public function update(Request $request, string $id)
     {
         $data = $request->validate([
-            'user_id' => 'required|exists:users,id',    
-            'product_id' => 'required|exists:products,id',    
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
             'content' => 'required',
             'status' => 'nullable|in:0,1'
         ]);
@@ -92,7 +93,27 @@ class CommentController extends Controller
             return response()->json([
                 'message' => 'KHông tồn tại cmt có id=' . $id
             ], 404);
-    
+        }
+        
+        try {
+
+            // $data['status'] ??= 0;
+
+            $comment->update($data);
+
+            return response()->json($comment);
+
+        } catch (\Throwable $th) {
+
+            Log::error(
+                __CLASS__ . '@' . __FUNCTION__,
+                ['error' => $th->getMessage()]
+            );
+
+            return response()->json([
+                'message' => 'Loi he thong ' . $th
+            ], 500);
+
         }
     }
 
@@ -104,6 +125,32 @@ class CommentController extends Controller
         Comment::destroy($id);
 
         return response()->json([], 204);
+
+    }
+    public function getCmtByProductId(Product $product)
+    {
+
+        try {
+            $comments = Comment::where('product_id', $product->id)->get();
+
+            if ($comments->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'không tìm thấy dữ liệu bản ghi có id bình luận  = ' . $product->id
+                ], 404);
+            }
+            return response()->json([
+                'status' => true,
+                'message' => 'Hiển thị thành công',
+                'data' => $comments
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi hệ thống: ' . $th->getMessage()
+            ], 500);
+        }
 
     }
 }

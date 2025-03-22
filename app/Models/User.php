@@ -1,15 +1,14 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens; // ✅ Thêm HasApiTokens
 
-
-class User extends Model
+class User extends Authenticatable
 {
-    use HasFactory, SoftDeletes;
+    use HasApiTokens, HasFactory, SoftDeletes; // ✅ Sử dụng HasApiTokens
 
     protected $fillable = [
         'name',
@@ -17,12 +16,9 @@ class User extends Model
         'phone',
         'address',
         'password',
-
-        'email_verified_at',
-        'remember_token',
-
         'role_id',
-
+        'remember_token',
+        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -32,23 +28,28 @@ class User extends Model
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'phone' => 'string',
     ];
-     public function oder(){
+
+    public function orders()
+    {
         return $this->hasMany(Oder::class);
     }
-    public function isAdmin()
-{
-    return $this->role === 'admin';
-}
-
-public function isStaff()
-{
-    return $this->role === 'staff';
-}
 
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
+    public function isAdmin()
+    {
+        return $this->role_id === 1;
+    }
+
+    public function isStaff()
+    {
+        return $this->role_id === 2;
+    }
 }
+    
+

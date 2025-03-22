@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\ProductVariant;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 
 class ProductVariantController extends Controller
 {
@@ -16,9 +18,12 @@ class ProductVariantController extends Controller
     public function index()
     {
         //
-        $title ="product variant";
-        $productVariant= ProductVariant::where('status',true)->get();
-        return view('admin.product_variants.index',compact('title','productVariant'));
+        $title = "Biến thể sản phẩm";
+    $productVariant = ProductVariant::where('status', true)
+        ->orderBy('product_id') // 👉 Sắp xếp theo product_id
+        ->get();
+
+    return view('admin.product_variants.index', compact('title', 'productVariant'));;
     }
 
     /**
@@ -39,10 +44,10 @@ class ProductVariantController extends Controller
 
 
     public function store(Request $request)
-    {
-        // Validate toàn bộ dữ liệu
+{
+    try {
         $validatedData = $request->validate([
-            'product_variants'                  => 'required|array', // Phải là một mảng
+            'product_variants'                  => 'required|array', 
             'product_variants.*.sku'            => [
                 'required', 
                 'string', 
@@ -51,25 +56,25 @@ class ProductVariantController extends Controller
                     return $query->where('product_id', $request->input('product_id'));
                 })
             ],
-            'product_variants.*.product_id'     => 'required|exists:products,id', // Phải tồn tại trong bảng products
-            'product_variants.*.price'          => 'required|numeric|min:0', // Giá không âm
-            'product_variants.*.promotional_price' => 'nullable|numeric|min:0|lte:product_variants.*.price', // Giá khuyến mãi phải nhỏ hơn hoặc bằng giá gốc
-            'product_variants.*.quantity'       => 'required|integer|min:0', // Số lượng phải là số nguyên không âm
-            'product_variants.*.status'         => 'nullable|in:0,1' // Trạng thái chỉ nhận 0 hoặc 1
-        ], [
-            // Thông báo lỗi tùy chỉnh
-            'product_variants.required' => 'The variant list cannot be empty!',
-            'product_variants.array' => 'Invalid variant data!',
-            'product_variants.*.sku.required' => 'Each variant must have a SKU!',
-            'product_variants.*.sku.unique' => 'The SKU already exists for this product!',
-            'product_variants.*.product_id.required' => 'Each variant must have a product_id!',
-            'product_variants.*.product_id.exists' => 'Invalid product_id!',
-            'product_variants.*.price.required' => 'Product price is required!',
-            'product_variants.*.price.min' => 'Price cannot be negative!',
-            'product_variants.*.promotional_price.lte' => 'Promotional price must be less than or equal to the original price!',
-            'product_variants.*.quantity.required' => 'Quantity is required!',
-            'product_variants.*.quantity.integer' => 'Quantity must be an integer!',
-            'product_variants.*.status.in' => 'Status must be either 0 or 1!'
+            'product_variants.*.product_id'     => 'required|exists:products,id', 
+            'product_variants.*.price'          => 'required|numeric|min:0', 
+            'product_variants.*.promotional_price' => 'nullable|numeric|min:0|lte:product_variants.*.price', 
+            'product_variants.*.quantity'       => 'required|integer|min:0', 
+            'product_variants.*.status'         => 'nullable|in:0,1'
+        ],[
+            //THÊM THÔNG BÁO LỖI TÙY CHỈNH
+            'product_variants.required' => 'Danh sách biến thể không được để trống!',
+            'product_variants.array' => 'Dữ liệu biến thể không hợp lệ!',
+            'product_variants.*.sku.required' => 'Mỗi biến thể phải có một SKU!',
+            'product_variants.*.sku.unique' => 'SKU đã tồn tại cho sản phẩm này!',
+            'product_variants.*.product_id.required' => 'Mỗi biến thể phải có một product_id!',
+            'product_variants.*.product_id.exists' => 'product_id không hợp lệ!',
+            'product_variants.*.price.required' => 'Giá sản phẩm là bắt buộc!',
+            'product_variants.*.price.min' => 'Giá không được nhỏ hơn 0!',
+            'product_variants.*.promotional_price.lte' => 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá gốc!',
+            'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
+            'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
+            'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
         ]);
 
         // Lưu vào database
@@ -84,8 +89,21 @@ class ProductVariantController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Thêm biến thể thành công!');
+        return redirect()->route('product_variants.index')->with('success', 'Thêm biến thể thành công!');
+    } catch (ValidationException $e) {
+        // Bắt lỗi validate của Laravel
+        return back()->withErrors($e->errors())->withInput();
+    } catch (QueryException $e) {
+        // 💡 Bắt lỗi SQL trùng lặp SKU và tạo lỗi thủ công vào session
+        if ($e->errorInfo[1] == 1062) {
+            $errors = ['product_variants.*.sku' => 'SKU đã tồn tại cho sản phẩm này!'];
+            return back()->withErrors($errors)->withInput();
+        }
+
+        // Nếu là lỗi khác, hiển thị thông báo lỗi chung
+        return redirect()->route('product_variants.index')->withErrors(['error' => 'Có lỗi xảy ra, vui lòng thử lại!'])->withInput();
     }
+}
 
 
     /**
@@ -106,7 +124,7 @@ class ProductVariantController extends Controller
         $product = Product::get();
         $title ="product variant";
         if (!$productVariant) {
-            return redirect()->route('product_variants.index')->with('error','Product does not exist!');
+            return redirect()->route('product_variants.index')->with('error','Sản phẩm không tồn tại!');
         }
         return view('admin.product_variants.edit', compact('productVariant','product','title'));
 
@@ -154,7 +172,7 @@ class ProductVariantController extends Controller
     public function variantDiscontinued()
     {
         //
-        $title = "Product variant";
+        $title = "Biến thể sản phẩm";
         $listVariant = ProductVariant::where('status', false)->get();
         return view('admin.product_variants.variantDiscontinued',compact('title','listVariant'));
     }

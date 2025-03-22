@@ -17,30 +17,45 @@ class LoginController extends Controller
     {
         $credentials = $request->validate([
             'email' => 'required|string|email',
-            'password' => 'required|string',
+            'password' => 'required|string|min:6',
         ]);
 
         $user = User::where('email', $credentials['email'])->first();
-
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'message' => 'Email hoặc mật khẩu không chính xác!',
             ], 401);
         }
 
+        // Xóa token cũ (nếu có) để tránh trùng lặp
+        $user->tokens()->delete();
+
+        // Tạo token mới
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Đăng nhập thành công!',
             'token' => $token,
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role_id' => $user->role_id,
+            ],
         ], 200);
     }
+
     /**
      * Đăng xuất người dùng
      */
     public function logout(Request $request)
     {
+        if (!$request->user()) {
+            return response()->json([
+                'message' => 'Người dùng chưa đăng nhập!',
+            ], 401);
+        }
+
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
@@ -48,3 +63,4 @@ class LoginController extends Controller
         ], 200);
     }
 }
+

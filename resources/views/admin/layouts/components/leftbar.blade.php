@@ -7,46 +7,18 @@
             <div class="logo-box">
                 <a class='logo logo-light' href='index.html'>
                     <span class="logo-sm">
-
-
-                        <img src="{{ asset('admins/images/logo-sm.png')}}" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{{ asset('admins/images/logo-light.png')}}" alt="" height="24">
-
-                        <img src="assets/images/logo-sm.png" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="assets/images/logo-light.png" alt="" height="24">
-
-
                         <img src="{{ asset('admins/images/logo-sm.png') }}" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ asset('admins/images/logo-light.png') }}" alt="" height="24">
-
                     </span>
                 </a>
                 <a class='logo logo-dark' href='index.html'>
                     <span class="logo-sm">
-
-
-                        <img src="{{ asset('admins/images/logo-sm.png')}}" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{{ asset('admins/images/logo-dark.png')}}" alt="" height="24">
-
-                        <img src="assets/images/logo-sm.png" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="assets/images/logo-dark.png" alt="" height="24">
-
-
                         <img src="{{ asset('admins/images/logo-sm.png') }}" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ asset('admins/images/logo-dark.png') }}" alt="" height="24">
-
                     </span>
                 </a>
             </div>
@@ -118,62 +90,47 @@
                 <li>
                     <a href="#sidebarError" data-bs-toggle="collapse">
                         <i data-feather="alert-octagon"></i>
-
-
-                        <span> Product </span>
-
-                        <span> Error Pages </span>
-
-
-                        <span> Product </span>
-
+                        <span> Quản lí sản phẩm </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarError">
                         <ul class="nav-second-level">
                             <li>
-                                <a class='tp-link' href='{{route('products.index')}}'>List Product</a>
+                                <a class='tp-link' href='{{ route('products.index') }}'>Danh sách sản phẩm</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='{{route('product_variants.index')}}'>Product variants</a>
+                                <a class='tp-link' href='{{ route('product_variants.index') }}'>biến thể sản phẩm</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='error-503.html'>Error 503</a>
+                                <a class='tp-link' href='{{ route('products.productDiscontinued') }}'>Sản phẩm ngừng
+                                    kinh doanh</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='error-429.html'>Error 429</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='offline-page.html'>Offline Page</a>
+                                <a class='tp-link' href='{{ route('product_variants.variantDiscontinued') }}'>Biến thể
+                                    đã ngừng kinh doanh</a>
                             </li>
                         </ul>
                     </div>
                 </li>
 
-
-
-               
-                <li>
-                    <a class='tp-link' href='{{route('categories.index')}}'>
-                        <i data-feather="calendar"></i>
-                        <span> Category </span>
-                    </a>
-                </li>
-
-                                
-
-
-
                 <li>
                     <a class='tp-link' href='{{ route('categories.index') }}'>
-                        <i data-feather="package"></i>
-                        <span> Category </span>
+                        <i data-feather="calendar"></i>
+                        <span> Quản lí danh mục </span>
                     </a>
                 </li>
+
                 <li>
                     <a class='tp-link' href='{{ route('users.index') }}'>
                         <i data-feather="package"></i>
-                        <span> User </span>
+                        <span> Quản lí người dùng </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class='tp-link' href='{{ route('orders.index') }}'>
+                        <i data-feather="cpu"></i>
+                        <span> Quản lí đơn hàng </span>
                     </a>
                 </li>
                 <li>

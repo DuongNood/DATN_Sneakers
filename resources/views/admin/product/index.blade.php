@@ -6,8 +6,7 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
             </div>
-            <a href="{{route('products.create')}}" class="btn btn-success ">Create product</a>
-            <a href="{{route('products.productDiscontinued')}}" class="btn btn-danger m-lg-1">product discontinued</a>
+            <a href="{{route('products.create')}}" class="btn btn-success ">Thêm mới</a>
         </div>
 
         <!-- start row -->
@@ -44,7 +43,7 @@
                                             <th scope="row">{{$item->id}}</th>
                                             <td>{{$item->product_code}}</td>
                                             <td>{{$item->product_name}}</td>
-                                            <td><img src="{{Storage::url($item->image)}}" alt="" width="150px"></td>
+                                            <td><img src="{{ $item->image }} " alt="" width="150px"></td>
                                             <td>{{$item->description}}</td>
                                             <td>{{$item->category->category_name}}</td>
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">

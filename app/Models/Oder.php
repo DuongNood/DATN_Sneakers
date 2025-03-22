@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Oder extends Model
 {
     use HasFactory;
-    protected $fillable =[
+
+    protected $table = 'oders';
+
+    protected $fillable = [
         'user_id',
         'recipient_name',
         'recipient_phone',
@@ -18,36 +20,85 @@ class Oder extends Model
         'payment_method',
         'payment_status',
         'status',
-        
     ];
-    protected $casts =[
-        'status'=>'boolean' 
+
+    protected $casts = [
+        'total_price' => 'decimal:2',
+        'shipping_fee' => 'decimal:2',
     ];
-   
-    const TRANG_THAI_THANH_TOAN =[
-        'chua_thanh_toan'=>'chưa thanh toán',
-        'da_thanh_toan'=>'đã thanh toán',
+
+    // Trạng thái thanh toán
+    const PAYMENT_STATUS = [
+        'chua_thanh_toan' => 'Chưa thanh toán',
+        'da_thanh_toan' => 'Đã thanh toán',
     ];
-    const TRANG_THAI_DON_HANG = [
-        'cho_xac_nhan'=>'chờ xác nhận',
-        'da_xac_nhan'=>'đã xác nhận',
-        'dang_chuan_bi'=>'đang chuẩn bị',
-        'dang_van_chuyen'=>'đang vận chuyển',
-        'da_giang_hang'=>'đã giao hàng',
-        'huy_don_hang'=>'hủy đơn hàng'
+
+    // Trạng thái đơn hàng
+    const ORDER_STATUS = [
+        'cho_xac_nhan' => 'Chờ xác nhận',
+        'da_xac_nhan' => 'Đã xác nhận',
+        'dang_chuan_bi' => 'Đang chuẩn bị',
+        'dang_van_chuyen' => 'Đang vận chuyển',
+        'da_giao_hang' => 'Đã giao hàng',
+        'huy_don_hang' => 'Hủy đơn hàng',
     ];
-    const CHO_XAC_NHAN  = 'cho_xac_nhan';
+
+    // Định nghĩa trạng thái
+    const CHO_XAC_NHAN = 'cho_xac_nhan';
     const DA_XAC_NHAN = 'da_xac_nhan';
     const DANG_CHUAN_BI = 'dang_chuan_bi';
     const DANG_VAN_CHUYEN = 'dang_van_chuyen';
-    const DA_GIANG_HANG = 'da_giang_hang';
+    const DA_GIAO_HANG = 'da_giao_hang';
     const HUY_DON_HANG = 'huy_don_hang';
-    const CHUA_THANH_TOAN ='chua_thanh_toan';
-    const DA_THANH_TOAN ='da_thanh_toan';
-     public function user(){
-       return $this->belongsTo(User::class);
+    const CHUA_THANH_TOAN = 'chua_thanh_toan';
+    const DA_THANH_TOAN = 'da_thanh_toan';
+
+    /**
+     * Quan hệ với bảng users
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
-    public function oderDetail(){
-       return $this->hasMany(OderDetail::class);
+
+    /**
+     * Quan hệ với bảng order_details
+     */
+    public function oderDetails()
+    {
+        return $this->hasMany(OderDetail::class);
+    }
+
+    /**
+     * Scope lọc đơn hàng theo trạng thái
+     */
+    public function scopeStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Mutator: Chuẩn hóa số điện thoại
+     */
+    public function setRecipientPhoneAttribute($value)
+    {
+        $this->attributes['recipient_phone'] = preg_match('/^\+84/', $value) ? $value : '+84' . ltrim($value, '0');
+    }
+
+    /**
+     * Mutator: Định dạng tên người nhận (Viết hoa chữ cái đầu)
+     */
+    public function setRecipientNameAttribute($value)
+    {
+        $this->attributes['recipient_name'] = ucwords(strtolower($value));
+    }
+
+    /**
+     * Lấy trạng thái đơn hàng theo format dễ đọc hơn
+     */
+    public function getStatusTextAttribute()
+    {
+        return self::ORDER_STATUS[$this->status] ?? 'Không xác định';
     }
 }
+
