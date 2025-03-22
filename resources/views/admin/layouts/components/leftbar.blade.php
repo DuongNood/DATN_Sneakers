@@ -90,7 +90,7 @@
                 <li>
                     <a href="#sidebarError" data-bs-toggle="collapse">
                         <i data-feather="alert-octagon"></i>
-                        <span> Sản phẩm </span>
+                        <span> Quản lí sản phẩm </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarError">
@@ -102,11 +102,13 @@
                                 <a class='tp-link' href='{{ route('product_variants.index') }}'>biến thể sản phẩm</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='{{route('products.productDiscontinued')}}'>Sản phẩm ngừng kinh doanh</a>
+                                <a class='tp-link' href='{{ route('products.productDiscontinued') }}'>Sản phẩm ngừng
+                                    kinh doanh</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='{{route('product_variants.variantDiscontinued')}}'>Biến thể đã ngừng kinh doanh</a>
-                            </li>                          
+                                <a class='tp-link' href='{{ route('product_variants.variantDiscontinued') }}'>Biến thể
+                                    đã ngừng kinh doanh</a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -114,14 +116,21 @@
                 <li>
                     <a class='tp-link' href='{{ route('categories.index') }}'>
                         <i data-feather="calendar"></i>
-                        <span> Category </span>
+                        <span> Quản lí danh mục </span>
                     </a>
                 </li>
 
                 <li>
                     <a class='tp-link' href='{{ route('users.index') }}'>
                         <i data-feather="package"></i>
-                        <span> User </span>
+                        <span> Quản lí người dùng </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class='tp-link' href='{{ route('orders.index') }}'>
+                        <i data-feather="cpu"></i>
+                        <span> Quản lí đơn hàng </span>
                     </a>
                 </li>
 
