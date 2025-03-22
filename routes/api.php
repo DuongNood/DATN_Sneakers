@@ -22,7 +22,7 @@ use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-
+use App\Models\Promotion;
 
 Route::apiResource('banners', BannerController::class);
 
@@ -71,9 +71,13 @@ Route::resource('comments', CommentController::class);
 Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
 // route tin tức
 Route::resource('news', NewsController::class);
-// Quản lý User
+// User
 Route::apiResource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
+// Promotion
+Route::get('/promotions', function () {
+    return response()->json(Promotion::where('status', 1)->get());
+});
 
 
 Route::get('/statistics/total-revenue', [StatisticsController::class, 'totalRevenue']);
