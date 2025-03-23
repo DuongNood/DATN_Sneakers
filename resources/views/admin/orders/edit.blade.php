@@ -70,7 +70,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($order->details as $detail)
+                    @foreach ($order->orderDetails as $detail)
                         <tr class="border-b">
                             <td class="p-2">{{ $detail->productVariant->id }}</td>
                             <td class="p-2">{{ $detail->productVariant->product->name }}</td>
@@ -86,7 +86,7 @@
             </table>
 
             <div class="mb-4">
-                <a href="{{ route('ordersorders.index') }}" class="ml-4 text-blue-500">Quay lại</a>
+                <a href="{{ route('orders.index') }}" class="ml-4 text-blue-500">Quay lại</a>
                 <button type="submit" class="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Cập nhật</button>
             </div>
         </form>
