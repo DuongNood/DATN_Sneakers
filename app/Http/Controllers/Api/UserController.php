@@ -32,7 +32,15 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::find($id);
+
+        if ($user) {
+            return response()->json($user);
+        }
+
+        return response()->json([
+            'message' => 'Không tồn tại bản ghi có ID là: ' . $id
+        ], 404);
     }
 
     /**
@@ -40,8 +48,6 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $data = $request->validated();
-
         $user = User::find($id);
 
         if (!$user) {
@@ -57,7 +63,7 @@ class UserController extends Controller
 
             $currentImage = $user->image_user;
 
-            $user->update($data);
+            $user->update($request->all());
 
             if ($request->hasFile('image_user') && !empty($currentImage) && Storage::exists($currentImage)) {
                 Storage::delete($currentImage);
@@ -87,7 +93,7 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         User::destroy($id);
-        
+
         return response()->json([], 204);
     }
 
