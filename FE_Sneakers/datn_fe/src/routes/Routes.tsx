@@ -61,6 +61,7 @@ const RoutesConfig = () => {
           <Route path='/change-password' element={<ChangePasswordPage />} />
         </Route>
       </Routes>
+
       <Footer />
       <BackToTop />
     </>
