@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { FaTrash, FaMinus, FaPlus } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 const CartPage = () => {
+  const { t } = useTranslation() 
   const [cart, setCart] = useState([
     {
       id: 1,
@@ -48,7 +50,7 @@ const CartPage = () => {
 
   const removeItem = (id: number) => {
     setCart(cart.filter((item) => item.id !== id))
-    toast.success('Đã xóa sản phẩm khỏi giỏ hàng!', { position: 'top-right' })
+    toast.success(t('item_removed'), { position: 'top-right' })
   }
 
   const totalOriginalPrice = cart.reduce((acc, item) => (item.selected ? acc + item.price * item.quantity : acc), 0)
@@ -60,33 +62,32 @@ const CartPage = () => {
     if (discountCode === 'thicho') {
       setDiscountAmount(0.2 * totalDiscountPrice)
       setDiscountValid(true)
-      toast.success('Mã giảm giá áp dụng thành công!', { position: 'top-right' })
+      toast.success(t('discount_applied'), { position: 'top-right' })
     } else if (discountCode) {
       setDiscountAmount(0)
       setDiscountValid(false)
-      toast.error('Mã giảm giá không hợp lệ!', { position: 'top-right' })
+      toast.error(t('discount_invalid_message'), { position: 'top-right' })
     } else {
       setDiscountAmount(0)
       setDiscountValid(true)
     }
-  }, [discountCode, totalDiscountPrice])
+  }, [discountCode, totalDiscountPrice, t]) 
 
   const handlePayment = () => {
     const finalAmount = totalDiscountPrice - discountAmount
-    toast.success(`Thanh toán thành công! Tổng tiền: ${finalAmount.toLocaleString()}đ`, { position: 'top-right' })
+    toast.success(t('payment_success', { amount: finalAmount.toLocaleString() }), { position: 'top-right' })
   }
 
   if (!isLoggedIn) {
     return (
       <div className='max-w-5xl mx-auto p-4 bg-white shadow-md rounded-lg mt-6 text-center'>
         <Toaster />
-
-        <p className='text-gray-500 mb-4 text-red-500'>Bạn chưa đăng nhập, đăng nhập ngay để xem giỏ hàng!</p>
+        <p className='text-gray-500 mb-4 text-red-500'>{t('not_logged_in')}</p>
         <Link
           to='/login'
           className='inline-block bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition'
         >
-          Đăng nhập ngay
+          {t('login_now')}
         </Link>
       </div>
     )
@@ -95,10 +96,10 @@ const CartPage = () => {
   return (
     <div className='max-w-5xl mx-auto p-4 bg-white shadow-md rounded-lg mt-6'>
       <Toaster />
-      <h2 className='text-2xl font-semibold mb-4 text-center'>Giỏ hàng của bạn</h2>
+      <h2 className='text-2xl font-semibold mb-4 text-center'>{t('your_cart')}</h2>
 
       {cart.length === 0 ? (
-        <p className='text-gray-500 text-center'>Giỏ hàng của bạn đang trống, mua hàng ngay</p>
+        <p className='text-gray-500 text-center'>{t('cart_empty')}</p>
       ) : (
         <div className='space-y-4'>
           {cart.map((item) => (
@@ -146,37 +147,37 @@ const CartPage = () => {
 
           <div className='mt-6 p-5 bg-gray-200 rounded-lg text-sm md:text-lg'>
             <div className='flex justify-between font-medium'>
-              <span>Tổng tiền:</span>
+              <span>{t('total_price')}:</span>
               <span className='text-gray-700'>{totalOriginalPrice.toLocaleString()}đ</span>
             </div>
             <div className='flex justify-between font-medium text-green-600'>
-              <span>Tiết kiệm:</span>
+              <span>{t('savings')}:</span>
               <span>-{totalSavings.toLocaleString()}đ</span>
             </div>
             <div className='flex justify-between text-base md:text-xl font-semibold mt-2'>
-              <span>Thành tiền:</span>
+              <span>{t('subtotal')}:</span>
               <span className='text-red-500'>{totalDiscountPrice.toLocaleString()}đ</span>
             </div>
 
-            {/* Mã giảm giá */}
+           
             <div className='mt-4'>
               <input
                 type='text'
-                placeholder='Nhập mã giảm giá'
+                placeholder={t('discount_code_placeholder')}
                 value={discountCode}
                 onChange={(e) => setDiscountCode(e.target.value)}
                 className={`w-full p-3 border ${discountValid ? 'border-gray-300' : 'border-red-500'} rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
               />
-              {!discountValid && <p className='text-red-500 text-sm mt-2'>Mã giảm giá không hợp lệ</p>}
+              {!discountValid && <p className='text-red-500 text-sm mt-2'>{t('discount_invalid')}</p>}
             </div>
 
-            {/* Hiển thị giá cuối sau giảm giá */}
+          
             <div className='flex justify-between text-lg font-semibold mt-2'>
-              <span>Giảm giá:</span>
+              <span>{t('discount')}:</span>
               <span className='text-green-600'>- {discountAmount.toLocaleString()}đ</span>
             </div>
             <div className='flex justify-between text-xl font-semibold mt-2'>
-              <span>Tổng tiền:</span>
+              <span>{t('final_total')}:</span>
               <span className='text-red-500'>{(totalDiscountPrice - discountAmount).toLocaleString()}đ</span>
             </div>
 
@@ -184,7 +185,7 @@ const CartPage = () => {
               onClick={handlePayment}
               className='w-full mt-4 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition'
             >
-              Thanh toán
+              {t('checkout')}
             </button>
           </div>
         </div>

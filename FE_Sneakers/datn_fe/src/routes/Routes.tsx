@@ -19,12 +19,16 @@ import ChangePasswordPage from '../pages/ChangePasswordPage'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Navbar from '../components/TopHeader'
 import ProductDetail from '../pages/DetailsProduct'
+import ScrollToTop from '../components/ScrollToTop'
+import SearchContainer from '../components/Search'
+import SearchResults from '../components/SearchResults'
 
 const RoutesConfig = () => {
   return (
     <>
       <Navbar />
       <Header />
+      <ScrollToTop />
       <Routes>
         <Route
           path='/'
@@ -36,7 +40,6 @@ const RoutesConfig = () => {
               <ProductList />
               <TitleWithEffect1 />
               <ProductHot />
-              {/* <ProductDetail /> */}
             </>
           }
         />
@@ -49,6 +52,8 @@ const RoutesConfig = () => {
         <Route path='/detail-product/:id' element={<ProductDetail />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
+        <Route path='/' element={<SearchContainer />} />
+        <Route path='/search' element={<SearchResults />} />
         {/* Bảo vệ router */}
         <Route element={<ProtectedRoute />}>
           <Route path='/profile' element={<ProfilePage />} />

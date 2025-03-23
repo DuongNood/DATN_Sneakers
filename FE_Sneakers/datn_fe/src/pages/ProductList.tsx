@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 interface Product {
   id: number
-  name: string
+  product_name: string
   original_price: string
   discounted_price: string
-  imageUrl: string
+  image: string
   rating: number
 }
 
@@ -46,12 +47,36 @@ const ProductList = () => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
   const totalPages = Math.ceil(products.length / itemsPerPage)
 
+  const SkeletonLoading = () => (
+    <div className=''>
+      <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
+        {Array(itemsPerPage)
+          .fill(0)
+          .map((_, index) => (
+            <div
+              key={index}
+              className='bg-white shadow-lg rounded-lg p-4 text-center relative h-[18rem]'
+            >
+              <div className='absolute top-0 left-0 h-6 w-12 bg-gray-300 rounded-tr-md'></div>
+
+              <div className='w-full h-48 bg-gray-300 rounded-md mb-4'></div>
+
+              <div className='h-4 w-3/4 bg-gray-300 rounded mx-auto mb-2'></div>
+
+              <div className='flex justify-center items-center mb-2 space-x-2'>
+                <div className='h-4 w-16 bg-gray-300 rounded'></div>
+                <div className='h-4 w-20 bg-gray-300 rounded'></div>
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
+  )
+
   return (
     <div className='container mx-auto px-4 sm:px-8 md:px-16 my-12'>
       {isLoading ? (
-        <div className='flex justify-center items-center h-64'>
-          <div className='animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500'></div>
-        </div>
+        <SkeletonLoading />
       ) : (
         <>
           <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
@@ -59,13 +84,17 @@ const ProductList = () => {
               currentProducts.map((product) => (
                 <div
                   key={product.id}
-                  className='bg-white shadow-lg rounded-lg p-4 text-center relative cursor-pointer hover:shadow-xl transition-shadow duration-300'
+                  className='bg-white shadow-lg rounded-lg p-4 text-center relative cursor-pointer hover:shadow-xl transition-shadow duration-300 h-[18rem]' // Chiều cao cố định
                   onClick={() => handleProductClick(product.id)}
                 >
                   <div className='absolute top-0 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-tr-md z-10'>
                     <p className='text-sm text-white-500'>
                       -
-                      {Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100)}
+                      {Math.round(
+                        ((Number(product.original_price) - Number(product.discounted_price)) /
+                          Number(product.original_price)) *
+                          100
+                      )}
                       %
                     </p>
                   </div>
@@ -82,12 +111,12 @@ const ProductList = () => {
                   <div className='flex justify-center items-center mb-2'>
                     <p className='text-gray-500 line-through text-sm mr-2'>
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                        product.original_price
+                        Number(product.original_price)
                       )}
                     </p>
                     <p className='text-sm font-semibold text-red-500'>
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                        product.discounted_price
+                        Number(product.discounted_price)
                       )}
                     </p>
                   </div>
@@ -138,7 +167,7 @@ const ProductList = () => {
                 className='px-4 py-2 mx-1 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50'
                 disabled={currentPage === totalPages}
               >
-                Next{' '}
+                Next
               </button>
             </div>
           )}

@@ -3,18 +3,19 @@ import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import * as yup from 'yup'
-
+import { useTranslation } from 'react-i18next'
 
 const schema = yup.object().shape({
-  name: yup.string().required('Họ tên không được để trống'),
-  address: yup.string().required('Địa chỉ không được để trống'),
+  name: yup.string().required('name_required'),
+  address: yup.string().required('address_required'),
   phone: yup
     .string()
-    .matches(/^[0-9]{10}$/, 'Số điện thoại phải có 10 chữ số')
-    .required('Số điện thoại không được để trống')
+    .matches(/^[0-9]{10}$/, 'phone_invalid')
+    .required('phone_required')
 })
 
 const ProfilePage = () => {
+  const { t } = useTranslation() // Thêm useTranslation để dịch
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editField, setEditField] = useState({ name: false, address: false, phone: false })
@@ -32,7 +33,7 @@ const ProfilePage = () => {
         })
 
         if (!response.ok) {
-          throw new Error('Lỗi, vui lòng thử lại sau.')
+          throw new Error(t('fetch_error'))
         }
 
         const data = await response.json()
@@ -44,13 +45,13 @@ const ProfilePage = () => {
         })
         setLoading(false)
       } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu người dùng:', error)
+        console.error('Error fetching user data:', error)
         setLoading(false)
       }
     }
 
     fetchUserData()
-  }, [])
+  }, [t]) // Thêm t vào dependency để cập nhật khi ngôn ngữ thay đổi
 
   const handleEditToggle = (field) => {
     setEditField((prev) => ({ ...prev, [field]: !prev[field] }))
@@ -76,37 +77,80 @@ const ProfilePage = () => {
       })
 
       if (!response.ok) {
-        throw new Error('Không thể cập nhật thông tin')
+        throw new Error(t('update_error'))
       }
 
       const updatedData = await response.json()
       setUserData(updatedData)
       setEditField({ name: false, address: false, phone: false })
-      toast.success('Cập nhật thông tin thành công!', { autoClose: 1000 })
+      toast.success(t('update_success'), { autoClose: 1000 })
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         const newErrors = { name: '', address: '', phone: '' }
         error.inner.forEach((err) => {
-          newErrors[err.path] = err.message
+          newErrors[err.path] = t(err.message) // Dịch lỗi từ schema
         })
         setErrors(newErrors)
       } else {
-        console.error('Lỗi khi cập nhật thông tin:', error)
-        toast.error('Lỗi khi cập nhật, vui lòng thử lại.')
+        console.error('Error updating profile:', error)
+        toast.error(t('update_error'))
       }
     }
   }
 
-  if (loading) {
-    return (
-      <div className='flex justify-center items-center h-64'>
-        <div className='animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500'></div>
+  // Skeleton loading khớp với layout thực tế
+  const SkeletonLoading = () => (
+    <div className='max-w-5xl mx-auto p-6 mt-6 flex flex-col md:flex-row gap-6 animate-pulse'>
+      <div className='w-full md:w-1/4 bg-white shadow-md rounded-lg p-4'>
+        <div className='space-y-2'>
+          <div className='h-10 w-full bg-gray-300 rounded-md'></div>
+          <div className='h-10 w-full bg-gray-300 rounded-md'></div>
+          <div className='h-10 w-full bg-gray-300 rounded-md'></div>
+        </div>
       </div>
-    )
+      <div className='w-full md:w-3/4 bg-white shadow-md rounded-lg p-6'>
+        <div className='h-6 w-1/4 bg-gray-300 rounded mb-6'></div>
+        <div className='space-y-6'>
+          <div className='flex flex-col items-center'>
+            <div className='w-32 h-32 bg-gray-300 rounded-full mb-4'></div>
+            <div className='h-10 w-40 bg-gray-300 rounded'></div>
+          </div>
+          <div>
+            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
+            <div className='relative'>
+              <div className='w-full h-12 bg-gray-300 rounded-md'></div>
+            </div>
+          </div>
+          <div>
+            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
+            <div className='relative'>
+              <div className='w-full h-12 bg-gray-300 rounded-md'></div>
+            </div>
+          </div>
+          <div>
+            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
+            <div className='relative'>
+              <div className='w-full h-12 bg-gray-300 rounded-md'></div>
+            </div>
+          </div>
+          <div>
+            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
+            <div className='relative'>
+              <div className='w-full h-12 bg-gray-300 rounded-md'></div>
+            </div>
+          </div>
+          <div className='w-full h-12 bg-gray-300 rounded-lg'></div>
+        </div>
+      </div>
+    </div>
+  )
+
+  if (loading) {
+    return <SkeletonLoading />
   }
 
   if (!userData) {
-    return <p className='text-center text-lg'>Không tìm thấy thông tin người dùng.</p>
+    return <p className='text-center text-lg'>{t('no_user_data')}</p>
   }
 
   return (
@@ -114,19 +158,19 @@ const ProfilePage = () => {
       <div className='w-full md:w-1/4 bg-white shadow-md rounded-lg p-4'>
         <nav className='space-y-2'>
           <Link to='/profile' className='flex items-center p-2 text-blue-600 bg-blue-50 rounded-md'>
-            <span className='mr-2'>👤</span> Tài khoản của tôi
+            <span className='mr-2'>👤</span> {t('my_account')}
           </Link>
           <Link to='/change-password' className='flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md'>
-            <span className='mr-2'>🔒</span> Đổi mật khẩu
+            <span className='mr-2'>🔒</span> {t('change_password')}
           </Link>
           <Link to='/orders' className='flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md'>
-            <span className='mr-2'>📋</span> Đơn mua
+            <span className='mr-2'>📋</span> {t('orders')}
           </Link>
         </nav>
       </div>
 
       <div className='w-full md:w-3/4 bg-white shadow-md rounded-lg p-6'>
-        <h2 className='text-xl font-semibold mb-6'>Tài khoản của tôi</h2>
+        <h2 className='text-xl font-semibold mb-6'>{t('my_account')}</h2>
 
         <div className='space-y-6'>
           <div className='flex flex-col items-center'>
@@ -146,12 +190,12 @@ const ProfilePage = () => {
           </div>
 
           <div className='relative'>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>Họ tên</label>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>{t('name')}</label>
             <div className='relative'>
               <input
                 type='text'
                 className='w-full p-3 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder='Nhập họ tên'
+                placeholder={t('name_placeholder')}
                 value={formData.name}
                 onChange={(e) => handleInputChange(e, 'name')}
                 readOnly={!editField.name}
@@ -160,30 +204,30 @@ const ProfilePage = () => {
                 onClick={() => handleEditToggle('name')}
                 className='absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-600 hover:underline text-sm'
               >
-                {editField.name ? 'Hủy' : 'Thay đổi'}
+                {editField.name ? t('cancel') : t('edit')}
               </button>
             </div>
             {errors.name && <p className='text-red-500 text-sm mt-1'>{errors.name}</p>}
           </div>
 
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>Email</label>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>{t('email')}</label>
             <input
               type='email'
               className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='Nhập email'
+              placeholder={t('email_placeholder')}
               value={userData.email || ''}
               readOnly
             />
           </div>
 
           <div className='relative'>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>Địa chỉ</label>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>{t('address')}</label>
             <div className='relative'>
               <input
                 type='text'
                 className='w-full p-3 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder='Nhập địa chỉ'
+                placeholder={t('address_placeholder')}
                 value={formData.address}
                 onChange={(e) => handleInputChange(e, 'address')}
                 readOnly={!editField.address}
@@ -192,19 +236,19 @@ const ProfilePage = () => {
                 onClick={() => handleEditToggle('address')}
                 className='absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-600 hover:underline text-sm'
               >
-                {editField.address ? 'Hủy' : 'Thay đổi'}
+                {editField.address ? t('cancel') : t('edit')}
               </button>
             </div>
             {errors.address && <p className='text-red-500 text-sm mt-1'>{errors.address}</p>}
           </div>
 
           <div className='relative'>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>Số điện thoại</label>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>{t('phone')}</label>
             <div className='relative'>
               <input
                 type='text'
                 className='w-full p-3 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder='Nhập số điện thoại'
+                placeholder={t('phone_placeholder')}
                 value={formData.phone}
                 onChange={(e) => handleInputChange(e, 'phone')}
                 readOnly={!editField.phone}
@@ -213,7 +257,7 @@ const ProfilePage = () => {
                 onClick={() => handleEditToggle('phone')}
                 className='absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-600 hover:underline text-sm'
               >
-                {editField.phone ? 'Hủy' : 'Thay đổi'}
+                {editField.phone ? t('cancel') : t('edit')}
               </button>
             </div>
             {errors.phone && <p className='text-red-500 text-sm mt-1'>{errors.phone}</p>}
@@ -223,7 +267,7 @@ const ProfilePage = () => {
             onClick={handleSaveChanges}
             className='w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition'
           >
-            Lưu thay đổi
+            {t('save_changes')}
           </button>
         </div>
       </div>

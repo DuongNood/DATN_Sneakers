@@ -1,73 +1,76 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const ChangePasswordPage = () => {
+  const { t } = useTranslation() 
+
   return (
     <div className='max-w-5xl mx-auto p-6 mt-6 flex flex-col md:flex-row gap-6'>
-      {/* Menu dọc bên trái */}
+     
       <div className='w-full md:w-1/4 bg-white shadow-md rounded-lg p-4'>
         <nav className='space-y-2'>
           <Link to='/profile' className='flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md'>
-            <span className='mr-2'>👤</span> Tài khoản của tôi
+            <span className='mr-2'>👤</span> {t('my_account')}
           </Link>
           <Link to='/change-password' className='flex items-center p-2 text-blue-600 bg-blue-50 rounded-md'>
-            <span className='mr-2'>🔒</span> Đổi mật khẩu
+            <span className='mr-2'>🔒</span> {t('change_password')}
           </Link>
           <Link to='/orders' className='flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md'>
-            <span className='mr-2'>📋</span> Đơn mua
+            <span className='mr-2'>📋</span> {t('orders')}
           </Link>
         </nav>
       </div>
 
-      {/* Nội dung bên phải: Đổi mật khẩu */}
+     
       <div className='w-full md:w-3/4 bg-white shadow-md rounded-lg p-6'>
-        <h2 className='text-xl font-semibold mb-6'>Đổi mật khẩu</h2>
+        <h2 className='text-xl font-semibold mb-6'>{t('change_password')}</h2>
 
         <div className='space-y-6'>
-          {/* Mật khẩu cũ */}
+        
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>Mật khẩu cũ</label>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>{t('old_password')}</label>
             <input
               type='password'
               className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='Nhập mật khẩu cũ'
+              placeholder={t('old_password_placeholder')}
               value=''
               readOnly
             />
           </div>
 
-          {/* Mật khẩu mới */}
+      
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>Mật khẩu mới</label>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>{t('new_password')}</label>
             <input
               type='password'
               className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='Nhập mật khẩu mới'
+              placeholder={t('new_password_placeholder')}
               value=''
               readOnly
             />
           </div>
 
-          {/* Xác nhận mật khẩu mới */}
+        
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>Xác nhận mật khẩu mới</label>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>{t('confirm_new_password')}</label>
             <input
               type='password'
               className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='Xác nhận mật khẩu mới'
+              placeholder={t('confirm_new_password_placeholder')}
               value=''
               readOnly
             />
           </div>
 
-          {/* Nút lưu */}
+        
           <button className='w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition'>
-            Lưu thay đổi
+            {t('save_changes')}
           </button>
 
-          {/* Quên mật khẩu */}
+         
           <div className='text-center'>
             <Link to='/forgot-password' className='text-blue-600 hover:underline text-sm'>
-              Quên mật khẩu?
+              {t('forgot_password')}
             </Link>
           </div>
         </div>

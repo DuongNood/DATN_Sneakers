@@ -3,19 +3,31 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FiShoppingCart, FiUser, FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 import Search from './Search'
 
 const Header = () => {
+  const { t, i18n } = useTranslation()
   const [search, setSearch] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileProductOpen, setMobileProductOpen] = useState(false)
+  const [langOpen, setLangOpen] = useState(false)
   const navigate = useNavigate()
   const isLoggedIn = !!localStorage.getItem('user')
-  const user = isLoggedIn ? JSON.parse(localStorage.getItem('user')) : null
-  // Hàm đăng xuất
+  const user = isLoggedIn ? JSON.parse(localStorage.getItem('user') || '{}') : null
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng).then(() => {
+      setLangOpen(false)
+      toast.success(`${t('change_language')} ${lng === 'en' ? t('english') : t('vietnamese')}`)
+      console.log('Language changed to:', i18n.language)
+      console.log('Placeholder:', t('search_placeholder'))
+    })
+  }
+
   const handleLogout = () => {
     localStorage.clear()
-    toast.success('Đăng xuất thành công.'), { autoclose: 1000 }
+    toast.success(t('logout_success'), { autoClose: 1000 })
     navigate('/login')
   }
 
@@ -28,27 +40,27 @@ const Header = () => {
 
         <nav className='hidden md:flex space-x-8'>
           <Link to='/' className='nav-link'>
-            Trang Chủ
+            {t('home')}
           </Link>
           <div className='relative group hidden md:block'>
-            <button className='nav-link'>Sản phẩm</button>
+            <button className='nav-link'>{t('products')}</button>
             <div className='absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
               <Link to='/giay-nam' className='dropdown-link'>
-                Giày Nam
+                {t('men_shoes')}
               </Link>
               <Link to='/giay-nu' className='dropdown-link'>
-                Giày Nữ
+                {t('women_shoes')}
               </Link>
             </div>
           </div>
           <Link to='/product-sale' className='nav-link'>
-            Giảm Giá
+            {t('sale')}
           </Link>
           <Link to='/ho-tro' className='nav-link'>
-            Tin Tức
+            {t('news')}
           </Link>
           <Link to='/contact' className='nav-link'>
-            Liên Hệ
+            {t('contact')}
           </Link>
         </nav>
 
@@ -75,19 +87,18 @@ const Header = () => {
               </div>
               <div className='absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 <p className='px-4 py-2 text-gray-700 flex'>
-                  Hi,
-                  <div className='text-blue-600'>
-                    {(user?.name && user.name.length > 12 ? user.name.slice(0, 12) + '...' : user.name) || 'đại ka'}
-                  </div>{' '}
+                  {t('greeting', {
+                    name: user?. name?. length > 12 ? user.name.slice(0, 12) + '...' : user.name || t('default_name')
+                  })}
                 </p>
                 <Link to='/profile' className='dropdown-link'>
-                  Tài khoản của tôi
+                  {t('profile')}
                 </Link>
                 <Link to='/orders' className='dropdown-link'>
-                  Đơn hàng
+                  {t('orders')}
                 </Link>
                 <button onClick={handleLogout} className='w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100'>
-                  Đăng xuất
+                  {t('logout')}
                 </button>
               </div>
             </div>
@@ -113,14 +124,14 @@ const Header = () => {
         >
           <nav className='flex flex-col space-y-4 px-6'>
             <Link to='/' className='mobile-nav-link'>
-              Trang chủ
+              {t('home')}
             </Link>
             <div>
               <button
                 onClick={() => setMobileProductOpen(!mobileProductOpen)}
                 className='mobile-nav-link flex justify-between w-full'
               >
-                Sản phẩm
+                {t('products')}
                 <FiChevronDown
                   className={`transition-transform duration-300 ${mobileProductOpen ? 'rotate-180' : ''}`}
                 />
@@ -128,43 +139,43 @@ const Header = () => {
               {mobileProductOpen && (
                 <div className='pl-4 space-y-2'>
                   <Link to='/giay-nam' className='dropdown-link'>
-                    Giày Nam
+                    {t('men_shoes')}
                   </Link>
                   <Link to='/giay-nu' className='dropdown-link'>
-                    Giày Nữ
+                    {t('women_shoes')}
                   </Link>
                 </div>
               )}
             </div>
             <Link to='/product-sale' className='mobile-nav-link'>
-              Sale
+              {t('sale')}
             </Link>
             <Link to='/ho-tro' className='mobile-nav-link'>
-              Tin tức
+              {t('news')}
             </Link>
             <Link to='/contact' className='mobile-nav-link'>
-              Liên hệ
+              {t('contact')}
             </Link>
             {isLoggedIn && (
               <>
                 <Link to='/profile' className='mobile-nav-link'>
-                  Quản lý thông tin
+                  {t('profile')}
                 </Link>
                 <Link to='/orders' className='mobile-nav-link'>
-                  Quản lý đơn hàng
+                  {t('orders')}
                 </Link>
                 <button onClick={handleLogout} className='mobile-nav-link text-left'>
-                  Đăng xuất
+                  {t('logout')}
                 </button>
               </>
             )}
             <input
+              key={i18n.language}
               type='text'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className='w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-full 
-              focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-300'
-              placeholder='Tìm kiếm...'
+              className='w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-300'
+              placeholder={t('search_placeholder')}
             />
           </nav>
         </motion.div>
