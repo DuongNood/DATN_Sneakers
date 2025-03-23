@@ -22,7 +22,7 @@ type FormValues = {
 }
 
 const ContactPage: React.FC = () => {
-  const { t } = useTranslation() 
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const {
     register,
@@ -55,14 +55,14 @@ const ContactPage: React.FC = () => {
 
   return (
     <motion.div
-      className='container mx-auto p-20 shadow-md mt-5 mb-5'
+      className='container mx-auto p-4 md:p-20 shadow-md mt-5 mb-5'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <h1 className='text-4xl font-bold mb-8'>{t('contact')}</h1>
+      <h1 className='text-4xl font-bold mb-8 text-center'>{t('contact')}</h1>
 
-      <div className='flex flex-col lg:flex-row space-x-8 gap-8'>
+      <div className='flex flex-col lg:flex-row gap-8'>
         <motion.div className='w-full lg:w-1/2' initial={{ x: -100 }} animate={{ x: 0 }} transition={{ duration: 0.5 }}>
           <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
             <div>
@@ -127,10 +127,9 @@ const ContactPage: React.FC = () => {
           </form>
         </motion.div>
 
-      
         <motion.div className='w-full lg:w-1/2' initial={{ x: 100 }} animate={{ x: 0 }} transition={{ duration: 0.5 }}>
           <iframe
-            src='https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7447.727851395522!2d105.747262!3d21.03813!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313455e940879933%3A0xcf10b34e9f1a03df!2zVHLGsOG7nW5nIENhbyDEkeG6s25nIEZQVCBQb2x5dGVjaG5pYw!5e0!3m2!1sen!2sus!4v1722291695252!5m2!1sen!2sus'
+            src='https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7447.727851395522!2d105.747262!3d21.03813!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313455e940879933%3A0xcf10b34e9f1a03df!2zVHLGsOG7nW5nIENhzyDEkeG6s25nIEZQVCBQb2x5dGVjaG5pYw!5e0!3m2!1sen!2sus!4v1722291695252!5m2!1sen!2sus'
             width='100%'
             height='450'
             style={{ border: 0 }}
