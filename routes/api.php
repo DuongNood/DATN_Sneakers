@@ -16,7 +16,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
-
+use App\Http\Controllers\CartController;
 
 use App\Http\Controllers\Auth\RegisterController;
 
@@ -99,4 +99,16 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
 Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cart', [CartController::class, 'getUserCart']);
+    Route::get('/admin/carts', [CartController::class, 'getAllCarts'])->middleware('isAdmin');
+    Route::post('/cart/add', [CartController::class, 'addToCart']);
+    Route::put('/cart/update/{id}', [CartController::class, 'updateCartItem']);
+    Route::delete('/cart/remove/{id}', [CartController::class, 'removeCartItem']);
+    Route::delete('/cart/clear', [CartController::class, 'clearCart']);
+    Route::post('/cart/checkout', [CartController::class, 'checkout']);
+});
 
