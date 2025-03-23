@@ -4,11 +4,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Oder extends Model
+class Order extends Model
 {
     use HasFactory;
 
-    protected $table = 'oders';
+    protected $table = 'orders';
 
     protected $fillable = [
         'user_id',
@@ -66,7 +66,7 @@ class Oder extends Model
      */
     public function oderDetails()
     {
-        return $this->hasMany(OderDetail::class);
+        return $this->hasMany(OrderDetail::class);
     }
 
     /**
