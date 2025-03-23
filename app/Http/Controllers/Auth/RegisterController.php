@@ -19,8 +19,8 @@ class RegisterController extends Controller
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
-        'phone' => 'nullable|string|max:15',
-        'address' => 'nullable|string|max:255',
+        // 'phone' => 'nullable|string|max:15',
+        // 'address' => 'nullable|string|max:255',
         'password' => ['required', 'string', 'min:8', 'confirmed'], // Thêm 'confirmed'
         'role_id' => 'nullable|integer',
     ]);
@@ -62,8 +62,8 @@ class RegisterController extends Controller
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
-        'phone' => $request->phone,
-        'address' => $request->address,
+        // 'phone' => $request->phone,
+        // 'address' => $request->address,
         'password' => Hash::make($request->password),
         'role_id' => $roleId,
     ]);
