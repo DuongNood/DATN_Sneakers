@@ -73,8 +73,8 @@ class ProductController extends Controller
             'is_show_home' => $product->is_show_home,
             'created_at' => $product->created_at,
             'updated_at' => $product->updated_at,
-            'price' => $firstVariant ? $firstVariant->price : null,
-            'promotional_price' => $firstVariant ? $firstVariant->promotional_price : null,
+            'original_price' => $firstVariant ? $firstVariant->price : null,
+            'discounted_price' => $firstVariant ? $firstVariant->promotional_price : null,
             'quantity' => $firstVariant ? $firstVariant->quantity : null,
         ];
     });

@@ -5,10 +5,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens; // ✅ Thêm HasApiTokens
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, SoftDeletes; // ✅ Sử dụng HasApiTokens
+    use HasApiTokens, HasFactory, SoftDeletes, Notifiable; // ✅ Sử dụng HasApiTokens
 
     protected $fillable = [
         'name',
