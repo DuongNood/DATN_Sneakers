@@ -22,6 +22,7 @@ import ProductDetail from '../pages/DetailsProduct'
 import ScrollToTop from '../components/ScrollToTop'
 import SearchContainer from '../components/Search'
 import SearchResults from '../components/SearchResults'
+import BackToTop from '../components/BackToTop'
 
 const RoutesConfig = () => {
   return (
@@ -61,6 +62,7 @@ const RoutesConfig = () => {
         </Route>
       </Routes>
       <Footer />
+      <BackToTop />
     </>
   )
 }

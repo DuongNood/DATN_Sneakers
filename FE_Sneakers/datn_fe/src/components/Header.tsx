@@ -29,6 +29,13 @@ const Header = () => {
     localStorage.clear()
     toast.success(t('logout_success'), { autoClose: 1000 })
     navigate('/login')
+    setMenuOpen(false) 
+  }
+
+  
+  const handleLinkClick = () => {
+    setMenuOpen(false) 
+    setMobileProductOpen(false) 
   }
 
   return (
@@ -88,7 +95,7 @@ const Header = () => {
               <div className='absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
                 <p className='px-4 py-2 text-gray-700 flex'>
                   {t('greeting', {
-                    name: user?. name?. length > 12 ? user.name.slice(0, 12) + '...' : user.name || t('default_name')
+                    name: user?.name?.length > 12 ? user.name.slice(0, 12) + '...' : user.name || t('default_name')
                   })}
                 </p>
                 <Link to='/profile' className='dropdown-link'>
@@ -123,7 +130,7 @@ const Header = () => {
           className='md:hidden absolute top-16 left-0 w-full bg-white shadow-md py-4'
         >
           <nav className='flex flex-col space-y-4 px-6'>
-            <Link to='/' className='mobile-nav-link'>
+            <Link to='/' className='mobile-nav-link' onClick={handleLinkClick}>
               {t('home')}
             </Link>
             <div>
@@ -138,30 +145,30 @@ const Header = () => {
               </button>
               {mobileProductOpen && (
                 <div className='pl-4 space-y-2'>
-                  <Link to='/giay-nam' className='dropdown-link'>
+                  <Link to='/giay-nam' className='dropdown-link' onClick={handleLinkClick}>
                     {t('men_shoes')}
                   </Link>
-                  <Link to='/giay-nu' className='dropdown-link'>
+                  <Link to='/giay-nu' className='dropdown-link' onClick={handleLinkClick}>
                     {t('women_shoes')}
                   </Link>
                 </div>
               )}
             </div>
-            <Link to='/product-sale' className='mobile-nav-link'>
+            <Link to='/product-sale' className='mobile-nav-link' onClick={handleLinkClick}>
               {t('sale')}
             </Link>
-            <Link to='/ho-tro' className='mobile-nav-link'>
+            <Link to='/ho-tro' className='mobile-nav-link' onClick={handleLinkClick}>
               {t('news')}
             </Link>
-            <Link to='/contact' className='mobile-nav-link'>
+            <Link to='/contact' className='mobile-nav-link' onClick={handleLinkClick}>
               {t('contact')}
             </Link>
             {isLoggedIn && (
               <>
-                <Link to='/profile' className='mobile-nav-link'>
+                <Link to='/profile' className='mobile-nav-link' onClick={handleLinkClick}>
                   {t('profile')}
                 </Link>
-                <Link to='/orders' className='mobile-nav-link'>
+                <Link to='/orders' className='mobile-nav-link' onClick={handleLinkClick}>
                   {t('orders')}
                 </Link>
                 <button onClick={handleLogout} className='mobile-nav-link text-left'>
