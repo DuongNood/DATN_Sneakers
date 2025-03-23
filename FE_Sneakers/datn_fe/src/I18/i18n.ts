@@ -1,32 +1,18 @@
-// src/i18n.ts
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
-
-// Định nghĩa các bản dịch
-const resources = {
-  en: {
-    translation: {
-      welcome: 'Welcome to my app',
-      greeting: 'Hello, {{name}}!'
-    }
-  },
-  vi: {
-    translation: {
-      welcome: 'Chào mừng bạn đến với ứng dụng của tôi',
-      greeting: 'Xin chào, {{name}}!'
-    }
-  }
-}
+import HttpBackend from 'i18next-http-backend'
 
 i18n
-  .use(LanguageDetector) // Sử dụng detector để phát hiện ngôn ngữ
-  .use(initReactI18next) // Kết nối với React
+  .use(HttpBackend)
+  .use(initReactI18next)
   .init({
-    resources,
-    fallbackLng: 'vi', // Ngôn ngữ mặc định nếu không phát hiện được
+    lng: 'vi', // Ngôn ngữ mặc định là tiếng Việt
+    fallbackLng: 'en', // Dự phòng là tiếng Anh
+    backend: {
+      loadPath: '/locales/{{lng}}/translation.json'
+    },
     interpolation: {
-      escapeValue: false // React đã tự động escape
+      escapeValue: false
     }
   })
 

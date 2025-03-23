@@ -6,12 +6,14 @@ import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import axios from 'axios'
+import { useTranslation } from 'react-i18next'
 
 const schema = yup.object().shape({
-  email: yup.string().email('Email không hợp lệ').required('Vui lòng nhập email')
+  email: yup.string().email('email_invalid').required('email_required')
 })
 
 const ForgotPassword = () => {
+  const { t } = useTranslation() 
   const navigate = useNavigate()
   const {
     register,
@@ -24,10 +26,10 @@ const ForgotPassword = () => {
   const onSubmit = async (data: { email: string }) => {
     try {
       await axios.post('http://127.0.0.1:8000/api/forgot-password', { email: data.email })
-      toast.success('Vui lòng kiểm tra email để đặt lại mật khẩu.', { autoClose: 2000 })
+      toast.success(t('reset_password_success'), { autoClose: 2000 })
       setTimeout(() => navigate('/login'), 2000)
     } catch (error) {
-      toast.error('Lỗi, vui lòng thử lại.')
+      toast.error(t('reset_password_error'))
     }
   }
 
@@ -39,18 +41,18 @@ const ForgotPassword = () => {
         transition={{ duration: 0.8, ease: 'easeInOut' }}
         className='w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl bg-white shadow-lg rounded-lg p-6 sm:p-8'
       >
-        <h2 className='text-2xl font-semibold text-gray-800 mb-6 text-center'>Quên Mật Khẩu</h2>
+        <h2 className='text-2xl font-semibold text-gray-800 mb-6 text-center'>{t('forgot_password')}</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
           <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-            <label className='block text-sm font-medium text-gray-700'>Email</label>
+            <label className='block text-sm font-medium text-gray-700'>{t('email')}</label>
             <input
               type='email'
               className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder='Nhập email của bạn'
+              placeholder={t('email_placeholder')}
               {...register('email')}
             />
-            {errors.email && <span className='text-red-500 text-sm'>{errors.email.message}</span>}
+            {errors.email && <span className='text-red-500 text-sm'>{t(errors.email.message)}</span>}
           </motion.div>
 
           <motion.button
@@ -59,14 +61,14 @@ const ForgotPassword = () => {
             transition={{ duration: 0.3 }}
             className='w-full bg-blue-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition'
           >
-            Gửi Yêu Cầu
+            {t('send_request')}
           </motion.button>
         </form>
 
         <p className='text-gray-600 mt-6 text-center text-sm'>
-          Đã có tài khoản?{' '}
+          {t('have_account')}{' '}
           <Link to='/login' className='text-blue-500 hover:underline'>
-            Đăng nhập
+            {t('login')}
           </Link>
         </p>
       </motion.div>

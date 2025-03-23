@@ -1,26 +1,27 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'react-toastify'
 
 const Navbar = () => {
+  const { t, i18n } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen)
   }
 
-  const changeLanguage = (lang) => {
-    if (lang === 'vi') {
-      console.log('Đã chuyển sang Tiếng Việt!')
-    } else if (lang === 'en') {
-      console.log('Switched to English!')
-    }
-    setIsOpen(false)
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng).then(() => {
+      toast.success(t(`language_changed_to_${lng}`), { autoClose: 1000 })
+      setIsOpen(false)
+    })
   }
 
   return (
     <div className='flex justify-end items-center bg-white-100 p-2 border-b border-gray-300 relative z-[1000]'>
       <div className='flex items-center mr-6'>
         <span className='text-lg mr-2'>👑</span>
-        <span className='text-sm text-gray-700 '>Pole Sneakers</span>
+        <span className='text-sm text-gray-700'>{t('pole_sneakers')}</span>
       </div>
 
       <div className='relative mr-6'>
@@ -29,7 +30,7 @@ const Navbar = () => {
           className='bg-blue-600 text-white px-4 py-1 rounded-md text-sm hover:bg-blue-700 focus:outline-none flex items-center'
         >
           <span className='mr-2'>🌐</span>
-          <span>Ngôn ngữ</span>
+          <span>{t('language')}</span>
         </button>
         {isOpen && (
           <div className='absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-[2000]'>
@@ -37,13 +38,13 @@ const Navbar = () => {
               onClick={() => changeLanguage('vi')}
               className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
             >
-              Tiếng Việt
+              {t('vietnamese')}
             </button>
             <button
               onClick={() => changeLanguage('en')}
               className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
             >
-              Tiếng Anh
+              {t('english')}
             </button>
           </div>
         )}
@@ -51,7 +52,7 @@ const Navbar = () => {
 
       <div className='flex items-center'>
         <span className='text-lg mr-2'>📞</span>
-        <span className='text-sm text-gray-700'>Liên Hệ: 0399922999</span>
+        <span className='text-sm text-gray-700'>{t('contact')}: 0399926999</span>
       </div>
     </div>
   )
