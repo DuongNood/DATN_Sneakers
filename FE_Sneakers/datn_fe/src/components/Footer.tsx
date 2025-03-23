@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 
 const Footer = () => {
+  const { t } = useTranslation()
+
   const handleSubmit = (event) => {
     event.preventDefault()
     const email = event.target.elements.email.value
@@ -15,84 +18,85 @@ const Footer = () => {
       mode: 'no-cors'
     })
       .then(() => {
-        toast.success('Đăng ký nhận tin thành công!', {
+        toast.success(t('subscription_success'), {
           autoClose: 1000
         })
       })
       .catch((error) => {
-        console.error('Lỗi gửi dữ liệu:', error)
+        console.error('Error sending data:', error)
       })
 
     event.target.reset()
   }
+
   return (
     <footer className='bg-gray-900 text-gray-300 py-12'>
       <div className='container mx-auto px-6 md:px-12'>
         <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
           <div>
-            <h2 className='text-2xl font-bold text-white'>Sneakers</h2>
-            <p className='mt-3 text-sm'>Chuyên cung cấp giày sneakers chính hãng, mẫu mã đa dạng.</p>
+            <h2 className='text-2xl font-bold text-white'>{t('footer_brand')}</h2>
+            <p className='mt-3 text-sm'>{t('footer_brand_description')}</p>
           </div>
 
           <div>
-            <h3 className='text-lg font-semibold text-white mb-4'>Về Chúng Tôi</h3>
+            <h3 className='text-lg font-semibold text-white mb-4'>{t('about_us')}</h3>
             <ul className='space-y-3'>
               <li>
                 <Link to='/about' className='hover:text-white transition'>
-                  Giới thiệu
+                  {t('about')}
                 </Link>
               </li>
               <li>
                 <Link to='/contact' className='hover:text-white transition'>
-                  Liên hệ
+                  {t('contact')}
                 </Link>
               </li>
               <li>
                 <Link to='/privacy-policy' className='hover:text-white transition'>
-                  Chính sách bảo mật
+                  {t('privacy_policy')}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className='text-lg font-semibold text-white mb-4'>Hỗ Trợ</h3>
+            <h3 className='text-lg font-semibold text-white mb-4'>{t('support')}</h3>
             <ul className='space-y-3'>
               <li>
                 <Link to='/faq' className='hover:text-white transition'>
-                  Câu hỏi thường gặp
+                  {t('faq')}
                 </Link>
               </li>
               <li>
                 <Link to='/return-policy' className='hover:text-white transition'>
-                  Chính sách đổi trả
+                  {t('return_policy')}
                 </Link>
               </li>
               <li>
                 <Link to='/how-to-buy' className='hover:text-white transition'>
-                  Hướng dẫn mua hàng
+                  {t('how_to_buy')}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className='text-lg font-semibold text-white mb-4'>Đăng ký nhận tin</h3>
-            <p className='text-sm mb-3'>Nhận thông tin mới nhất về sản phẩm & khuyến mãi.</p>
+            <h3 className='text-lg font-semibold text-white mb-4'>{t('subscribe')}</h3>
+            <p className='text-sm mb-3'>{t('subscribe_description')}</p>
             <div className='flex'>
               <form className='flex' onSubmit={handleSubmit}>
                 <input
                   type='email'
                   name='email'
                   required
-                  placeholder='Nhập email...'
+                  placeholder={t('email_placeholder')}
                   className='w-full p-2 text-gray-900 rounded-l-md focus:outline-none'
                 />
                 <button
                   type='submit'
                   className='bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-r-md transition'
                 >
-                  Gửi
+                  {t('submit')}
                 </button>
               </form>
             </div>
@@ -102,7 +106,7 @@ const Footer = () => {
         <div className='border-t border-gray-700 my-6'></div>
 
         <div className='flex flex-col md:flex-row items-center justify-between'>
-          <p className='text-sm'>© {new Date().getFullYear()} Sneakers. All rights reserved.</p>
+          <p className='text-sm'>{t('copyright', { year: new Date().getFullYear() })}</p>
           <div className='flex space-x-4 mt-4 md:mt-0'>
             <a
               href='https://www.facebook.com'
@@ -110,7 +114,7 @@ const Footer = () => {
               rel='noopener noreferrer'
               className='hover:text-white transition'
             >
-              Facebook
+              {t('facebook')}
             </a>
             <a
               href='https://www.instagram.com'
@@ -118,7 +122,7 @@ const Footer = () => {
               rel='noopener noreferrer'
               className='hover:text-white transition'
             >
-              Instagram
+              {t('instagram')}
             </a>
             <a
               href='https://www.twitter.com'
@@ -126,7 +130,7 @@ const Footer = () => {
               rel='noopener noreferrer'
               className='hover:text-white transition'
             >
-              Twitter
+              {t('twitter')}
             </a>
           </div>
         </div>

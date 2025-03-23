@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('product_name')->unique();
             $table->string('image')->nullable();
             $table->text('description')->nullable();
+            $table->double('original_price'); // Giá gốc 
+            $table->double('discounted_price')->nullable(); // Giá sau giảm giá mặc định
             $table->foreignIdFor(Category::class)->constrained();
             $table->boolean('status')->default(true);
             $table->boolean('is_show_home')->default(true);

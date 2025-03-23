@@ -5,8 +5,9 @@
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
 
-                <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
+                <h4 class="fs-18 fw-semibold m-0">Danh mục</h4>
             </div>
+             <a href="{{route('categories.create')}}" class="btn btn-success col-1">Thêm mới</a>
         </div>
 
         <!-- start row -->
@@ -16,9 +17,9 @@
                     <div class="card-body">
                         <div class="table-responsive">
 
-                <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>              
+            
             </div>
-            <a href="{{route('categories.create')}}" class="btn btn-success col-1">Create</a>
+           
         </div>
 
         <!-- start row -->

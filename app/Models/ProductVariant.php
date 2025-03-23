@@ -11,6 +11,7 @@ class ProductVariant extends Model
     protected $fillable =[
         'sku',
         'product_id',
+        'size',
         'price',
         'promotional_price',
         'quantity',
@@ -22,7 +23,7 @@ class ProductVariant extends Model
 
     public function orderDetails()
     {
-        return $this->hasMany(OderDetail::class);
+        return $this->hasMany(OrderDetail::class);
     }
 
     public function product()

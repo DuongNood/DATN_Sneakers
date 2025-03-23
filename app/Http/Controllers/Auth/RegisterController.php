@@ -21,12 +21,12 @@ class RegisterController extends Controller
         'email' => 'required|string|email|max:255|unique:users',
         'phone' => 'nullable|string|max:15',
         'address' => 'nullable|string|max:255',
-        'password' => 'required|string|min:8',
+        'password' => ['required', 'string', 'min:8', 'confirmed'], // Thêm 'confirmed'
         'role_id' => 'nullable|integer',
     ]);
+    
 
     $roleId = $request->role_id;
-
     if ($roleId === 1 || $roleId === 2) {
         // Kiểm tra xem role có tồn tại chưa
         $roleExists = \DB::table('roles')->where('id', $roleId)->exists();

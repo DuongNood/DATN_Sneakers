@@ -34,43 +34,55 @@
                                         <form id="variant-form" action="{{ route('product_variants.store') }}" method="POST">
                                             @csrf
                                             <div id="variant-table">                                              
-                                            <div class="variant-row row align-items-end mb-3">
-                                                <div class="col-md-2 ">
-                                                    <label for="simpleinput" class="form-label">variant name</label>
-                                                    <input type="text" class="form-control" name="product_variants[0][sku]"  placeholder="variant name"
-                                                    value="{{ old('product_variants.0.sku') }}">
-                                                    @error('product_variants.0.sku')
-                                                        <p class="text-danger position-absolute">{{ $message }}</p>
-                                                    @enderror
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="simpleinput" class="form-label">Product name</label>
-                                                    <select class="form-select" aria-label="Default select example" name="product_variants[0][product_id]" >
-                                                        @foreach ($product as $item)
-                                                            <option value="{{ $item->id }}">{{ $item->product_name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="simpleinput" class="form-label">Price</label>
-                                                    <input type="number" class="form-control" name="product_variants[0][price]" step="0.01" 
-                                                        placeholder="Price" value="{{ old('product_variants.0.price') }}">
-                                                        @error('product_variants.0.price')
+                                            @foreach(old('product_variants', [0 => []]) as $key => $variant)
+                                                <div class="variant-row row align-items-end mb-3">
+                                                    <div class="col-md-2">
+                                                        <label for="simpleinput" class="form-label">Variant name</label>
+                                                        <input type="text" class="form-control" name="product_variants[{{ $key }}][sku]" placeholder="Variant name"
+                                                            value="{{ old("product_variants.$key.sku") }}">
+                                                        @error("product_variants.$key.sku")
                                                             <p class="text-danger position-absolute">{{ $message }}</p>
                                                         @enderror
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label for="simpleinput" class="form-label">Product name</label>
+                                                        <select class="form-select" name="product_variants[{{ $key }}][product_id]">
+                                                            @foreach ($product as $item)
+                                                                <option value="{{ $item->id }}" {{ old("product_variants.$key.product_id") == $item->id ? 'selected' : '' }}>
+                                                                    {{ $item->product_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label for="simpleinput" class="form-label">Price</label>
+                                                        <input type="number" class="form-control" name="product_variants[{{ $key }}][price]"
+                                                            value="{{ old("product_variants.$key.price") }}" placeholder="Price" step="0.01">
+                                                        @error("product_variants.$key.price")
+                                                            <p class="text-danger position-absolute">{{ $message }}</p>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label for="simpleinput" class="form-label">Promotional price</label>
+                                                        <input type="number" class="form-control" name="product_variants[{{ $key }}][promotional_price]"
+                                                            value="{{ old("product_variants.$key.promotional_price") }}" placeholder="Promotional price" step="0.01">
+                                                        @error("product_variants.$key.promotional_price")
+                                                            <p class="text-danger position-absolute">{{ $message }}</p>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label for="simpleinput" class="form-label">Quantity</label>
+                                                        <input type="number" class="form-control" name="product_variants[{{ $key }}][quantity]"
+                                                            value="{{ old("product_variants.$key.quantity") }}" placeholder="Quantity">
+                                                        @error("product_variants.$key.quantity")
+                                                            <p class="text-danger position-absolute">{{ $message }}</p>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <button type="button" class="remove-row btn btn-danger">Xóa</button>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <label for="simpleinput" class="form-label">quantity</label>
-                                                    <input type="number" class="form-control" name="product_variants[0][quantity]"  placeholder="quantity"
-                                                    value="{{ old('product_variants.0.quantity') }}">
-                                                    @error('product_variants.0.quantity')
-                                                        <p class="text-danger position-absolute">{{ $message }}</p>
-                                                    @enderror
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <button type="button" class="remove-row btn btn-danger">Xóa</button>
-                                                </div>
-                                            </div>
+                                            @endforeach
 
                                             </div>
 
@@ -94,40 +106,46 @@
 @endsection
 @section('js')
     <script>
-     $(document).ready(function () {
-            let index = 0; // Biến đếm số lượng biến thể
+    $(document).ready(function () {
+            let index = {{ count(old('product_variants', [0 => []])) - 1 }}; // Lấy số lượng biến thể đã có từ old()
 
+            // Thêm biến thể mới
             $("#add-variant").click(function () {
-                index++; // Tăng chỉ mục cho mỗi biến thể mới
+                index++;
                 let newRow = `
             <div class="variant-row row align-items-end mb-3">
                 <div class="col-md-2">
-                    <input type="text" class="form-control" name="product_variants[${index}][sku]"  placeholder="SKU"
-                    value="{{ old('product_variants.${index}.sku') }}">
-                    @error('product_variants.${index}.sku')
-                        <p class="text-danger position-absolute">{{ $message }}</p>
-                    @enderror
+                    <input type="text" class="form-control" name="product_variants[${index}][sku]" 
+                           placeholder="SKU">
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" name="product_variants[${index}][product_id]" >
+                    <select class="form-select" name="product_variants[${index}][product_id]">
                         @foreach ($product as $item)
                             <option value="{{ $item->id }}">{{ $item->product_name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <input type="number" class="form-control" name="product_variants[${index}][price]" step="0.01"  placeholder="Giá">
+                    <input type="number" class="form-control" name="product_variants[${index}][price]" 
+                           placeholder="Price" step="0.01">
                 </div>
                 <div class="col-md-2">
-                    <input type="number" class="form-control" name="product_variants[${index}][quantity]"  placeholder="Số lượng">
+                    <input type="number" class="form-control" name="product_variants[${index}][promotional_price]" 
+                           placeholder="Promotional price" step="0.01">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" name="product_variants[${index}][quantity]" 
+                           placeholder="Quantity">
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="remove-row btn btn-danger">Xóa</button>
                 </div>
-            </div>`;
+            </div>
+        `;
                 $("#variant-table").append(newRow);
             });
 
+            // Xóa biến thể
             $(document).on("click", ".remove-row", function () {
                 $(this).closest(".variant-row").remove();
             });

@@ -6,8 +6,6 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
             </div>
-            <a href="{{route('product_variants.create')}}" class="btn btn-success col-1">Create</a>
-            <a href="{{route('product_variants.variantDiscontinued')}}" class="btn btn-primary m-lg-1">variant</a>
         </div>
 
         <!-- start row -->

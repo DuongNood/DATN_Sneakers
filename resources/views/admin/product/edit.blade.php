@@ -47,8 +47,8 @@
                                     <div class="mb-3">
                                         <label for="example-password" class="form-label">Is show home</label>
                                         <select class="form-select" aria-label="Default select example" name="is_show_home">
-                                            <option value="1" {{ $item->is_show_home == 1 ? 'selected' : '' }}>Display</option>
-                                            <option value="0" {{ $item->is_show_home == 0 ? 'selected' : '' }}>Hide</option>
+                                            <option value="1" {{ $item->is_show_home == 0 ? 'selected' : '' }}>Display</option>
+                                            <option value="0" {{ $item->is_show_home == 1 ? 'selected' : '' }}>Hide</option>
                                         </select>
                                     </div>
 
@@ -72,7 +72,7 @@
                                         <label for="image" class="form-label">Image</label>
                                         <input type="file" id="image" name="image" class="form-control"
                                             onchange="showIamge(event)">
-                                        <img id="img_product" src="{{Storage::url($product->image)}}" alt="hinh anh" style="width:150px">
+                                        <img id="img_product" src="{{$product->image}}" alt="hinh anh" style="width:150px">
                                     </div>
                                     <div class="mb-3">
                                         <label for="hinh_anh" class="form-label">Album product</label>
@@ -84,7 +84,7 @@
                                                     <tr>
                                                         <td class="d-flex align-items-center">
                                                             <img id="preview_{$index}"
-                                                                src="{{Storage::url($image->image_product)}}"
+                                                                src="{{$image->image_product}}"
                                                                 alt="hinh anh" style="width:50px" class="me-3">
                                                             <input type="file" id="hinh_anh" name="list_image[{{$image->id}}]" class="form-control" onchange="previewImage(this,{{$index}})">
                                                             <input type="hidden" name="list_image[{{$image->id}}]" value="{{$image->id}}">

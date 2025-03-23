@@ -1,339 +1,245 @@
-import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "../assets/style/css/productDetail.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "../assets/style/css/news.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
-const relatedProducts = [
-  {
-    id: 1,
-    name: "Diamond Halo Stud Ligula",
-    price: "$732.00",
-    imageUrl:
-      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-    discount: 10,
-  },
-  {
-    id: 2,
-    name: "Diamond Halo Stud Ligula",
-    price: "$732.00",
-    imageUrl:
-      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-    discount: 15,
-  },
-  {
-    id: 3,
-    name: "Diamond Halo Stud Ligula",
-    price: "$732.00",
-    imageUrl:
-      "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-    discount: 5,
-  },
-];
+interface Product {
+  id: number
+  name: string
+  original_price: string
+  discounted_price: string
+  product_code: string
+  imageUrl: string | null
+  rating: number
+  quantity?: number
+  images?: string[]
+}
 
-const categories = [
-  "Tin khuyến mãi",
-  "Tin khuyến mãi",
-  "Tin khuyến mãi",
-  "Tin khuyến mãi",
-  "Tin khuyến mãi",
-];
+const ProductDetail = () => {
+  const navigate = useNavigate()
+  const { id } = useParams()
 
-const recentPosts = [
-  {
-    img: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-    title: "Lorem ipsum dolor sit amet consectetur adipiscing",
-    date: "25/02/2020",
-  },
-  {
-    img: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-    title: "Lorem ipsum dolor sit amet consectetur adipiscing",
-    date: "25/02/2020",
-  },
-  {
-    img: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-    title: "Lorem ipsum dolor sit amet consectetur adipiscing",
-    date: "25/02/2020",
-  },
-];
-const keywords = ["Thể thao", "Xu hướng", "Trang sức", "Man", "Giày", "Giày thể thao", "Sport"];
+  const [product, setProduct] = useState<Product | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [quantity, setQuantity] = useState(1)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
 
-const DetailsProduct = () => {
-  const [selectedImage, setSelectedImage] = useState(
-    "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400"
-  );
-  const [selectedColor, setSelectedColor] = useState("red");
-
-  const colorImages = [
-    {
-      color: "red",
-      imageUrl: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400",
-    },
-    {
-      color: "blue",
-      imageUrl:
-        "https://product.hstatic.net/1000150581/product/1124a5577-4__9__d16ebe37003d42c6ab0ebdb4aa299630.jpg",
-    },
-    {
-      color: "green",
-      imageUrl:
-        "https://product.hstatic.net/1000150581/product/1124a5577-4__9__d16ebe37003d42c6ab0ebdb4aa299630.jpg",
-    },
-    {
-      color: "yellow",
-      imageUrl: "https://images.pexels.com/photos/2529157/pexels-photo-2529157.jpeg?auto=compress&cs=tinysrgb&w=400",
-    },
-  ];
-
-  const handleColorChange = (color: string) => {
-    setSelectedColor(color);
-    const selectedColorImage = colorImages.find((c) => c.color === color);
-    if (selectedColorImage) {
-      setSelectedImage(selectedColorImage.imageUrl);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch(`http://localhost:8000/api/detail-product/${id}`)
+        if (!response.ok) throw new Error('API không phản hồi')
+        const data = await response.json()
+        const productData = data.data
+        setProduct({
+          id: productData.id,
+          name: productData.product_name,
+          original_price: productData.original_price,
+          discounted_price: productData.discounted_price,
+          imageUrl: productData.image || 'https://via.placeholder.com/300',
+          rating: productData.rating || 5,
+          product_code: productData.product_code || 'SP123',
+          quantity: productData.quantity,
+          images: productData.images || [productData.image || 'https://via.placeholder.com/300']
+        })
+        setSelectedImage(productData.image || 'https://via.placeholder.com/300')
+      } catch (error) {
+        console.error('Lỗi khi fetch sản phẩm:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  };
 
-  const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
-  const sizes = ["36", "37", "38", "39", "40", "41", "42"];
+    if (id) fetchProduct()
+  }, [id])
 
-  const handleSizeChange = (size: string | number) => {
-    setSelectedSize(size.toString());
-  };
+  const handleQuantityChange = (change: number) => {
+    setQuantity((prev) => {
+      const newQuantity = prev + change
+      if (newQuantity < 1) return 1
+      if (product && newQuantity > (product.quantity || 0)) return product.quantity || 0
+      return newQuantity
+    })
+  }
 
-  const [activeTab, setActiveTab] = useState("mieuTa");
+  const handleAddToCart = () => {
+    console.log(`Thêm ${quantity} sản phẩm ${product?.name} (Size: ${selectedSize || 'Chưa chọn'}) vào giỏ hàng`)
+  }
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
+  const handleBuyNow = () => {
+    console.log(`Mua ngay ${quantity} sản phẩm ${product?.name} (Size: ${selectedSize || 'Chưa chọn'})`)
+    navigate('/checkout')
+  }
 
-  return (
-    <div>
-      <div className="container mt-5">
-        <div className="row">
-          <div className="col-md-9">
-            <div className="row">
-              <div className="col-md-6">
-                <img
-                  src={selectedImage}
-                  alt="Product"
-                  className="img-fluid"
-                  style={{ border: "2px solid #ddd", maxWidth: "100%", height: "auto" }}
-                />
+  const handleImageClick = (image: string) => {
+    setSelectedImage(image)
+  }
 
-                {/* Chọn màu sản phẩm với hiệu ứng zoom */}
-                <div className="d-flex mt-3">
-                  {colorImages.map((colorObj, index) => (
-                    <button
-                      key={index}
-                      className={`btn border border-dark btn-sm me-2 p-0 color-thumbnail ${
-                        selectedColor === colorObj.color ? "border-3 border-primary" : ""
-                      }`}
-                      onClick={() => handleColorChange(colorObj.color)}
-                      style={{ width: "70px", height: "70px", padding: 0 }}
-                    >
-                      <img
-                        src={colorObj.imageUrl}
-                        alt={colorObj.color}
-                        className="img-fluid"
-                        style={{ width: "100%", height: "100%" }}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
+  const handleSizeClick = (size: string) => {
+    setSelectedSize(size)
+  }
 
-              <div className="col-md-6">
-                <h3>Diamond Halo Stud Aenean</h3>
-                <h5 className="text-warning">$552.00</h5>
-                <p className="text-muted">Mã Sản Phẩm: E-00037</p>
-                <p>Tình trạng: Còn hàng</p>
-                <p>
-                  <strong>Mô tả:</strong> Giày thể thao nam đẹp, thoải mái, phù hợp cho nhiều dịp.
-                  Cấu trúc hỗ trợ tốt cho việc vận động và tập luyện.
-                </p>
+  const sizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44']
 
-                <div className="mt-3">
-                  <label className="mb-2">
-                    <strong>Chọn Kích Cỡ:</strong>
-                  </label>
-                  <div className="d-flex flex-wrap">
-                    {sizes.map((size) => (
-                      <button
-                        key={size}
-                        className="border border-dark rounded btn btn-outline-secondary btn-sm me-2 mb-2"
-                        onClick={() => handleSizeChange(size)}
-                        style={{ width: "60px", height: "40px" }}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-4 d-flex align-items-center">
-                  <div className="d-flex align-items-center border border-dark rounded-3 p-1 ms-1">
-                    <button
-                      className="btn btn-outline-secondary btn-sm rounded-circle"
-                      onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
-                      style={{ width: "30px", height: "35px" }}
-                    >
-                      -
-                    </button>
-                    <span className="mx-3" style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
-                      {quantity}
-                    </span>
-                    <button
-                      className="btn btn-outline-secondary btn-sm rounded-circle"
-                      onClick={() => setQuantity(quantity + 1)}
-                      style={{ width: "35px", height: "35px" }}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <button className="btn btn-warning ms-2">Thêm vào giỏ</button>
-                  <button className="btn btn-primary ms-2">Mua ngay</button>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="d-flex mt-3">
-                <button
-                  className={`btn ${
-                    activeTab === "mieuTa" ? "btn-success" : "btn-outline-secondary"
-                  } me-3 tab-button`}
-                  onClick={() => handleTabChange("mieuTa")}
-                >
-                  Mô Tả
-                </button>
-                <button
-                  className={`btn ${
-                    activeTab === "danhGia" ? "btn-success" : "btn-outline-secondary"
-                  } tab-button`}
-                  onClick={() => handleTabChange("danhGia")}
-                >
-                  Đánh Giá
-                </button>
-              </div>
-
-              <div className="tab-content mt-3">
-                {activeTab === "mieuTa" && (
-                  <div className="tab-pane active">
-                    <h4>Mô Tả Sản Phẩm</h4>
-                    <p>
-                      Giày thể thao nam đẹp, thoải mái, phù hợp cho nhiều dịp. Cấu trúc hỗ trợ tốt
-                      cho việc vận động và tập luyện.
-                    </p>
-                  </div>
-                )}
-                {activeTab === "danhGia" && (
-                  <div className="tab-pane active">
-                    <h4>Đánh Giá Sản Phẩm</h4>
-                    <p>Đây là phần đánh giá của khách hàng về sản phẩm này.</p>
-                  </div>
-                )}
-              </div>
-              <div className="mt-3">
-                <div className="mb-3">
-                  <textarea
-                    className="form-control"
-                    rows={3}
-                    placeholder="Viết bình luận của bạn về sản phẩm..."
-                  ></textarea>
-                </div>
-                <button className="btn btn-primary">Gửi Bình Luận</button>
-              </div>
-            </div>
-
-            <div className="mt-5 mb-3">
-              <h4>Sản phẩm cùng danh mục</h4>
-              <div className="row mt-3">
-                {relatedProducts.map((product) => (
-                  <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-                    <div className="card h-100" style={{ borderRadius: "8px" }}>
-                      <img
-                        src={product.imageUrl}
-                        className="card-img-top"
-                        alt={product.name}
-                        style={{ height: "200px", objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title">{product.name}</h5>
-                        <p className="card-text">{product.price}</p>
-                        {product.discount > 0 && (
-                          <span
-                            className="badge bg-success"
-                            style={{
-                              position: "absolute",
-                              top: "10px",
-                              left: "10px",
-                              zIndex: 10,
-                            }}
-                          >
-                            -{product.discount}%
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+  const SkeletonLoading = () => (
+    <div className='container mx-auto px-[30px] my-12 animate-pulse'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+        <div className='flex flex-col items-center'>
+          <div className='relative w-full max-w-sm h-80 bg-gray-300 rounded-lg'></div>
+          <div className='flex space-x-2 mt-4'>
+            {Array(5)
+              .fill(0)
+              .map((_, index) => (
+                <div key={index} className='w-14 h-14 bg-gray-300 rounded-lg'></div>
+              ))}
           </div>
+        </div>
 
-          <div className="col-md-3">
-            <div className="category-box p-3 rounded shadow-sm">
-              <h5 className="fw-bold">THƯ MỤC</h5>
-              <div className="category-line"></div>
-              <ul className="list-group">
-                {categories.map((category, index) => (
-                  <li
-                    key={index}
-                    className="list-group-item d-flex justify-content-between align-items-center"
-                  >
-                    {category}
-                    <button className="btn btn-outline-secondary btn-sm">
-                      <i className="bi bi-plus"></i>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="recent-posts mt-4 p-3 rounded shadow-sm">
-              <h5 className="fw-bold">BÀI ĐĂNG GẦN ĐÂY</h5>
-              <div className="category-line"></div>
-              {recentPosts.map((post, index) => (
-                <div key={index} className="d-flex align-items-start mb-3">
-                  <img src={post.img} className="img-thumbnail me-3" alt="Post" width="70" />
-                  <div>
-                    <p className="mb-1 post-title">{post.title}</p>
-                    <p className="text-muted mb-0">
-                      <i className="bi bi-calendar"></i> {post.date}
-                    </p>
-                  </div>
-                </div>
+        <div className='flex flex-col space-y-5'>
+          <div className='h-10 w-2/3 bg-gray-300 rounded'></div>
+          <div className='h-4 w-1/3 bg-gray-300 rounded'></div>
+          <div className='flex items-center space-x-4 bg-gray-200 px-1 py-2 border rounded-md'>
+            <div className='h-5 w-24 bg-gray-300 rounded'></div>
+            <div className='h-7 w-28 bg-gray-300 rounded'></div>
+            <div className='h-4 w-12 bg-gray-300 rounded'></div>
+          </div>
+          <div className='flex flex-col space-y-2'>
+            <div className='h-4 w-28 bg-gray-300 rounded'></div>
+            <div className='flex flex-wrap gap-2'>
+              {sizes.map((_, index) => (
+                <div key={index} className='h-8 w-12 bg-gray-300 rounded-lg sm:h-10 sm:w-14'></div>
               ))}
             </div>
-
-            <div className="keywords mt-4 mb-2 p-3 rounded shadow-sm">
-              <h5 className="fw-bold">TỪ KHÓA</h5>
-              <div className="category-line"></div>
-              <div className="d-flex flex-wrap">
-                {keywords.map((keyword, index) => (
-                  <span key={index} className="badge bg-light text-dark keyword-badge">
-                    {keyword}
-                  </span>
-                ))}
-              </div>
+          </div>
+          <div className='flex items-center space-x-4'>
+            <div className='h-4 w-16 bg-gray-300 rounded'></div>
+            <div className='flex items-center border border-gray-300 rounded-lg'>
+              <div className='h-10 w-10 bg-gray-300'></div>
+              <div className='h-10 w-12 bg-gray-300'></div>
+              <div className='h-10 w-10 bg-gray-300'></div>
             </div>
+            <div className='h-4 w-28 bg-gray-300 rounded'></div>
+          </div>
+          <div className='flex gap-3'>
+            <div className='h-10 w-40 bg-gray-300 rounded'></div>
+            <div className='h-10 w-40 bg-gray-300 rounded'></div>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
 
-export default DetailsProduct;
+  if (isLoading) {
+    return <SkeletonLoading />
+  }
+
+  if (!product) {
+    return <p className='text-lg sm:text-xl text-center text-gray-600'>Không có sản phẩm nào để hiển thị.</p>
+  }
+
+  return (
+    <div className='container mx-auto px-[30px] my-12'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+        <div className='flex flex-col items-center'>
+          <div className='relative w-full max-w-sm'>
+            <img
+              src={selectedImage || product.imageUrl}
+              alt={product.name}
+              className='w-full h-auto object-cover rounded-lg shadow-md transition-transform duration-300 hover:scale-105'
+            />
+          </div>
+          <div className='flex space-x-2 mt-4'>
+            {(product.images || []).slice(0, 5).map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`${product.name} variant ${index + 1}`}
+                onClick={() => handleImageClick(image)}
+                className={`w-14 h-14 object-cover rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                  selectedImage === image ? 'border-red-500' : 'border-gray-300'
+                } hover:border-red-500 hover:shadow-md`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className='flex flex-col space-y-5'>
+          <h1 className='text-2xl sm:text-3xl font-bold uppercase text-gray-800'>{product.name}</h1>
+          <span className='text-sm sm:text-base text-gray-600'>Mã sản phẩm: {product.product_code}</span>
+
+          <div className='flex items-center space-x-4 bg-gray-200 px-1 py-2 border rounded-md'>
+            <p className='text-lg sm:text-xl text-gray-500 line-through'>
+              {(Number(product.original_price) || 0).toLocaleString('vi-VN')} ₫
+            </p>
+            <p className='text-2xl sm:text-2xl font-semibold text-red-500'>
+              {(Number(product.discounted_price) || 0).toLocaleString('vi-VN')} ₫
+            </p>
+            <p className='text-sm text-white bg-red-500 px-2 rounded-md'>
+              -
+              {Math.round(
+                ((Number(product.original_price) - Number(product.discounted_price)) / Number(product.original_price)) *
+                  100
+              )}
+              %
+            </p>
+          </div>
+
+          <div className='flex flex-col space-y-2'>
+            <p className='text-sm sm:text-base font-medium text-gray-700 uppercase'>Chọn size giày</p>
+            <div className='flex flex-wrap gap-2'>
+              {sizes.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => handleSizeClick(size)}
+                  className={`px-3 py-1 border rounded-lg text-sm font-medium transition-all duration-200 sm:px-4 sm:py-2 ${
+                    selectedSize === size
+                      ? 'bg-blue-500 text-white border-blue-500'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className='flex items-center space-x-4'>
+            <p className='text-sm sm:text-base font-medium text-gray-700'>Số lượng</p>
+            <div className='flex items-center border border-gray-300 rounded-lg'>
+              <button
+                onClick={() => handleQuantityChange(-1)}
+                className='px-3 py-1 text-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200'
+              >
+                -
+              </button>
+              <span className='px-4 py-1 text-base sm:text-lg font-medium'>{quantity}</span>
+              <button
+                onClick={() => handleQuantityChange(1)}
+                className='px-3 py-1 text-lg text-gray-600 hover:bg-gray-100 transition-colors duration-200'
+              >
+                +
+              </button>
+            </div>
+            <p className='text-sm sm:text-base text-gray-600'>{product.quantity} sản phẩm có sẵn</p>
+          </div>
+
+          <div className='flex gap-3'>
+            <button
+              onClick={handleAddToCart}
+              className='bg-yellow-500 text-white px-5 py-2 rounded text-base font-medium transition-all duration-300 ease-in-out hover:bg-yellow-600 hover:shadow-md hover:scale-105'
+            >
+              Thêm vào giỏ hàng
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className='bg-blue-500 text-white px-5 py-2 rounded text-base font-medium transition-all duration-300 ease-in-out hover:bg-blue-600 hover:shadow-md hover:scale-105'
+            >
+              Mua ngay
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ProductDetail

@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
-            $table->string('sku')->unique();
             $table->foreignIdFor(Product::class)->constrained();
+            $table->string('size');
             $table->double('price');
             $table->double('promotional_price')->nullable();
             $table->integer('quantity');
