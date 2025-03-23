@@ -51,7 +51,7 @@ const ProfilePage = () => {
     }
 
     fetchUserData()
-  }, [t]) // Thêm t vào dependency để cập nhật khi ngôn ngữ thay đổi
+  }, [t])
 
   const handleEditToggle = (field) => {
     setEditField((prev) => ({ ...prev, [field]: !prev[field] }))
@@ -67,7 +67,7 @@ const ProfilePage = () => {
       await schema.validate(formData, { abortEarly: false })
 
       const token = localStorage.getItem('token')
-      const response = await fetch('http://127.0.0.1:8000/api/user/update', {
+      const response = await fetch('http://127.0.0.1:8000/api/users/{$id}', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

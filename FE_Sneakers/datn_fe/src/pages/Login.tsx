@@ -1,3 +1,4 @@
+import { useState } from 'react' // Thêm useState để quản lý trạng thái
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
@@ -8,15 +9,17 @@ import 'react-toastify/dist/ReactToastify.css'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import axios from 'axios'
 import { useTranslation } from 'react-i18next'
-
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 const schema = yup.object().shape({
   email: yup.string().email('email_invalid').required('email_required'),
   password: yup.string().min(8, 'password_min').required('password_required')
 })
 
 const Login = () => {
-  const { t } = useTranslation() 
+  const { t } = useTranslation()
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -47,6 +50,10 @@ const Login = () => {
     }
   }
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
   return (
     <div className='flex justify-center items-center min-h-screen bg-gray-100 px-4'>
       <motion.div
@@ -71,12 +78,21 @@ const Login = () => {
 
           <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
             <label className='block text-sm font-medium text-gray-700'>{t('password')}</label>
-            <input
-              type='password'
-              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder={t('password_placeholder')}
-              {...register('password')}
-            />
+            <div className='relative'>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
+                placeholder={t('password_placeholder')}
+                {...register('password')}
+              />
+              <button
+                type='button'
+                onClick={togglePasswordVisibility}
+                className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700'
+              >
+                {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+              </button>
+            </div>
             {errors.password && <span className='text-red-500 text-sm'>{t(errors.password.message)}</span>}
           </motion.div>
 

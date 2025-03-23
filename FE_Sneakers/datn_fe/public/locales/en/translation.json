@@ -134,5 +134,8 @@
   "copyright": "© {{year}} Sneakers. All rights reserved.",
   "facebook": "Facebook",
   "instagram": "Instagram",
-  "twitter": "Twitter"
+  "twitter": "Twitter",
+  "signup_title": "Sign up to receive code",
+  "signup_button": "Sign Up",
+  "promotion_text": "Receive a <1>100K DISCOUNT VOUCHER</1> from us when you sign up for updates."
 }

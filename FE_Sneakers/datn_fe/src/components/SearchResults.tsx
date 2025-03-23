@@ -103,9 +103,7 @@ const SearchResults: React.FC = () => {
               {item.original_price && item.discounted_price ? (
                 <div className='flex justify-center items-center mb-2'>
                   <p className='text-gray-500 line-through text-sm mr-2'>
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                      Number(item.original_price)
-                    )}
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price))}
                   </p>
                   <p className='text-sm font-semibold text-red-500'>
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
