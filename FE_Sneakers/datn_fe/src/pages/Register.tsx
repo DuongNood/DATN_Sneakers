@@ -7,15 +7,12 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import axios from 'axios'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 
 const schema = yup.object().shape({
   name: yup.string().required('name_required'),
   email: yup.string().email('email_invalid').required('email_required'),
-  phone: yup
-    .string()
-    .matches(/^[0-9]{10}$/, 'phone_invalid')
-    .required('phone_required'),
-  address: yup.string().required('address_required'),
   password: yup.string().min(8, 'password_min').required('password_required'),
   confirmPassword: yup
     .string()
@@ -34,13 +31,14 @@ const Register = () => {
     resolver: yupResolver(schema)
   })
 
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   const onSubmit = async (data: any) => {
     try {
       await axios.post('http://localhost:8000/api/register', {
         name: data.name,
         email: data.email,
-        phone: data.phone,
-        address: data.address,
         password: data.password,
         password_confirmation: data.confirmPassword
       })
@@ -92,46 +90,42 @@ const Register = () => {
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-            <label className='block text-sm font-medium text-gray-700'>{t('phone')}</label>
-            <input
-              {...register('phone')}
-              type='text'
-              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder={t('phone_placeholder')}
-            />
-            {errors.phone && <p className='text-red-500 text-sm'>{t(errors.phone.message)}</p>}
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-            <label className='block text-sm font-medium text-gray-700'>{t('address')}</label>
-            <input
-              {...register('address')}
-              type='text'
-              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder={t('address_placeholder')}
-            />
-            {errors.address && <p className='text-red-500 text-sm'>{t(errors.address.message)}</p>}
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
             <label className='block text-sm font-medium text-gray-700'>{t('password')}</label>
-            <input
-              {...register('password')}
-              type='password'
-              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder={t('password_placeholder')}
-            />
+            <div className='relative'>
+              <input
+                {...register('password')}
+                type={showPassword ? 'text' : 'password'}
+                className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
+                placeholder={t('password_placeholder')}
+              />
+              <button
+                type='button'
+                className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700'
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+              </button>
+            </div>
             {errors.password && <p className='text-red-500 text-sm'>{t(errors.password.message)}</p>}
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
             <label className='block text-sm font-medium text-gray-700'>{t('confirm_password')}</label>
-            <input
-              {...register('confirmPassword')}
-              type='password'
-              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder={t('confirm_password_placeholder')}
-            />
+            <div className='relative'>
+              <input
+                {...register('confirmPassword')}
+                type={showConfirmPassword ? 'text' : 'password'}
+                className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
+                placeholder={t('confirm_password_placeholder')}
+              />
+              <button
+                type='button'
+                className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700'
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+              </button>
+            </div>
             {errors.confirmPassword && <p className='text-red-500 text-sm'>{t(errors.confirmPassword.message)}</p>}
           </motion.div>
 

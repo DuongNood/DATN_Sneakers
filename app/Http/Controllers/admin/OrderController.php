@@ -130,7 +130,7 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
-        $order = Order::with('details.productVariant.product')->findOrFail($id);
+        $order = Order::with('orderDetails.productVariant.product')->findOrFail($id);
         $statusOptions = ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'];
         return view(self::PATH_VIEW . __FUNCTION__, compact('order', 'statusOptions'));
     }

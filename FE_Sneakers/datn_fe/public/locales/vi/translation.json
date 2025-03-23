@@ -132,5 +132,9 @@
   "copyright": "© {{year}} Sneakers. All rights reserved.",
   "facebook": "Facebook",
   "instagram": "Instagram",
-  "twitter": "Twitter"
+  "twitter": "Twitter",
+  "signup_title": "Đăng ký nhận code",
+
+  "signup_button": "Đăng Kí",
+  "promotion_text": "Nhận ngay <1>VOUCHER GIẢM GIÁ 100K</1> từ chúng tôi khi đăng kí nhận tin."
 }
