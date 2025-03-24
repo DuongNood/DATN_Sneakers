@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\api\DetailController;
+use App\Http\Controllers\Api\MomopaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
@@ -57,17 +58,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-// // Đăng nhập
-// Route::post('/login', [LoginController::class, 'login'])->name('api.login');
 
-
-// // Các route yêu cầu xác thực
-// Route::middleware('auth:sanctum')->group(function () {
-//     // Đăng xuất
-//     Route::post('/logout', [LogoutController::class, 'logout'])->name('api.logout');
-//     // Lấy thông tin người dùng
-//     // Route::get('/user', [UserController::class, 'getUser'])->name('api.user');
-// });
 
 // route bình luận
 Route::resource('comments', CommentController::class);
@@ -101,7 +92,6 @@ Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
 
 
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cart', [CartController::class, 'getUserCart']);
     Route::get('/admin/carts', [CartController::class, 'getAllCarts'])->middleware('isAdmin');
@@ -111,4 +101,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/cart/clear', [CartController::class, 'clearCart']);
     Route::post('/cart/checkout', [CartController::class, 'checkout']);
 });
+
+// MomoPayment 
+// tạo thanh toán momo
+Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);
+// xử lí phản hồi từ momo
+Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
+// lấy danh sách giao dịch 
+Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
+
+
+
 
