@@ -18,7 +18,8 @@ class Product extends Model
         'original_price',
         'discounted_price',
         'is_show_home',
-        'category_id'
+        'category_id',
+        'view'
 
     ];
     protected $casts = [
@@ -38,7 +39,7 @@ class Product extends Model
         return $this->hasMany(Imageproduct::class);
     }
 
-    public function variants()
+    public function productVariant()
     {
         return $this->hasMany(ProductVariant::class, 'product_id');
     }

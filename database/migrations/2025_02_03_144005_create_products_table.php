@@ -21,6 +21,7 @@ return new class extends Migration
             $table->double('original_price'); // Giá gốc 
             $table->double('discounted_price')->nullable(); // Giá sau giảm giá mặc định
             $table->foreignIdFor(Category::class)->constrained();
+            $table->integer('view')->nullable();
             $table->boolean('status')->default(true);
             $table->boolean('is_show_home')->default(true);
             $table->timestamps();

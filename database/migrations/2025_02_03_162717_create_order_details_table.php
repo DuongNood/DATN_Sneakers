@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Order;
-use App\Models\ProductVariant;
+use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,8 +16,7 @@ return new class extends Migration
         Schema::create('order_details', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Order::class)->constrained();
-            $table->foreignIdFor(ProductVariant::class)->constrained();
-            $table->integer('quantity');
+            $table->foreignIdFor(Product::class)->constrained();
             $table->double('price');
             $table->double('discount')->default(0);
             $table->double('total_price');

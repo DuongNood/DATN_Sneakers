@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Product;
+use App\Models\ProductSize;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,9 +16,7 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class)->constrained();
-            $table->string('size');
-            $table->double('price');
-            $table->double('promotional_price')->nullable();
+            $table->foreignIdFor(ProductSize::class)->constrained();
             $table->integer('quantity');
             $table->boolean('status')->default(true);
             $table->timestamps();
