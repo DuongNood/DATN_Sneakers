@@ -24,7 +24,11 @@ use App\Http\Controllers\admin\ProductVariantController;
 
 
 use App\Http\Controllers\admin\PromotionController;
+
 use App\Http\Controllers\admin\SettingController;
+
+use App\Http\Controllers\admin\SizeController;
+
 use App\Http\Controllers\ProductPromotionController;
 
 
@@ -103,10 +107,20 @@ Route::prefix('product_variants')
     ->as('product_variants.')
     ->group(function () {
         Route::get('/', [ProductVariantController::class, 'index'])->name('index');
-        Route::get('create', [ProductVariantController::class, 'create'])->name('create');
+        Route::get('{id}/create', [ProductVariantController::class, 'create'])->name('create');
         Route::post('store', [ProductVariantController::class, 'store'])->name('store');
         Route::get('{id}/edit', [ProductVariantController::class, 'edit'])->name('edit');
         Route::put('update/{id}', [ProductVariantController::class, 'update'])->name('update');
         Route::delete('destroy/{id}', [ProductVariantController::class, 'destroy'])->name('destroy');
         Route::get('variant_discontinued', [ProductVariantController::class, 'variantDiscontinued'])->name('variantDiscontinued');
+    });
+Route::prefix('size')
+    ->as('size.')
+    ->group(function () {
+        Route::get('/', [SizeController::class, 'index'])->name('index');
+        Route::get('create', [SizeController::class, 'create'])->name('create');
+        Route::post('store', [SizeController::class, 'store'])->name('store');
+        Route::get('{id}/edit', [SizeController::class, 'edit'])->name('edit');
+        Route::put('update/{id}', [SizeController::class, 'update'])->name('update');
+        Route::delete('destroy/{id}', [SizeController::class, 'destroy'])->name('destroy');       
     });

@@ -27,6 +27,8 @@ class ProductRequest extends FormRequest
             'product_name'=>'required|max:255',
             'image'=>'image|mimes:png,jpg,jpeg',
             'category_id'=>'required|exists:"categories",id',
+            'original_price'=>'required|numeric|min:0',
+            'discounted_price'=>'required|numeric|min:0|lte:original_price',
         ];
     }
      /**
@@ -46,6 +48,13 @@ class ProductRequest extends FormRequest
             'image.mimes' => 'Hình ảnh phải có định dạng: png, jpg hoặc jpeg.',  
             'category_id.required' => 'Vui lòng chọn danh mục cho sản phẩm.',
             'category_id.exists' => 'Danh mục được chọn không tồn tại.',
+            'original_price.required' => 'Giá gốc là bắt buộc.',
+            'original_price.numeric' => 'Giá gốc phải là một số.',
+            'original_price.min' => 'Giá gốc phải lớn hơn hoặc bằng 0.',
+            'discounted_price.required' => 'Giá khuyến mãi là bắt buộc.',
+            'discounted_price.numeric' => 'Giá khuyến mãi phải là một số.',
+            'discounted_price.min' => 'Giá khuyến mãi phải lớn hơn hoặc bằng 0.',
+            'discounted_price.lte' => 'Giá khuyến mãi không được lớn hơn giá gốc.',
         ];
     }
 }

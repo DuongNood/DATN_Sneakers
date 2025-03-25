@@ -42,7 +42,6 @@
                                     <tr>
                                         <th scope="col">ID</th>
                                         <th scope="col">Category_name</th>
-                                        <th scope="col">image</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Act</th>
 
@@ -52,8 +51,7 @@
                                     @foreach ($category as $item)
                                         <tr>
                                             <th scope="row">{{$item->id}}</th>
-                                            <td>{{$item->category_name}}</td>
-                                            <td><img src="{{Storage::url($item->image)}}" alt="" width="150px"></td>                                           
+                                            <td>{{$item->category_name}}</td>                                                                                     
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
                                             </td>

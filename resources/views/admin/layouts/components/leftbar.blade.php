@@ -76,6 +76,9 @@
                                 <a class='tp-link' href='{{ route('product_variants.variantDiscontinued') }}'>Biến thể
                                     đã ngừng kinh doanh</a>
                             </li>
+                            <li>
+                                <a class='tp-link' href='{{ route('size.index') }}'>Size</a>
+                            </li>
                         </ul>
                     </div>
                 </li>

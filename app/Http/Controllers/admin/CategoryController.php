@@ -48,11 +48,7 @@ class CategoryController extends Controller
             $params['status'] = 1;
         } 
         
-        if($request->hasFile('image')){
-                $params['image'] =$request->file('image')->store('uploads/category', 'public');
-        }else{
-                $params['image'] =null;
-        }
+       
         Category::create($params);
         return redirect()->route('categories.index')->with('success', 'Add new Success List!');
 
