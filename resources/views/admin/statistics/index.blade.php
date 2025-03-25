@@ -18,8 +18,8 @@
 
         <h3>Khách hàng mua nhiều nhất</h3>
         <ul>
-            @foreach ($topCustomers as $customer)
-                <li>{{ $customer->customer->name }} - {{ $customer->total_orders }} đơn hàng</li>
+            @foreach ($topUsers as $user)
+                <li>{{ $user->user->name }} - {{ $user->total_orders }} đơn hàng</li>
             @endforeach
         </ul>
     </div>

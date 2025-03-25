@@ -94,7 +94,7 @@
                 </li>
 
                 <li>
-                    <a class='tp-link' href='#'>
+                    <a class='tp-link' href='{{ route('admin.statistics.index') }}'>
                         <i data-feather="bar-chart-2"></i>
                         <span> Quản lý thống kê </span>
                     </a>
