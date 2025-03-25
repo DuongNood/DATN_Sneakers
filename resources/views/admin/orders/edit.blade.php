@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        <form action="{{ route('orders.update', $order->id) }}" method="POST" enctype="multipart/form-data" class="card p-4">
+        <form action="{{ route('admin.orders.update', $order->id) }}" method="POST" enctype="multipart/form-data" class="card p-4">
             @csrf
             @method('PUT')
 
@@ -79,7 +79,7 @@
             </table>
 
             <div class="d-flex justify-content-between mt-3">
-                <a href="{{ route('orders.index') }}" class="btn btn-secondary">Quay lại</a>
+                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">Quay lại</a>
                 <button type="submit" class="btn btn-success">Cập nhật</button>
             </div>
         </form>

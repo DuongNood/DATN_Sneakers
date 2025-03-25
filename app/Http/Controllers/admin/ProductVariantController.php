@@ -79,7 +79,7 @@ class ProductVariantController extends Controller
             ]);
         }
 
-        return redirect()->route('product_variants.index')->with('success', 'Thêm biến thể thành công!');
+        return redirect()->route('admin.product_variants.index')->with('success', 'Thêm biến thể thành công!');
     } catch (ValidationException $e) {
         // Bắt lỗi validate của Laravel
         return back()->withErrors($e->errors())->withInput();
@@ -91,7 +91,7 @@ class ProductVariantController extends Controller
         }
 
         // Nếu là lỗi khác, hiển thị thông báo lỗi chung
-        return redirect()->route('product_variants.index')->withErrors(['error' => 'Có lỗi xảy ra, vui lòng thử lại!'])->withInput();
+        return redirect()->route('admin.product_variants.index')->withErrors(['error' => 'Có lỗi xảy ra, vui lòng thử lại!'])->withInput();
     }
 }
 
@@ -114,7 +114,7 @@ class ProductVariantController extends Controller
         $product = Product::get();
         $title ="product variant";
         if (!$productVariant) {
-            return redirect()->route('product_variants.index')->with('error','Sản phẩm không tồn tại!');
+            return redirect()->route('admin.product_variants.index')->with('error','Sản phẩm không tồn tại!');
         }
         return view('admin.product_variants.edit', compact('productVariant','product','title'));
 
@@ -129,7 +129,7 @@ class ProductVariantController extends Controller
         $productVariant = ProductVariant::find($id);
 
         if (!$productVariant) {
-            return redirect()->route('product_variants.index')->with('error', 'Danh Mục Không Tồn Tại!');
+            return redirect()->route('admin.product_variants.index')->with('error', 'Danh Mục Không Tồn Tại!');
         }
 
         // Validate dữ liệu gửi lên từ form
@@ -149,7 +149,7 @@ class ProductVariantController extends Controller
         // Thực hiện cập nhật
         $productVariant->update($param);
 
-        return redirect()->route('product_variants.index')->with('success', 'Cập Nhật Danh Mục Thành Công!');
+        return redirect()->route('admin.product_variants.index')->with('success', 'Cập Nhật Danh Mục Thành Công!');
     }
 
     /**

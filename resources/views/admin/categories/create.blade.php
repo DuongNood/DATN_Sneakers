@@ -21,13 +21,13 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <form action="{{ route('categories.store') }}"  method="POST">
+                                <form action="{{ route('admin.categories.store') }}" method="POST">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="simpleinput" class="form-label">Category name</label>
                                         <input type="text" id="simpleinput" class="form-control" name="category_name">
                                     </div>
-                                    
+
                                     {{-- <div class="mb-3">
                                         <label for="status" class="form-label ">Trạng Thái</label>
                                         <div class="col-sm-10 mb-3 d-flex gap-2">
@@ -47,16 +47,16 @@
                                             </div>
                                         </div>
                                     </div> --}}
+
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>
                             </div>
                         </div>
-
-                
+                    </div>
+                </div><!-- end row -->
             </div>
-        </div><!-- end row -->
+        </div>
     </div>
 @endsection
 @section('js')
 @endsection
-

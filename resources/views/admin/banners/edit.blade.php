@@ -6,7 +6,7 @@
     <div class="container">
         <h2>Chỉnh sửa Banner</h2>
 
-        <form action="{{ route('banners.update', $banner->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.banners.update', $banner->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 

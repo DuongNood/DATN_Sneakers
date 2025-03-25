@@ -16,7 +16,7 @@ class UserController extends Controller
      * Display a listing of the resource.
      */
 
-    const PATH_VIEW = 'admin/users.';
+    const PATH_VIEW = 'admin.users.';
 
     public function index()
     {

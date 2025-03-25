@@ -7,7 +7,7 @@
 
                 <h4 class="fs-18 fw-semibold m-0">Danh mục</h4>
             </div>
-             <a href="{{route('categories.create')}}" class="btn btn-success col-1">Thêm mới</a>
+             <a href="{{route('admin.categories.create')}}" class="btn btn-success col-1">Thêm mới</a>
         </div>
 
         <!-- start row -->
@@ -56,9 +56,9 @@
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
                                             </td>
                                             <td>
-                                                <a href="{{ route('categories.edit', $item->id) }}"><i
+                                                <a href="{{ route('admin.categories.edit', $item->id) }}"><i
                                                     class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
-                                                    <form action="{{ route('categories.destroy', $item->id) }}" method="POST" class="d-inline me-2">
+                                                    <form action="{{ route('admin.categories.destroy', $item->id) }}" method="POST" class="d-inline me-2">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
-    const PATH_VIEW = 'admin/settings.';
+    const PATH_VIEW = 'admin.settings.';
 
     public function index()
     {

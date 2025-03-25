@@ -6,7 +6,7 @@
     <div class="container">
         <h2>Thêm mới banner</h2>
 
-        <form action="{{ route('banners.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.banners.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label>Title</label>

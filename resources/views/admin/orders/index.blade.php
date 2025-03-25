@@ -67,7 +67,7 @@
                                 </td>
                                 <td class="text-center">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="text-center">
-                                    <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-primary btn-sm">Sửa</a>
+                                    <a href="{{ route('admin.orders.edit', $order->id) }}" class="btn btn-primary btn-sm">Sửa</a>
                                 </td>
                             </tr>
                         @endforeach

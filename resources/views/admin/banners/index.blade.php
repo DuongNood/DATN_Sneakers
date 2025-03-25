@@ -18,7 +18,7 @@
             </div>
         @endif
 
-        <a href="{{ route('banners.create') }}" class="btn btn-primary">Add Banner</a>
+        <a href="{{ route('admin.banners.create') }}" class="btn btn-primary">Add Banner</a>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -40,8 +40,8 @@
                         <td><img src="{{ asset('storage/' . $banner->image) }}" width="100"></td>
                         <td>{{ $banner->link }}</td>
                         <td>
-                            <a href="{{ route('banners.edit', $banner->id) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('banners.destroy', $banner->id) }}" method="POST"
+                            <a href="{{ route('admin.banners.edit', $banner->id) }}" class="btn btn-warning">Edit</a>
+                            <form action="{{ route('admin.banners.destroy', $banner->id) }}" method="POST"
                                 style="display:inline;">
                                 @csrf
                                 @method('DELETE')

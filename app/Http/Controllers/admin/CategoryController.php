@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
+    const PATH_VIEW = 'admin.categories.';
+
     /**
      * Display a listing of the resource.
      */
@@ -17,7 +19,7 @@ class CategoryController extends Controller
         //
         $title = "Category";
         $category = Category::get();    
-        return view('admin.category.index', compact('category','title'));
+        return view(self::PATH_VIEW . __FUNCTION__, compact('category','title'));
 
     }
 
@@ -29,7 +31,7 @@ class CategoryController extends Controller
         //
 
         $title = "Category";
-        return view('admin.category.create',compact('title'));
+        return view(self::PATH_VIEW . __FUNCTION__,compact('title'));
 
     }
 
@@ -50,7 +52,7 @@ class CategoryController extends Controller
         
        
         Category::create($params);
-        return redirect()->route('categories.index')->with('success', 'Add new Success List!');
+        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Add new Success List!');
 
 
     }
@@ -72,7 +74,7 @@ class CategoryController extends Controller
 
         $title = "Category";
         $category = Category::find($id);
-        return view('admin.category.edit',compact('title','category'));
+        return view(self::PATH_VIEW . 'edit',compact('title','category'));
     }
 
     /**
@@ -107,7 +109,7 @@ class CategoryController extends Controller
         
         $category->update($param);
 
-        return redirect()->route('categories.index')->with('success', 'Update List Successfully!');
+        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Update List Successfully!');
 
     }
 
@@ -127,7 +129,7 @@ class CategoryController extends Controller
         //         ->with('error', 'Category được sử dụng trong các sản phẩm. Bạn không thể xóa nó.');
         // }
         $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Xóa Danh Mục Thành Công!');
+        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Xóa Danh Mục Thành Công!');
 
     }
 }

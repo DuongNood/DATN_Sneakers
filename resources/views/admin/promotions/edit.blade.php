@@ -5,7 +5,7 @@
 @section('content')
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-semibold mb-4">Chỉnh sửa mã giảm giá</h2>
-        <form action="{{ route('promotions.update', $promotion->id) }}" method="POST">
+        <form action="{{ route('admin.promotions.update', $promotion->id) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -63,7 +63,7 @@
 
             <div class="mb-44">
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Cập nhật</button>
-                <a href="{{ route('promotions.index') }}" class="ml-4 text-blue-500">Quay lại</a>
+                <a href="{{ route('admin.promotions.index') }}" class="ml-4 text-blue-500">Quay lại</a>
             </div>
         </form>
     </div>

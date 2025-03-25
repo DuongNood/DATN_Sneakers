@@ -7,7 +7,7 @@
 
                 <h4 class="fs-18 fw-semibold m-0">Bảng size</h4>
             </div>
-            <a href="{{route('size.create')}}" class="btn btn-success col-1">Thêm mới</a>
+            <a href="{{ route('admin.sizes.create') }}" class="btn btn-success col-1">Thêm mới</a>
         </div>
 
         <!-- start row -->
@@ -42,7 +42,7 @@
                                             <thead>
                                                 <tr>
                                                     <th scope="col">ID</th>
-                                                    <th scope="col">name</th>                                                  
+                                                    <th scope="col">name</th>
                                                     <th scope="col">Act</th>
 
                                                 </tr>
@@ -50,12 +50,13 @@
                                             <tbody>
                                                 @foreach ($size as $item)
                                                     <tr>
-                                                        <th scope="row">{{$item->id}}</th>
-                                                        <td>{{$item->name}}</td>                                                      
+                                                        <th scope="row">{{ $item->id }}</th>
+                                                        <td>{{ $item->name }}</td>
                                                         <td>
-                                                            <a href="{{ route('categories.edit', $item->id) }}"><i
+                                                            <a href="{{ route('admin.categories.edit', $item->id) }}"><i
                                                                     class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
-                                                            <form action="{{ route('categories.destroy', $item->id) }}"
+                                                            <form
+                                                                action="{{ route('admin.categories.destroy', $item->id) }}"
                                                                 method="POST" class="d-inline me-2">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -76,8 +77,8 @@
                             </div>
                         </div>
                     </div><!-- end row -->
-
-
-
                 </div>
+            </div>
+        </div>
+    </div>
 @endsection

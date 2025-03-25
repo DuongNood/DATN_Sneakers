@@ -6,7 +6,7 @@
             <div class="flex-grow-1">
                 {{-- <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4> --}}
             </div>
-            <a href="{{ route('news.create') }}" class="btn btn-success ">Create news</a>
+            <a href="{{ route('admin.news.create') }}" class="btn btn-success ">Create news</a>
         </div>
 
         <!-- start row -->
@@ -38,10 +38,10 @@
                                             </td>
                                             
                                             <td>
-                                                <a href="{{ route('news.edit', $news) }}">
+                                                <a href="{{ route('admin.news.edit', $news) }}">
                                                     <i class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i>
                                                 </a>
-                                                <form action="{{ route('news.destroy', $news) }}" method="POST" class="d-inline me-2">
+                                                <form action="{{ route('admin.news.destroy', $news) }}" method="POST" class="d-inline me-2">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">

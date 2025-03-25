@@ -12,7 +12,7 @@ class PromotionController extends Controller
      * Display a listing of the resource.
      */
 
-    const PATH_VIEW = 'admin/promotions.';
+    const PATH_VIEW = 'admin.promotions.';
 
     public function index()
     {

@@ -7,7 +7,7 @@
     <h1 class="text-2xl font-bold mb-4">Danh sách mã giảm giá</h1>
     
     <div class="flex justify-end mb-4">
-        <a href="{{ route('promotions.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Thêm mới</a>
+        <a href="{{ route('admin.promotions.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Thêm mới</a>
     </div>
     
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -39,8 +39,8 @@
                         </span>
                     </td>
                     <td class="border px-4 py-2 flex space-x-2">
-                        <a href="{{ route('promotions.edit', $promotion->id) }}" class="text-blue-500 hover:underline">Sửa</a>
-                        <form action="{{ route('promotions.destroy', $promotion->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
+                        <a href="{{ route('admin.promotions.edit', $promotion->id) }}" class="text-blue-500 hover:underline">Sửa</a>
+                        <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-500 hover:underline">Xóa</button>

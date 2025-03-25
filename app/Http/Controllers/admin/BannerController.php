@@ -14,7 +14,7 @@ class BannerController extends Controller
      * Display a listing of the resource.
      */
 
-    const PATH_VIEW = 'admin/banners.';
+    const PATH_VIEW = 'admin.banners.';
 
     public function index()
     {

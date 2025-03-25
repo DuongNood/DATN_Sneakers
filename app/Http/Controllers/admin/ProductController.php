@@ -23,7 +23,7 @@ class ProductController extends Controller
         //
         $title = "Sản phẩm";
         $listProduct = Product::where('status', true)->paginate(10);
-        return view('admin.product.index',compact('title','listProduct'));
+        return view('admin.products.index',compact('title','listProduct'));
     }
 
     /**
@@ -34,7 +34,7 @@ class ProductController extends Controller
         //
         $title = "Product";
         $listCategories = Category::where('status',true)->get();
-        return view('admin.product.create',compact('title','listCategories'));
+        return view('admin.products.create',compact('title','listCategories'));
     }
 
     /**
@@ -110,7 +110,7 @@ class ProductController extends Controller
         $title ="Cap nhat San pham";
         $product = Product::find($id);
         $category = Category::where('status', true)->get();
-        return view('admin.product.edit', compact('title', 'product','category'));
+        return view('admin.products.edit', compact('title', 'product','category'));
     }
 
     /**
@@ -190,7 +190,7 @@ class ProductController extends Controller
     // Cập nhật sản phẩm
     $product->update($params);
 
-    return redirect()->route('products.index')->with('success', 'Successfully updated product');
+    return redirect()->route('admin.products.index')->with('success', 'Successfully updated product');
 }
 
 
@@ -208,6 +208,6 @@ class ProductController extends Controller
         //
         $title = "Sản phẩm";
         $listProduct = Product::where('status', false)->get();
-        return view('admin.product.productDiscontinued',compact('title','listProduct'));
+        return view('admin.products.productDiscontinued',compact('title','listProduct'));
     }
 }

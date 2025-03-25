@@ -16,7 +16,7 @@ class SizeController extends Controller
         //
         $title = "Size giày";
         $size = ProductSize::get();    
-        return view('admin.size.index', compact('size','title'));
+        return view('admin.sizes.index', compact('size','title'));
     }
 
     /**
@@ -26,7 +26,7 @@ class SizeController extends Controller
     {
         //
         $title ="Size giày";
-        return view('admin.size.create',compact('title'));
+        return view('admin.sizes.create',compact('title'));
     }
 
     /**
@@ -39,7 +39,7 @@ class SizeController extends Controller
             'name'=> 'required|max:255|unique:product_sizes',
         ]);
         ProductSize::create($params);
-        return redirect()->route('size.index')->with('success', 'Add new Success List!');
+        return redirect()->route('admin.sizes.index')->with('success', 'Add new Success List!');
     }
 
     /**

@@ -20,7 +20,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <form action="{{ route('news.update', $news) }}" enctype="multipart/form-data"
+                                <form action="{{ route('admin.news.update', $news) }}" enctype="multipart/form-data"
                                     method="POST">
                                     @csrf
                                     @method('PUT')
@@ -53,7 +53,7 @@
                                     </div>
 
                                     <button type="submit" class="btn btn-primary">Submit</button>
-                                    <a href="{{ route('news.index') }}" class="btn btn-light">
+                                    <a href="{{ route('admin.news.index') }}" class="btn btn-light">
                                         Quay lại
                                     </a>
                                 </form>

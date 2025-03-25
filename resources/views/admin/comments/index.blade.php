@@ -42,7 +42,7 @@
                                             
                                             <td>
                                                 
-                                                <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="d-inline me-2">
+                                                <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST" class="d-inline me-2">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bình luận?')">

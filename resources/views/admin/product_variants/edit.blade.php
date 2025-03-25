@@ -31,7 +31,7 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-lg-12">
-                                                <form action="{{ route('product_variants.update', $productVariant->id) }}" method="POST">
+                                                <form action="{{ route('admin.product_variants.update', $productVariant->id) }}" method="POST">
                                                     @csrf
                                                     @method('PUT')
                                                     <div id="variant-table">
