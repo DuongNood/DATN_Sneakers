@@ -21,19 +21,14 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <form action="{{ route('categories.store') }}" enctype="multipart/form-data" method="POST">
+                                <form action="{{ route('categories.store') }}"  method="POST">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="simpleinput" class="form-label">Category name</label>
                                         <input type="text" id="simpleinput" class="form-control" name="category_name">
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="example-email" class="form-label">Image</label>
-                                        <input type="file" id="example-email" name="image" class="form-control"
-                                            onchange="showIamge(event)">
-                                        <img id="img_category" alt="hinh anh" style="width:150px; display: none">
-                                    </div>
-                                    <div class="mb-3">
+                                    
+                                    {{-- <div class="mb-3">
                                         <label for="status" class="form-label ">Trạng Thái</label>
                                         <div class="col-sm-10 mb-3 d-flex gap-2">
                                             <div class="form-check">
@@ -51,7 +46,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>
                             </div>
@@ -63,19 +58,5 @@
     </div>
 @endsection
 @section('js')
-    <script>
-        function showIamge(event) {
-            const img_category = document.getElementById('img_category');
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function() {
-                img_category.src = reader.result;
-                img_category.style.display = 'block';
-            }
-            if (file) {
-                reader.readAsDataURL(file)
-            }
-        }
-    </script>
 @endsection
 

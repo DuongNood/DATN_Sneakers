@@ -8,7 +8,9 @@ use App\Models\ImageProduct;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductController extends Controller
@@ -20,7 +22,7 @@ class ProductController extends Controller
     {
         //
         $title = "Sản phẩm";
-        $listProduct = Product::where('status', true)->get();
+        $listProduct = Product::where('status', true)->paginate(10);
         return view('admin.product.index',compact('title','listProduct'));
     }
 
@@ -39,29 +41,25 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(ProductRequest $request)
-    {
-        $params = $request->except('_token');
-        
-        // Xử lý status
-         if ($request->has('status')) {
-            $params['status'] = 1;
-            } 
-        
+{
+    $params = $request->except('_token');
 
+    // Xử lý status
+    if ($request->has('status')) {
+        $params['status'] = 1;
+    }
+
+    try {
         // 👉 Upload ảnh chính lên Cloudinary
         if ($request->hasFile('image')) {
             $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            if ($uploadedFileUrl) {
-                $params['image'] = $uploadedFileUrl;
-            } else {
-                $params['image'] = null;
-            }
+            $params['image'] = $uploadedFileUrl ?: null;
         }
-        
-        // Tạo sản phẩm mới
+
+        // 👉 Tạo sản phẩm mới
         $product = Product::create($params);
 
-        // Lấy ID của sản phẩm vừa tạo
+        // 👉 Lấy ID của sản phẩm vừa tạo
         $productID = $product->id;
 
         // 👉 Upload danh sách ảnh lên Cloudinary
@@ -77,8 +75,23 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'Successfully added new product');
+        return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công!');
+    } catch (QueryException $e) {
+        if ($e->errorInfo[1] == 1062) {
+            // 👉 Lỗi trùng lặp khóa duy nhất
+            $validator = Validator::make($request->all(), []);
+            $validator->errors()->add('product_name', 'Mã sản phẩm đã tồn tại, vui lòng chọn mã khác.');
+
+            // 👉 Quay lại với thông báo lỗi
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // 👉 Trả về lỗi khác nếu có
+        return redirect()->back()->with('error', 'Đã xảy ra lỗi! Vui lòng thử lại.');
     }
+}
 
     /**
      * Display the specified resource.

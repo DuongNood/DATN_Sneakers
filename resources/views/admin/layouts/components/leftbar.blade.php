@@ -99,7 +99,7 @@
                                 <a class='tp-link' href='{{ route('products.index') }}'>Danh sách sản phẩm</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='{{ route('product_variants.index') }}'>biến thể sản phẩm</a>
+                                <a class='tp-link' href='{{ route('product_variants.index') }}'>Biến thể sản phẩm</a>
                             </li>
                             <li>
                                 <a class='tp-link' href='{{ route('products.productDiscontinued') }}'>Sản phẩm ngừng
@@ -108,6 +108,9 @@
                             <li>
                                 <a class='tp-link' href='{{ route('product_variants.variantDiscontinued') }}'>Biến thể
                                     đã ngừng kinh doanh</a>
+                            </li>
+                            <li>
+                                <a class='tp-link' href='{{ route('size.index') }}'>Size</a>
                             </li>
                         </ul>
                     </div>

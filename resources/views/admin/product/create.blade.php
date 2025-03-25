@@ -20,20 +20,55 @@
                                 <div class="col-lg-6">                              
                                         <div class="mb-3">
                                             <label for="simpleinput" class="form-label">Product code</label>
-                                            <input type="text" id="simpleinput" class="form-control" name="product_code">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="example-email" class="form-label">Product name</label>
-                                            <input type="text" id="example-email"  class="form-control" name="product_name">
+                                            <input type="text" id="simpleinput" class="form-control @error('product_code') is-invalid @enderror"
+                                                name="product_code" value="{{ old('product_code') }}">
+                                            @error('product_code')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <div class="mb-3">
+                                            <label for="example-email" class="form-label">Product name</label>
+                                            <input type="text" id="example-email" class="form-control @error('product_name') is-invalid @enderror"
+                                                name="product_name" value="{{ old('product_name') }}">
+                                            @error('product_name')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="example-email" class="form-label">Original price</label>
+                                            <input type="number" id="example-email" class="form-control @error('original_price') is-invalid @enderror"
+                                                name="original_price" value="{{ old('original_price') }}">
+                                            @error('original_price')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="example-email" class="form-label">Discounted price</label>
+                                            <input type="number" id="example-email" class="form-control @error('discounted_price') is-invalid @enderror"
+                                                name="discounted_price" value="{{ old('discounted_price') }}">
+                                            @error('discounted_price')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+
+
+                                        <div class="mb-3">
                                             <label for="example-password" class="form-label">Category</label>
-                                            <select class="form-select" aria-label="Default select example" name="category_id">                                               
+                                            <select class="form-select @error('category_id') is-invalid @enderror" name="category_id">
+                                                <option value="">-- Select Category --</option>
                                                 @foreach ($listCategories as $item)
-                                                    <option value="{{$item->id}}">{{$item->category_name}}</option> 
+                                                    <option value="{{ $item->id }}" {{ old('category_id') == $item->id ? 'selected' : '' }}>
+                                                        {{ $item->category_name }}
+                                                    </option> 
                                                 @endforeach                                                                                    
                                             </select>
+                                            @error('category_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <div class="mb-3">
@@ -81,7 +116,7 @@
                                         </div>                                    
                               </div>
                             </div>
-                            <div class="d-flex"><button type="submit" class="btn btn-primary">Thêm moi</button>
+                            <div class="d-flex"><button type="submit" class="btn btn-primary">Thêm mới</button>
                         </form>        
                     </div>
 

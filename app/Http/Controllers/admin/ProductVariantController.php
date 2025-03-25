@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\ProductVariant;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Models\ProductSize;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 
@@ -19,9 +20,9 @@ class ProductVariantController extends Controller
     {
         //
         $title = "Biến thể sản phẩm";
-    $productVariant = ProductVariant::where('status', true)
-        ->orderBy('product_id') // 👉 Sắp xếp theo product_id
-        ->get();
+        $productVariant = ProductVariant::where('status', true)
+        ->orderBy('product_id') 
+        ->paginate(10);
 
     return view('admin.product_variants.index', compact('title', 'productVariant'));;
     }
@@ -29,13 +30,13 @@ class ProductVariantController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(String $id)
     {
         //
-        $product = Product::where('status',true)->get();
-        
+        $product = Product::find($id);
+        $size= ProductSize::get();
         $title ="product variant";
-        return view('admin.product_variants.create',compact('title','product'));
+        return view('admin.product_variants.create',compact('title','product','size'));
     }
 
     /**
@@ -44,29 +45,20 @@ class ProductVariantController extends Controller
 
 
     public function store(Request $request)
-{
+    {
+        
     try {
         $validatedData = $request->validate([
             'product_variants'                  => 'required|array', 
-            'product_variants.*.sku'            => [
-                'required', 
-                'string', 
-                'max:50', 
-                Rule::unique('product_variants')->where(function ($query) use ($request) {
-                    return $query->where('product_id', $request->input('product_id'));
-                })
-            ],
+            'product_variants.*.product_size_id'=> 'required',
             'product_variants.*.product_id'     => 'required|exists:products,id', 
-            'product_variants.*.price'          => 'required|numeric|min:0', 
-            'product_variants.*.promotional_price' => 'nullable|numeric|min:0|lte:product_variants.*.price', 
             'product_variants.*.quantity'       => 'required|integer|min:0', 
             'product_variants.*.status'         => 'nullable|in:0,1'
         ],[
             //THÊM THÔNG BÁO LỖI TÙY CHỈNH
             'product_variants.required' => 'Danh sách biến thể không được để trống!',
             'product_variants.array' => 'Dữ liệu biến thể không hợp lệ!',
-            'product_variants.*.sku.required' => 'Mỗi biến thể phải có một SKU!',
-            'product_variants.*.sku.unique' => 'SKU đã tồn tại cho sản phẩm này!',
+            'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có một product_size_id!',
             'product_variants.*.product_id.required' => 'Mỗi biến thể phải có một product_id!',
             'product_variants.*.product_id.exists' => 'product_id không hợp lệ!',
             'product_variants.*.price.required' => 'Giá sản phẩm là bắt buộc!',
@@ -80,10 +72,8 @@ class ProductVariantController extends Controller
         // Lưu vào database
         foreach ($validatedData['product_variants'] as $variant) {
             ProductVariant::create([
-                'sku'                => $variant['sku'],
-                'product_id'         => $variant['product_id'],
-                'price'              => $variant['price'],
-                'promotional_price'  => $variant['promotional_price'] ?? null,
+                'product_size_id'=> $variant['product_size_id'],
+                'product_id'         => $variant['product_id'],               
                 'quantity'           => $variant['quantity'],
                 'status'             => $variant['status'] ?? 1,
             ]);
@@ -96,7 +86,7 @@ class ProductVariantController extends Controller
     } catch (QueryException $e) {
         // 💡 Bắt lỗi SQL trùng lặp SKU và tạo lỗi thủ công vào session
         if ($e->errorInfo[1] == 1062) {
-            $errors = ['product_variants.*.sku' => 'SKU đã tồn tại cho sản phẩm này!'];
+            $errors = ['product_variants.*.product_size_id' => 'SKU đã tồn tại cho sản phẩm này!'];
             return back()->withErrors($errors)->withInput();
         }
 

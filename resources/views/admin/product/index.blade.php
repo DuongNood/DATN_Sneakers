@@ -26,11 +26,12 @@
                             <table class="table mb-0">
                                 <thead>
                                     <tr>
-                                        <th scope="col">ID</th>
+                                        <th scope="col">STT</th>
                                         <th scope="col">Product code</th>
                                         <th scope="col">Product name</th>
                                         <th scope="col">image</th>
-                                        <th scope="col">description</th>
+                                        <th scope="col">Original_price</th>
+                                        <th scope="col">Discounted_price</th>
                                         <th scope="col">Category_id</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Is_show_home</th>                                       
@@ -38,13 +39,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($listProduct as $item)
+                                    @foreach ($listProduct as $index => $item)
                                         <tr>
-                                            <th scope="row">{{$item->id}}</th>
+                                            <th scope="row">{{$index + 1}}</th>
                                             <td>{{$item->product_code}}</td>
                                             <td>{{$item->product_name}}</td>
                                             <td><img src="{{ $item->image }} " alt="" width="150px"></td>
-                                            <td>{{$item->description}}</td>
+                                            <td>{{$item->original_price}}</td>
+                                            <td>{{$item->discounted_price}}</td>
                                             <td>{{$item->category->category_name}}</td>
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
@@ -54,7 +56,9 @@
                                             </td>
                                             <td>
                                                 <a href="{{ route('products.edit', $item->id) }}"><i
-                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>                                             
+                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
+                                                <a href="{{ route('product_variants.create', $item->id) }}"><i
+                                                        class="mdi mdi-plus text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -62,6 +66,9 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="mt-4">
+                        {{ $listProduct->links() }}
                     </div>
                 </div>
             </div>

@@ -6,8 +6,8 @@
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>              
             </div>
-            <a href="{{route('product_variants.create')}}" class="btn btn-success col-1">Thêm mới</a>
-            
+
+
         </div>
 
         <!-- start row -->
@@ -28,23 +28,19 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">STT</th>
-                                        <th scope="col">Sku</th>
                                         <th scope="col">Product id</th>
-                                        <th scope="col">price</th>
-                                        <th scope="col">promotional_price</th>
+                                        <th scope="col">Product size id</th>                                  
                                         <th scope="col">quantity</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Act</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($productVariant as $index=> $item)
+                                    @foreach ($productVariant as $index => $item)
                                         <tr>
-                                            <th scope="row">{{$index+1}}</th>
-                                            <td>{{$item->sku}}</td>
+                                            <th scope="row">{{$index + 1}}</th>>
                                             <td>{{$item->product->product_name}}</td>
-                                            <td>{{$item->price}}</td>
-                                            <td>{{$item->promotional_price}}</td>
+                                            <td>{{$item->product_size_id}}</td>>
                                             <td>{{$item->quantity}}</td>                                          
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
@@ -60,6 +56,7 @@
                             </table>
                         </div> 
                     </div>
+                    {{ $productVariant->links() }}
                 </div>
             </div>                         
         </div><!-- end row -->

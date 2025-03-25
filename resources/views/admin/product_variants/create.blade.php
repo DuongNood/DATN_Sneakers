@@ -36,40 +36,18 @@
                                             <div id="variant-table">                                              
                                             @foreach(old('product_variants', [0 => []]) as $key => $variant)
                                                 <div class="variant-row row align-items-end mb-3">
+                                                    <input type="hidden" value="{{$product->id}}"  name="product_variants[{{ $key }}][product_id]">
                                                     <div class="col-md-2">
-                                                        <label for="simpleinput" class="form-label">Variant name</label>
-                                                        <input type="text" class="form-control" name="product_variants[{{ $key }}][sku]" placeholder="Variant name"
-                                                            value="{{ old("product_variants.$key.sku") }}">
-                                                        @error("product_variants.$key.sku")
-                                                            <p class="text-danger position-absolute">{{ $message }}</p>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <label for="simpleinput" class="form-label">Product name</label>
-                                                        <select class="form-select" name="product_variants[{{ $key }}][product_id]">
-                                                            @foreach ($product as $item)
-                                                                <option value="{{ $item->id }}" {{ old("product_variants.$key.product_id") == $item->id ? 'selected' : '' }}>
-                                                                    {{ $item->product_name }}
+                                                        <label for="simpleinput" class="form-label">size</label>
+                                                        <select class="form-select" name="product_variants[{{ $key }}][product_size_id]">
+                                                            @foreach ($size as $item)
+                                                                <option value="{{ $item->id }}" {{ old("product_variants.$key.product_size_id") == $item->id ? 'selected' : '' }}>
+                                                                    {{ $item->name }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-2">
-                                                        <label for="simpleinput" class="form-label">Price</label>
-                                                        <input type="number" class="form-control" name="product_variants[{{ $key }}][price]"
-                                                            value="{{ old("product_variants.$key.price") }}" placeholder="Price" step="0.01">
-                                                        @error("product_variants.$key.price")
-                                                            <p class="text-danger position-absolute">{{ $message }}</p>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <label for="simpleinput" class="form-label">Promotional price</label>
-                                                        <input type="number" class="form-control" name="product_variants[{{ $key }}][promotional_price]"
-                                                            value="{{ old("product_variants.$key.promotional_price") }}" placeholder="Promotional price" step="0.01">
-                                                        @error("product_variants.$key.promotional_price")
-                                                            <p class="text-danger position-absolute">{{ $message }}</p>
-                                                        @enderror
-                                                    </div>
+
                                                     <div class="col-md-2">
                                                         <label for="simpleinput" class="form-label">Quantity</label>
                                                         <input type="number" class="form-control" name="product_variants[{{ $key }}][quantity]"
@@ -114,25 +92,16 @@
                 index++;
                 let newRow = `
             <div class="variant-row row align-items-end mb-3">
-                <div class="col-md-2">
-                    <input type="text" class="form-control" name="product_variants[${index}][sku]" 
-                           placeholder="SKU">
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select" name="product_variants[${index}][product_id]">
-                        @foreach ($product as $item)
-                            <option value="{{ $item->id }}">{{ $item->product_name }}</option>
+                <input type="hidden" value="{{$product->id}}"  name="product_variants[${index}][product_id]">
+                 <div class="col-md-2">
+                    <select class="form-select" name="product_variants[{{ $key }}][product_size_id]">
+                        @foreach ($size as $item)
+                            <option value="{{ $item->id }}">
+                                {{ $item->name }}
+                            </option>
                         @endforeach
                     </select>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" name="product_variants[${index}][price]" 
-                           placeholder="Price" step="0.01">
-                </div>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" name="product_variants[${index}][promotional_price]" 
-                           placeholder="Promotional price" step="0.01">
-                </div>
+                </div>                         
                 <div class="col-md-2">
                     <input type="number" class="form-control" name="product_variants[${index}][quantity]" 
                            placeholder="Quantity">

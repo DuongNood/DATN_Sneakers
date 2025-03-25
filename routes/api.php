@@ -90,6 +90,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
 Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
+Route::get('/categories', [HomeController::class, 'getCategories']);
+Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
