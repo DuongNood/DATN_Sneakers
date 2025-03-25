@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Order::class)->constrained();
             $table->foreignIdFor(Product::class)->constrained();
+            $table->integer('quantity');
             $table->double('price');
             $table->double('discount')->default(0);
             $table->double('total_price');
