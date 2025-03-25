@@ -3,7 +3,7 @@
 
 use App\Http\Controllers\admin\CommentController;
 
-use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\admin\StatisticsController;
 
 use App\Http\Controllers\admin\OrderController;
 
@@ -16,7 +16,7 @@ use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\NewsController;
 
 
-use App\Http\Controllers\BannerController;
+use App\Http\Controllers\admin\BannerController;
 
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductVariantController;
@@ -30,8 +30,7 @@ use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\SizeController;
 
 use App\Http\Controllers\ProductPromotionController;
-
-
+use App\Models\Banner;
 
 /*
  |--------------------------------------------------------------------------
@@ -64,22 +63,15 @@ Route::prefix('categories')
 
 Route::resource('news', NewsController::class);
 Route::resource('comments', CommentController::class);
-//  Route::prefix('banners')
-//      ->as('banners.')
-//      ->group(function () {
-//          Route::get('/', [BannerController::class, 'index'])->name('index');
-//          Route::get('create', [BannerController::class, 'create'])->name('create');
-//          Route::post('store', [BannerController::class, 'store'])->name('store');
-//          Route::get('{id}/edit', [BannerController::class, 'edit'])->name('edit');
-//          Route::put('update/{id}', [BannerController::class, 'update'])->name('update');
-//          Route::delete('destroy/{id}', [BannerController::class, 'destroy'])->name('destroy');
-//      });
+
 Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 
 Route::resource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
 
 Route::resource('orders', OrderController::class);
+
+Route::resource('banners', BannerController::class);
 
 Route::prefix('settings')
     ->as('settings.')

@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
-use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -35,7 +34,7 @@ class StatisticsController extends Controller
             ->take(5)
             ->get();
 
-        return view('statistics.index', compact('totalRevenue', 'totalOrders', 'bestSellingProducts', 'topCustomers'));
+        return view('admin.statistics.index', compact('totalRevenue', 'totalOrders', 'bestSellingProducts', 'topCustomers'));
     }
 }
 

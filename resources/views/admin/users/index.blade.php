@@ -3,7 +3,7 @@
     Danh sách người dùng
 @endsection
 @section('content')
-    <div class="container-xxl">
+    <div class="container">
 
         @if (session()->has('success') && !session()->get('success'))
             <div class="alert alert-danger">

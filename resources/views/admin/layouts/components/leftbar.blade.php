@@ -105,6 +105,20 @@
                 </li>
 
                 <li>
+                    <a class='tp-link' href='{{ route('banners.index') }}'>
+                        <i data-feather="package"></i>
+                        <span> Quản lý banner </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class='tp-link' href='#'>
+                        <i data-feather="package"></i>
+                        <span> Quản lý thống kê </span>
+                    </a>
+                </li>
+
+                <li>
                     <a class='tp-link' href='{{ route('comments.index') }}'>
                         <i data-feather="message-square"></i>
                         <span> Quản lý bình luận </span>
