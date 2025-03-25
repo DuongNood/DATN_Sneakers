@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\api\DetailController;
 use App\Http\Controllers\Api\MomopaymentController;
+use App\Http\Controllers\Api\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
@@ -69,6 +70,8 @@ Route::resource('news', NewsController::class);
 // User
 Route::apiResource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
+// Setting
+Route::get('settings', [SettingController::class, 'index']);
 // Promotion
 Route::get('/promotions', function () {
     return response()->json(Promotion::where('status', 1)->get());

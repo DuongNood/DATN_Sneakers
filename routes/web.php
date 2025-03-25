@@ -24,6 +24,7 @@ use App\Http\Controllers\admin\ProductVariantController;
 
 
 use App\Http\Controllers\admin\PromotionController;
+use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\ProductPromotionController;
 
 
@@ -75,6 +76,13 @@ Route::resource('users', UserController::class);
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
 
 Route::resource('orders', OrderController::class);
+
+Route::prefix('settings')
+    ->as('settings.')
+    ->group(function () {
+        Route::get('edit', [SettingController::class, 'edit'])->name('edit');
+        Route::put('update', [SettingController::class, 'update'])->name('update');
+    });
 
 Route::resource('promotions', PromotionController::class);
 Route::post('/product-promotions', [ProductPromotionController::class, 'store'])->name('product-promotions.store');

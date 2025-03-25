@@ -55,42 +55,9 @@
                 <li class="menu-title">Pages</li>
 
                 <li>
-                    <a href="#sidebarAuth" data-bs-toggle="collapse">
-                        <i data-feather="users"></i>
-                        <span> Authentication </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarAuth">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='auth-login.html'>Log In</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='auth-register.html'>Register</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='auth-recoverpw.html'>Recover Password</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='auth-lock-screen.html'>Lock Screen</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='auth-confirm-mail.html'>Confirm Mail</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='email-verification.html'>Email Verification</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='auth-logout.html'>Logout</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
                     <a href="#sidebarError" data-bs-toggle="collapse">
-                        <i data-feather="alert-octagon"></i>
-                        <span> Quản lí sản phẩm </span>
+                        <i data-feather="list"></i>
+                        <span> Quản lý sản phẩm </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarError">
@@ -99,7 +66,7 @@
                                 <a class='tp-link' href='{{ route('products.index') }}'>Danh sách sản phẩm</a>
                             </li>
                             <li>
-                                <a class='tp-link' href='{{ route('product_variants.index') }}'>biến thể sản phẩm</a>
+                                <a class='tp-link' href='{{ route('product_variants.index') }}'>Biến thể sản phẩm</a>
                             </li>
                             <li>
                                 <a class='tp-link' href='{{ route('products.productDiscontinued') }}'>Sản phẩm ngừng
@@ -115,208 +82,45 @@
 
                 <li>
                     <a class='tp-link' href='{{ route('categories.index') }}'>
-                        <i data-feather="calendar"></i>
-                        <span> Quản lí danh mục </span>
+                        <i data-feather="clipboard"></i>
+                        <span> Quản lý danh mục </span>
                     </a>
                 </li>
 
                 <li>
                     <a class='tp-link' href='{{ route('users.index') }}'>
-                        <i data-feather="package"></i>
-                        <span> Quản lí người dùng </span>
+                        <i data-feather="users"></i>
+                        <span> Quản lý người dùng </span>
                     </a>
                 </li>
 
                 <li>
                     <a class='tp-link' href='{{ route('orders.index') }}'>
-                        <i data-feather="cpu"></i>
-                        <span> Quản lí đơn hàng </span>
+                        <i data-feather="package"></i>
+                        <span> Quản lý đơn hàng </span>
                     </a>
                 </li>
+
                 <li>
                     <a class='tp-link' href='{{ route('comments.index') }}'>
-                        <i data-feather="package"></i>
-                        <span> Comments </span>
+                        <i data-feather="message-square"></i>
+                        <span> Quản lý bình luận </span>
                     </a>
                 </li>
+
                 <li>
                     <a class='tp-link' href='{{ route('news.index') }}'>
-                        <i data-feather="package"></i>
-                        <span> News </span>
+                        <i data-feather="align-justify"></i>
+                        <span> Quản lý tin tức </span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="#sidebarAdvancedUI" data-bs-toggle="collapse">
-                        <i data-feather="cpu"></i>
-                        <span> Extended UI </span>
-                        <span class="menu-arrow"></span>
+                    <a class='tp-link' href='{{ route('settings.edit') }}'>
+                        <i data-feather="settings"></i>
+                        <span> Quản lý cài đặt </span>
                     </a>
-                    <div class="collapse" id="sidebarAdvancedUI">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='extended-carousel.html'>Carousel</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='extended-notifications.html'>Notifications</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='extended-offcanvas.html'>Offcanvas</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='extended-range-slider.html'>Range Slider</a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
-
-                <li>
-                    <a href="#sidebarIcons" data-bs-toggle="collapse">
-                        <i data-feather="award"></i>
-                        <span> Icons </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarIcons">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='icons-feather.html'>Feather Icons</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='icons-mdi.html'>Material Design Icons</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarForms" data-bs-toggle="collapse">
-                        <i data-feather="briefcase"></i>
-                        <span> Forms </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarForms">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='forms-elements.html'>General Elements</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='forms-validation.html'>Validation</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='forms-quilljs.html'>Quilljs Editor</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='forms-pickers.html'>Picker</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarTables" data-bs-toggle="collapse">
-                        <i data-feather="table"></i>
-                        <span> Tables </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarTables">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='tables-basic.html'>Basic Tables</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='tables-datatables.html'>Data Tables</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarCharts" data-bs-toggle="collapse">
-                        <i data-feather="pie-chart"></i>
-                        <span> Apex Charts </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarCharts">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href='charts-line.html'>Line</a>
-                            </li>
-                            <li>
-                                <a href='charts-area.html'>Area</a>
-                            </li>
-                            <li>
-                                <a href='charts-column.html'>Column</a>
-                            </li>
-                            <li>
-                                <a href='charts-bar.html'>Bar</a>
-                            </li>
-                            <li>
-                                <a href='charts-mixed.html'>Mixed</a>
-                            </li>
-                            <li>
-                                <a href='charts-timeline.html'>Timeline</a>
-                            </li>
-                            <li>
-                                <a href='charts-rangearea.html'>Range Area</a>
-                            </li>
-                            <li>
-                                <a href='charts-funnel.html'>Funnel</a>
-                            </li>
-                            <li>
-                                <a href='charts-candlestick.html'>Candlestick</a>
-                            </li>
-                            <li>
-                                <a href='charts-boxplot.html'>Boxplot</a>
-                            </li>
-                            <li>
-                                <a href='charts-bubble.html'>Bubble</a>
-                            </li>
-                            <li>
-                                <a href='charts-scatter.html'>Scatter</a>
-                            </li>
-                            <li>
-                                <a href='charts-heatmap.html'>Heatmap</a>
-                            </li>
-                            <li>
-                                <a href='charts-treemap.html'>Treemap</a>
-                            </li>
-                            <li>
-                                <a href='charts-pie.html'>Pie</a>
-                            </li>
-                            <li>
-                                <a href='charts-radialbar.html'>Radialbar</a>
-                            </li>
-                            <li>
-                                <a href='charts-radar.html'>Radar</a>
-                            </li>
-                            <li>
-                                <a href='charts-polararea.html'>Polar</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarMaps" data-bs-toggle="collapse">
-                        <i data-feather="map"></i>
-                        <span> Maps </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarMaps">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href='maps-google.html'>Google Maps</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='maps-vector.html'>Vector Maps</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-
-
-
             </ul>
         </div>
         <!-- End Sidebar -->
