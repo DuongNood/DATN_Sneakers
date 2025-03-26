@@ -13,8 +13,6 @@ class OrderDetail extends Model
         'product_id', // 🔥 Đảm bảo có dòng này
         'quantity',
         'price',
-        'discount',
-        'total_price',
     ];
     public function order(){
         return $this->belongsTo(Order::class, 'order_id');

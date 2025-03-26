@@ -41,7 +41,7 @@ class NewsController extends Controller
             News::query()->create($data);
             // dd($data);
 
-            return redirect()->route('news.index')->with('success', 'create news successfully');
+            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'CCreate news successfully');
 
         } catch (\Throwable $th) {
             //throw $th;
@@ -102,7 +102,7 @@ class NewsController extends Controller
 
             $news->delete();
 
-            return redirect()->route('news.index')->with('success', 'Đã xóa thành công tin tức!');
+            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Đã xóa thành công tin tức!');
 
         } catch (\Throwable $th) {
             return back()
