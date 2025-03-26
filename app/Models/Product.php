@@ -52,9 +52,9 @@ class Product extends Model
     }
     // protected $fillable = ['name', 'price', 'stock'];
 
-    public function orderItems()
+    public function orderDetails()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderDetail::class);
     }
 
     public function getPriceWithoutPromotion()

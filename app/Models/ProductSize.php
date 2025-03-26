@@ -12,4 +12,6 @@ class ProductSize extends Model
     protected $fillable =[
         'name',
     ];
+    protected $table = 'product_sizes'; // Đặt đúng tên bảng nếu cần
 }
+

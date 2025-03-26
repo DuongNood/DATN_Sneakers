@@ -1,153 +1,135 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\ProductVariant;
-use App\Models\Order; // Đảm bảo đúng tên Model với DB của bạn
-use App\Models\OrderDetail;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ProductSize;
+use Str;
 
 class OrderController extends Controller
 {
-    /**
-     * Mua hàng (Tạo đơn hàng, chưa trừ kho)
-     */
-    public function buyProduct(Request $request, $product_id)
+    public function buyProductByName(Request $request, $product_name)
+{
+    $request->validate([
+        'product_size_id' => 'required|integer', // Đây là ID của size
+        'quantity' => 'required|integer|min:1'
+    ]);
+
+    $user = Auth::user();
+    
+    // Tìm sản phẩm theo tên
+    $product = Product::where('product_name', $product_name)->firstOrFail();
+
+    // Lấy thông tin kích cỡ sản phẩm
+    $productSize = ProductSize::find($request->product_size_id);
+    if (!$productSize) {
+        return response()->json(['message' => 'Không tìm thấy kích cỡ sản phẩm!'], 404);
+    }
+
+    // Lấy giá từ products (ưu tiên discounted_price nếu có, ngược lại dùng original_price)
+    $price = $product->discounted_price ?? $product->original_price;
+
+    if (!$price) {
+        return response()->json(['message' => 'Sản phẩm chưa có giá!'], 400);
+    }
+
+    $totalPrice = $price * $request->quantity;
+    $orderCode = 'ORD' . strtoupper(Str::random(10));
+
+    $order = Order::create([
+        'user_id' => $user->id,
+        'order_code' => $orderCode,
+        'recipient_name' => $user->name,
+        'recipient_phone' => $user->phone ?? 'N/A',
+        'recipient_address' => $user->address ?? 'N/A',
+        'total_price' => $totalPrice,
+        'shipping_fee' => 0,
+        'payment_method' => 'COD',
+        'payment_status' => 'chua_thanh_toan',
+        'status' => 'cho_xac_nhan',
+    ]);
+
+    OrderDetail::create([
+        'order_id' => $order->id,
+        'product_id' => $product->id, 
+        'product_size_id' => $productSize->id, // Lưu lại ID của size
+        'size_name' => $productSize->name, // Lưu thêm tên size
+        'quantity' => $request->quantity,
+        'price' => $price,
+        'discount' => $product->discounted_price ? ($product->original_price - $product->discounted_price) : 0,
+        'total_price' => $totalPrice,
+    ]);
+
+    return response()->json([
+        'message' => 'Đặt hàng thành công!',
+        'order' => $order,
+        'size' => $productSize->name // Trả về luôn thông tin size
+    ], 201);
+}
+
+
+
+public function confirmOrder($order_id)
 {
     DB::beginTransaction();
-
     try {
-        // Lấy danh sách biến thể có cùng product_id
-        $variants = ProductVariant::where('product_id', $product_id)
-            ->where('status', 1) // Chỉ lấy biến thể đang hoạt động
-            ->where('quantity', '>', 0) // Chỉ lấy biến thể còn hàng
-            ->get();
+        // Tìm đơn hàng theo order_id
+        $order = Order::with('orderDetails')->where('id', $order_id)->first();
 
-        if ($variants->isEmpty()) {
-            return response()->json(['message' => 'Không có biến thể nào khả dụng'], 404);
+        if (!$order) {
+            return response()->json(['message' => 'Đơn hàng không tồn tại'], 404);
         }
 
-        $quantityToBuy = $request->input('quantity', 1);
-
-        // Chọn biến thể đầu tiên có đủ hàng
-        $variant = $variants->where('quantity', '>=', $quantityToBuy)->first();
-
-        if (!$variant) {
-            return response()->json(['message' => 'Không có biến thể nào đủ số lượng yêu cầu'], 400);
+        if ($order->status !== 'cho_xac_nhan') {
+            return response()->json(['message' => 'Đơn hàng đã được xử lý trước đó'], 400);
         }
 
-        $price = $variant->promotional_price ?? $variant->price;
-        $totalPrice = $price * $quantityToBuy;
+        if ($order->orderDetails->isEmpty()) {
+            return response()->json(['message' => 'Đơn hàng không có sản phẩm'], 400);
+        }
 
-        // Tạo đơn hàng trong bảng 'orders'
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'recipient_name' => $request->input('recipient_name'),
-            'recipient_phone' => $request->input('recipient_phone'),
-            'recipient_address' => $request->input('recipient_address'),
-            'total_price' => $totalPrice,
-            'shipping_fee' => $request->input('shipping_fee', 0), 
-            'payment_method' => $request->input('payment_method', 'cod'), 
-            'payment_status' => 'chua_thanh_toan',
-            'status' => 'cho_xac_nhan'
-        ]);
+        foreach ($order->orderDetails as $item) {
+            if (!$item->product_size_id) {
+                return response()->json(['message' => 'Thiếu product_size_id trong order_details'], 400);
+            }
 
-        // Lưu chi tiết đơn hàng vào bảng 'order_details'
-        DB::table('order_details')->insert([
-            'product_variant_id' => $variant->id,
-            'order_id' => $order->id,
-            'price' => $price,
-            'quantity' => $quantityToBuy,
-            'total_price' => $totalPrice,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            // Tìm sản phẩm theo kích cỡ
+            $productSize = ProductSize::find($item->product_size_id);
+
+            if (!$productSize) {
+                return response()->json(['message' => 'Kích cỡ sản phẩm không tồn tại'], 404);
+            }
+
+            if ($productSize->quantity < $item->quantity) {
+                return response()->json(['message' => 'Kho không đủ hàng để xác nhận đơn'], 400);
+            }
+
+            // Trừ số lượng sản phẩm trong kho
+            $productSize->quantity -= $item->quantity;
+            $productSize->save();
+        }
+
+        // ✅ Cập nhật trạng thái đơn hàng trong bảng orders
+        $order->status = 'da_xac_nhan';
+        $order->save();
 
         DB::commit();
 
-        return response()->json([
-            'message' => 'Đơn hàng đã được đặt, chờ xác nhận!',
-            'order' => $order,
-            'product_variant' => [
-                'id' => $variant->id,
-                'sku' => $variant->sku,
-                'product_id' => $variant->product_id,
-                'image' => $variant->product->image,
-                'price' => $variant->price,
-                'promotional_price' => $variant->promotional_price,
-                'quantity' => $quantityToBuy
-            ]
-        ], 201);
+        return response()->json(['message' => 'Đơn hàng đã được xác nhận thành công!'], 200);
     } catch (\Exception $e) {
         DB::rollBack();
-        return response()->json([
-            'message' => 'Đã có lỗi xảy ra, vui lòng thử lại!',
-            'error' => $e->getMessage()
-        ], 500);
+        return response()->json(['message' => 'Lỗi khi xác nhận đơn hàng', 'error' => $e->getMessage()], 500);
     }
 }
 
 
 
-
-    /**
-     * Xác nhận đơn hàng (Trừ kho ngay sau khi xác nhận, cập nhật tổng tiền)
-     */
-
-    public function confirmOrder($id)
-    {
-        DB::beginTransaction();
-    
-        try {
-            $order = Order::with('oderDetails')->find($id); // Lấy đơn hàng kèm chi tiết đơn hàng
-    
-            if (!$order) {
-                return response()->json(['message' => 'Đơn hàng không tồn tại'], 404);
-
-            }
-    
-            if ($order->status !== 'cho_xac_nhan') {
-                return response()->json(['message' => 'Đơn hàng đã được xử lý trước đó'], 400);
-            }
-    
-            if ($order->oderDetails->isEmpty()) {
-                return response()->json(['message' => 'Đơn hàng không có sản phẩm'], 400);
-            }
-    
-            foreach ($order->oderDetails as $detail) {
-                $variant = ProductVariant::find($detail->product_variant_id);
-    
-                if (!$variant) {
-                    return response()->json(['message' => 'Sản phẩm không tồn tại'], 404);
-                }
-    
-                if ($variant->quantity < $detail->quantity) {
-                    return response()->json(['message' => 'Kho không đủ hàng để xác nhận đơn'], 400);
-                }
-    
-                // Cập nhật số lượng sản phẩm
-                $variant->quantity -= $detail->quantity;
-                $variant->save();
-            }
-    
-            // Xóa tất cả chi tiết đơn hàng trước
-            OrderDetail::where('oder_id', $id)->delete();
-    
-            // Xóa đơn hàng
-            $order->delete();
-            DB::commit();
-    
-            return response()->json([
-                'message' => 'Đơn hàng đã được xác nhận và xóa thành công!',
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Lỗi khi xác nhận đơn hàng', 'error' => $e->getMessage()], 500);
-        }
-    }
-    
 
 
 }

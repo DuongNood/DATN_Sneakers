@@ -83,30 +83,24 @@ Route::get('/statistics/total-orders', [StatisticsController::class, 'totalOrder
 Route::get('/statistics/best-selling-products', [StatisticsController::class, 'bestSellingProducts']);
 Route::get('/statistics/top-customers', [StatisticsController::class, 'topCustomers']);
 
-// mua hàng
-Route::middleware('auth:sanctum')->group(function () {
 
-    Route::post('/orders/buy/{product_id}', [OrderController::class, 'buyProduct']);
-    Route::post('/orders/confirm/{order_id}', [OrderController::class, 'confirmOrder']);
-});
+
 
 Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
 Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
 Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
-
+// mua hàng
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/cart', [CartController::class, 'getUserCart']);
-    Route::get('/admin/carts', [CartController::class, 'getAllCarts'])->middleware('isAdmin');
     Route::post('/cart/add', [CartController::class, 'addToCart']);
-    Route::put('/cart/update/{id}', [CartController::class, 'updateCartItem']);
-    Route::delete('/cart/remove/{id}', [CartController::class, 'removeCartItem']);
-    Route::delete('/cart/clear', [CartController::class, 'clearCart']);
-    Route::post('/cart/checkout', [CartController::class, 'checkout']);
+    Route::get('/cart', [CartController::class, 'viewCart']);
+    Route::post('/cart/checkout', [OrderController::class, 'checkout']);
+    Route::get('/orders/{id}', [OrderController::class, 'orderDetails']);
+    Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
+    Route::put('/orders/confirm/{order_id}', [OrderController::class, 'confirmOrder']);
 });
-
 // MomoPayment 
 // tạo thanh toán momo
 Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);

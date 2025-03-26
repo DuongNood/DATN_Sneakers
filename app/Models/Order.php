@@ -11,16 +11,10 @@ class Order extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        'user_id',
-        'recipient_name',
-        'recipient_phone',
-        'recipient_address',
-        'total_price',
-        'shipping_fee',
-        'payment_method',
-        'payment_status',
-        'status',
+        'user_id', 'order_code', 'recipient_name', 'recipient_phone', 'recipient_address',
+        'total_price', 'shipping_fee', 'payment_method', 'payment_status', 'status'
     ];
+    
 
     protected $casts = [
         'total_price' => 'decimal:2',
@@ -98,5 +92,10 @@ class Order extends Model
     {
         return self::ORDER_STATUS[$this->status] ?? 'Không xác định';
     }
+    public function productSize()
+{
+    return $this->belongsTo(ProductSize::class, 'product_size_id');
+}
+
 }
 

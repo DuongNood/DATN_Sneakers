@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     use HasFactory;
-    protected $fillable =[
+    protected $fillable = [
         'order_id',
-        'product_variant_id',
+        'product_id', // 🔥 Đảm bảo có dòng này
         'quantity',
         'price',
         'discount',
