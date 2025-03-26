@@ -19,7 +19,7 @@ return new class extends Migration
             $table->double('discount_value');
             $table->date('start_date');
             $table->date('end_date');
-            $table->double('max_discount_value');
+            $table->double('max_discount_value')->default(0);
             $table->text('description')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();

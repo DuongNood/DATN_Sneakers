@@ -20,8 +20,9 @@ return new class extends Migration
             $table->string('recipient_name');
             $table->string('recipient_phone');
             $table->string('recipient_address');
+            $table->double('promotion')->default(0);
+            $table->double('shipping_fee')->default(25000);
             $table->double('total_price');
-            $table->double('shipping_fee');
             $table->enum('payment_method',['COD', 'Online'])->nullable();
             $table->string('payment_status')->default(Order::CHUA_THANH_TOAN);
             $table->string('status')->default(Order::CHO_XAC_NHAN);
