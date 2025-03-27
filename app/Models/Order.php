@@ -11,9 +11,9 @@ class Order extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        'user_id', 'order_code', 'recipient_name', 'recipient_phone',
-        'recipient_address', 'total_price', 'promotion', 'shipping_fee',
-        'payment_method', 'payment_status', 'status'
+
+        'user_id', 'order_code', 'recipient_name', 'recipient_phone', 'recipient_address', 'promotion', 'shipping_fee',
+        'total_price', 'payment_method', 'payment_status', 'status'
     ];
 
     public function orderDetails()

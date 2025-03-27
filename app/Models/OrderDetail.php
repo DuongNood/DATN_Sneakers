@@ -10,8 +10,11 @@ class OrderDetail extends Model
     use HasFactory;
     
     protected $fillable = [
-        'order_id', 'product_id', 'product_size_id', 
-        'quantity', 'price', 'total_price'
+
+        'order_id',
+        'product_id', //  Đảm bảo có dòng này
+        'quantity',
+        'price',
     ];
 
     public function product()
