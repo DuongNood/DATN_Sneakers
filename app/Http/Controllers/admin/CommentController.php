@@ -17,11 +17,11 @@ class CommentController extends Controller
 
     public function index()
     {
-        $users = User::all();
-        $products = Product::all();
-        $comments = Comment::query()->latest()->paginate(20);
+        $user = User::all();
+        $product = Product::all();
+        $comments = Comment::query()->latest()->paginate(10);
 
-        return view(self::PATH_VIEW . __FUNCTION__, compact('comments', 'users', 'products'));
+        return view(self::PATH_VIEW . __FUNCTION__, compact('comments', 'user', 'product'));
     }
 
     /**

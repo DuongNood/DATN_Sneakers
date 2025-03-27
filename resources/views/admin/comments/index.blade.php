@@ -31,11 +31,11 @@
                                         <tr>
                                             <th scope="row">{{ $comment->id }}</th>
                                             <td>{{ $comment->content }}</td>
-                                            <td>{{ $comment->users->name }}</td>
-                                            <td>{{ $comment->products->product_name }}</td>
+                                            <td>{{ $comment->user->name }}</td>
+                                            <td>{{ $comment->product->product_name }}</td>
                                             <td>
-                                                @if ($comment->products->image)
-                                                    <img src="{{ Storage::url($comment->products->image) }}" alt=""
+                                                @if ($comment->product->image)
+                                                    <img src="{{ Storage::url($comment->product->image) }}" alt=""
                                                         width="100px">
                                                 @endif
                                             </td>

@@ -10,6 +10,17 @@ interface Product {
   rating: number
 }
 
+// slug url
+const createSlug = (name: string): string => {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
+
 const ProductList = () => {
   const navigate = useNavigate()
 
@@ -36,8 +47,9 @@ const ProductList = () => {
     fetchProducts()
   }, [])
 
-  const handleProductClick = (id: number) => {
-    navigate(`/detail-product/${id}`)
+  const handleProductClick = (id: number, productName: string) => {
+    const slug = createSlug(productName)
+    navigate(`/${slug}`, { state: { id } })
   }
 
   const indexOfLastProduct = currentPage * itemsPerPage
@@ -53,16 +65,10 @@ const ProductList = () => {
         {Array(itemsPerPage)
           .fill(0)
           .map((_, index) => (
-            <div
-              key={index}
-              className='bg-white shadow-lg rounded-lg p-4 text-center relative h-[18rem]'
-            >
+            <div key={index} className='bg-white shadow-lg rounded-lg p-4 text-center relative h-[18rem]'>
               <div className='absolute top-0 left-0 h-6 w-12 bg-gray-300 rounded-tr-md'></div>
-
               <div className='w-full h-48 bg-gray-300 rounded-md mb-4'></div>
-
               <div className='h-4 w-3/4 bg-gray-300 rounded mx-auto mb-2'></div>
-
               <div className='flex justify-center items-center mb-2 space-x-2'>
                 <div className='h-4 w-16 bg-gray-300 rounded'></div>
                 <div className='h-4 w-20 bg-gray-300 rounded'></div>
@@ -84,8 +90,8 @@ const ProductList = () => {
               currentProducts.map((product) => (
                 <div
                   key={product.id}
-                  className='bg-white shadow-lg rounded-lg p-4 text-center relative cursor-pointer hover:shadow-xl transition-shadow duration-300 h-[18rem]' // Chiều cao cố định
-                  onClick={() => handleProductClick(product.id)}
+                  className='bg-white shadow-lg rounded-lg p-4 text-center relative cursor-pointer hover:shadow-xl transition-shadow duration-300 h-[18rem]'
+                  onClick={() => handleProductClick(product.id, product.product_name)}
                 >
                   <div className='absolute top-0 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-tr-md z-10'>
                     <p className='text-sm text-white-500'>
@@ -107,7 +113,9 @@ const ProductList = () => {
                     />
                     <div className='absolute inset-0 bg-gradient-to-r from-transparent to-transparent group-hover:from-white group-hover:to-white opacity-30 transition-all duration-300 ease-in-out z-0' />
                   </div>
-                  <h3 className='text-sm mb-2'>{product.product_name}</h3>
+                  <h3 className='text-sm mb-2 whitespace-nowrap overflow-hidden text-ellipsis'>
+                    {product.product_name}
+                  </h3>
                   <div className='flex justify-center items-center mb-2'>
                     <p className='text-gray-500 line-through text-sm mr-2'>
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(

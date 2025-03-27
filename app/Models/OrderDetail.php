@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
 
         'order_id',
@@ -19,14 +19,23 @@ class OrderDetail extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->hasOneThrough(
+            Product::class,
+            ProductVariant::class,
+            'id',  // Khóa chính của ProductVariant
+            'id',  // Khóa chính của Product
+            'product_variant_id',  // Khóa ngoại trong OrderDetail
+            'product_id'  // Khóa ngoại trong ProductVariant
+        );
     }
 
     public function productVariant()
     {
-        return $this->belongsTo(ProductVariant::class, 'product_size_id');
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
-    public function order(){
+
+    public function order()
+    {
         return $this->belongsTo(Order::class, 'order_id');
     }
     public function promotion()

@@ -23,6 +23,12 @@ import ScrollToTop from '../components/ScrollToTop'
 import SearchContainer from '../components/Search'
 import SearchResults from '../components/SearchResults'
 import BackToTop from '../components/BackToTop'
+import AboutUs from '../components/Footer_Components/About'
+import PurchaseNotification from '../components/PurchaseNotification'
+import Checkout from '../pages/Checkout'
+import WarrantyPolicy from '../components/Footer_Components/PrivacyPolicy'
+import NewsList from '../pages/New'
+import NewsDetail from '../pages/DetailsNew'
 
 const RoutesConfig = () => {
   return (
@@ -41,20 +47,27 @@ const RoutesConfig = () => {
               <ProductList />
               <TitleWithEffect1 />
               <ProductHot />
+              <PurchaseNotification />
             </>
           }
         />
-        <Route path='/products/:id' element={<ProductList />} />
+        <Route path='/' element={<ProductList />} />
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/detail-product/:id' element={<ProductDetail />} />
+        <Route path='/:slug' element={<ProductDetail />} />
+        <Route path='/checkout' element={<Checkout />} />
+        <Route path='/news' element={<NewsList />} />
+        <Route path='/news/:id' element={<NewsDetail />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
         <Route path='/' element={<SearchContainer />} />
         <Route path='/search' element={<SearchResults />} />
+        {/* rau dưa footer */}
+        <Route path='/about' element={<AboutUs />} />
+        <Route path='/privacy-policy' element={<WarrantyPolicy />} />
         {/* Bảo vệ router */}
         <Route element={<ProtectedRoute />}>
           <Route path='/profile' element={<ProfilePage />} />

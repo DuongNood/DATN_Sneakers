@@ -137,5 +137,42 @@
   "twitter": "Twitter",
   "signup_title": "Sign up to receive code",
   "signup_button": "Sign Up",
-  "promotion_text": "Receive a <1>100K DISCOUNT VOUCHER</1> from us when you sign up for updates."
+  "promotion_text": "Receive a <1>100K DISCOUNT VOUCHER</1> from us when you sign up for updates.",
+
+  "saving": "Saving...",
+
+  "old_password_required": "Current password is required",
+  "new_password_required": "New password is required",
+  "confirm_new_password_required": "Confirmation of new password is required",
+  "password_min_length": "Password must be at least 6 characters",
+  "passwords_must_match": "Passwords must match",
+  "change_password_success": "Password changed successfully",
+  "change_password_error": "Failed to change password",
+
+  "not_found_message": "Error! The page you are looking for does not exist.",
+  "back_to_home": "Back to Home",
+
+  "about_us_title": "About Us",
+  "about_us_subtitle": "Your ultimate destination for premium sneakers and timeless style.",
+  "who_we_are": "Who We Are",
+  "about_us_intro_1": "Welcome to our sneaker haven! We’re a dedicated team of footwear enthusiasts who live and breathe sneaker culture. Our journey began with a shared passion for quality shoes, and today, we’re proud to bring you an exceptional collection of sneakers from the world’s most renowned brands.",
+  "about_us_intro_2": "From streetwear staples to performance-driven designs, we curate every pair with care, ensuring that each sneaker tells a story of craftsmanship, innovation, and style. Whether you’re chasing trends or building a timeless wardrobe, we’re here to help you step up your game.",
+  "about_us_image_alt": "A stunning collection of sneakers",
+  "our_mission": "Our Mission",
+  "mission_description": "Our mission is to redefine the sneaker shopping experience by offering a handpicked selection of top-tier footwear that combines fashion, comfort, and durability. We aim to inspire confidence and creativity in every step you take, delivering products that elevate your personal style while meeting the highest standards of quality.",
+  "our_vision": "Our Vision",
+  "vision_description": "We envision a world where every sneaker lover finds their perfect match. By bridging the gap between iconic designs and modern innovation, we strive to be the go-to platform for enthusiasts and casual buyers alike, fostering a global community united by a love for exceptional footwear.",
+  "watch_our_story": "Watch Our Story",
+  "youtube_video_title": "Our Sneaker Journey",
+  "our_commitment": "Our Commitment",
+  "commitment_description_1": "We’re more than just a store – we’re your sneaker partner. Our commitment goes beyond providing great products; it’s about creating a seamless and enjoyable shopping experience. From lightning-fast shipping to a hassle-free return policy, we’ve got your back every step of the way.",
+  "commitment_description_2": "Our team is obsessed with customer satisfaction. We work tirelessly to ensure that every order arrives on time, every question is answered promptly, and every customer leaves with a smile. Your trust fuels our passion, and we’re dedicated to earning it with every pair we deliver.",
+  "commitment_image_alt": "Close-up of a premium sneaker",
+  "join_us_title": "Step Into the Future With Us",
+  "join_us_description": "Ready to explore a world of sneakers that match your vibe? Dive into our collection and join a community of style setters and sneaker heads today!",
+  "shop_now": "Shop Now",
+  "logging_in": "Logging in...",
+  "registering": "Registering...",
+
+  "sending": "Sending..."
 }

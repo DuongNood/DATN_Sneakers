@@ -51,12 +51,13 @@ Route::get('/reset-password/{token}', function ($token) {
 
 // Xử lý đặt lại mật khẩu
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
 //danh sách sản phẩm
 Route::get('/products', [ProductController::class, 'index']);
 
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/users', function (Request $request) {
     return $request->user();
 });
 
@@ -69,7 +70,6 @@ Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByPr
 Route::resource('news', NewsController::class);
 // User
 Route::apiResource('users', UserController::class);
-Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
 // Setting
 Route::get('settings', [SettingController::class, 'index']);
 // Promotion

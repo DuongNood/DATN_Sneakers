@@ -20,10 +20,12 @@
                             <th>STT</th>
                             <th>Mã Đơn Hàng</th>
                             <th>Khách Hàng</th>
+                            <th class="text-center">Giảm Giá</th>
+                            <th class="text-center">Phí Ship</th>
                             <th class="text-end">Tổng Tiền</th>
                             <th class="text-center">Phương thức TT</th>
                             <th class="text-center">Trạng Thái TT</th>
-                            <th class="text-center">Trạng Thái Vận Chuyển</th>
+                            <th class="text-center">Trạng Thái Đơn Hàng</th>
                             <th class="text-center">Ngày Đặt</th>
                             <th class="text-center">Hành Động</th>
                         </tr>
@@ -38,6 +40,12 @@
                                     <small class="text-muted">{{ $order->recipient_phone }}</small><br>
                                     <small class="text-muted">{{ $order->recipient_address }}</small>
                                 </td>
+                                <td class="text-end">
+                                    {{ number_format($order->promotion, 0, ',', '.') }} VND
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($order->shipping_fee, 0, ',', '.') }} VND
+                                </td>
                                 <td class="text-end text-primary fw-bold">
                                     {{ number_format(round($order->total_price, -3), 0, ',', '.') }} VND
                                 </td>
@@ -47,7 +55,8 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge {{ $order->payment_status == 'da_thanh_toan' ? 'bg-success' : 'bg-danger' }}">
+                                    <span
+                                        class="badge {{ $order->payment_status == 'da_thanh_toan' ? 'bg-success' : 'bg-danger' }}">
                                         {{ $order->payment_status == 'da_thanh_toan' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
                                     </span>
                                 </td>
@@ -58,7 +67,7 @@
                                             'dang_chuan_bi' => 'bg-warning',
                                             'dang_van_chuyen' => 'bg-primary',
                                             'da_giao_hang' => 'bg-success',
-                                            'huy_don_hang' => 'bg-danger'
+                                            'huy_don_hang' => 'bg-danger',
                                         ];
                                     @endphp
                                     <span class="badge {{ $statusColors[$order->status] ?? 'bg-secondary' }}">
@@ -67,12 +76,12 @@
                                 </td>
                                 <td class="text-center">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td class="text-center">
-                                    <a href="{{ route('admin.orders.edit', $order->id) }}" class="btn btn-primary btn-sm">Sửa</a>
+                                    <a href="{{ route('admin.orders.edit', $order->id) }}"
+                                        class="btn btn-primary btn-sm">Sửa</a>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
-                    
                 </table>
             </div>
         </div>

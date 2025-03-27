@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use App\Models\ProductSize;
 class OrderController extends Controller
 {
     public function buyProductByName(Request $request, $product_name)
+
 {
     $request->validate([
         'product_size_id' => 'required|integer',
@@ -27,6 +29,7 @@ class OrderController extends Controller
     // Kiểm tra nếu user chưa có thông tin phone hoặc address
     if (!$user->phone || !$user->address) {
         return response()->json(['message' => 'Vui lòng cập nhật số điện thoại và địa chỉ trước khi mua hàng!'], 400);
+
     }
 
     // Tìm sản phẩm theo tên
@@ -144,4 +147,6 @@ class OrderController extends Controller
 
 
 
+
 }
+

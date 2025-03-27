@@ -13,7 +13,13 @@ class HomeController extends Controller
     //
     public function getHomeProducts(): JsonResponse
     {
-        $products = Product::with('category', 'variants')
+        $products = Product::with([
+        'category',
+        'productVariant' => function ($query) {
+            $query->with('productSize'); // Thêm thông tin về kích thước sản phẩm
+        },
+        'imageProduct' // Thêm thông tin về hình ảnh sản phẩm
+        ])
             ->where('is_show_home', true)
             ->where('status', true)
             ->get();
@@ -33,11 +39,20 @@ class HomeController extends Controller
     public function categoryByProduct($id)
     {
 
-        $category = Product::where('status', true)->where('category_id', $id)->get();
+         $products = Product::with([
+        'category',
+        'productVariant' => function ($query) {
+            $query->with('productSize'); // Lấy thông tin kích thước của sản phẩm
+        },
+        'imageProduct' // Lấy thông tin hình ảnh của sản phẩm
+        ])
+            ->where('status', true)
+            ->where('category_id', $id)
+            ->get();
 
         return response()->json([
             'success' => true,
-            'data' => $category
+            'data' => $products
         ]);
     }
 }
