@@ -57,7 +57,7 @@ Route::get('/products', [ProductController::class, 'index']);
 
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/users', function (Request $request) {
     return $request->user();
 });
 
@@ -69,8 +69,7 @@ Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByPr
 // route tin tức
 Route::resource('news', NewsController::class);
 // User
-Route::put('/users', [UserController::class, 'update'])->middleware('auth:sanctum');
-Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
+Route::apiResource('users', UserController::class);
 // Setting
 Route::get('settings', [SettingController::class, 'index']);
 // Promotion

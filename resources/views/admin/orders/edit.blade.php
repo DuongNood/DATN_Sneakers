@@ -58,21 +58,17 @@
                         <th>Size</th>
                         <th>Số lượng</th>
                         <th>Giá</th>
-                        <th>Giảm giá</th>
-                        <th>Thành tiền</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($order->orderDetails as $detail)
                         <tr>
-                            <td>{{ $detail->productVariant->product->product_code }}</td>
-                            <td>{{ $detail->productVariant->product->product_name }}</td>
-                            <td><img src="{{ asset('images/' . $detail->productVariant->product->image) }}" width="50"></td>
-                            <td>{{ $detail->productVariant->size }}</td>
+                            <td>{{ $detail->product->product_code }}</td>
+                            <td>{{ $detail->product->product_name }}</td>
+                            <td><img src="{{ $detail->product->image }}" width="50"></td>
+                            <td>{{ $detail->productSize->name }}</td>
                             <td>{{ $detail->quantity }}</td>
                             <td>{{ number_format($detail->price, 0, ',', '.') }} VND</td>
-                            <td>{{ number_format($detail->discount, 0, ',', '.') }} VND</td>
-                            <td>{{ number_format($detail->total_price, 0, ',', '.') }} VND</td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -28,7 +28,7 @@
                 <li class="menu-title">Menu</li>
 
                 <li>
-                    <a href="#sidebarDashboards" data-bs-toggle="collapse" href='#'>
+                    <a class='tp-link' href='{{ route('admin.index') }}'>
                         <i data-feather="home"></i>
                         <span> Dashboard </span>
                     </a>

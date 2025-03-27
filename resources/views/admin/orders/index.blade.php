@@ -20,6 +20,8 @@
                             <th>STT</th>
                             <th>Mã Đơn Hàng</th>
                             <th>Khách Hàng</th>
+                            <th class="text-center">Giảm Giá</th>
+                            <th class="text-center">Phí Ship</th>
                             <th class="text-end">Tổng Tiền</th>
                             <th class="text-center">Phương thức TT</th>
                             <th class="text-center">Trạng Thái TT</th>
@@ -38,6 +40,12 @@
                                     <small class="text-muted">{{ $order->recipient_phone }}</small><br>
                                     <small class="text-muted">{{ $order->recipient_address }}</small>
                                 </td>
+                                <td class="text-end">
+                                    {{ number_format($order->promotion, 0, ',', '.') }} VND
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($order->shipping_fee, 0, ',', '.') }} VND
+                                </td>
                                 <td class="text-end text-primary fw-bold">
                                     {{ number_format(round($order->total_price, -3), 0, ',', '.') }} VND
                                 </td>
@@ -47,8 +55,8 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge {{ $order->payment_status == 'da_thanh_toan' ? 'bg-success' : 'bg-danger' }}">
-                                        {{ $order->payment_status == 'da_thanh_toan' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+                                    <span class="badge {{ $order->payment_status == 'Đã thanh toán' ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $order->payment_status }}
                                     </span>
                                 </td>
                                 <td class="text-center">
@@ -72,7 +80,6 @@
                             </tr>
                         @endforeach
                     </tbody>
-                    
                 </table>
             </div>
         </div>

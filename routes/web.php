@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\admin\CommentController;
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\StatisticsController;
 
 use App\Http\Controllers\admin\OrderController;
@@ -42,8 +43,8 @@ Route::prefix('admin')
     ->as('admin.')
     ->group(function () {
         Route::get('/', function () {
-            return view('admin.layouts.index');
-        });
+            return view('admin.index');
+        })->name('index');
 
         Route::prefix('categories')
             ->as('categories.')
@@ -63,7 +64,8 @@ Route::prefix('admin')
         Route::resource('news', NewsController::class);
         Route::resource('comments', CommentController::class);
 
-        Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+        Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+        Route::get('statistics/data', [StatisticsController::class, 'getData'])->name('statistics.data');
 
         Route::resource('users', UserController::class);
         Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
 
         'order_id',
@@ -24,9 +24,16 @@ class OrderDetail extends Model
 
     public function productVariant()
     {
-        return $this->belongsTo(ProductVariant::class, 'product_size_id');
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
-    public function order(){
+
+    public function productSize()
+    {
+        return $this->hasOneThrough(ProductSize::class, ProductVariant::class, 'product_id', 'id', 'product_id', 'product_size_id');
+    }
+
+    public function order()
+    {
         return $this->belongsTo(Order::class, 'order_id');
     }
     public function promotion()
