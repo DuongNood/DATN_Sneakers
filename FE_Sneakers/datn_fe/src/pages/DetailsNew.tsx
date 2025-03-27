@@ -1,297 +1,125 @@
-import React, { useState } from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import '../assets/style/css/newDetail.css'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
-import '../assets/style/css/news.css' // Đường dẫn tới file CSS tùy chỉnh
-import 'bootstrap-icons/font/bootstrap-icons.css' // Import Bootstrap Icons
+import React, { useEffect, useState } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import axios from 'axios'
 
-const categories = ['Tin khuyến mãi', 'Tin khuyến mãi', 'Tin khuyến mãi', 'Tin khuyến mãi', 'Tin khuyến mãi']
+const NewsDetail = () => {
+  const { id } = useParams()
+  const [news, setNews] = useState(null)
+  const [relatedNews, setRelatedNews] = useState([])
+  const [loading, setLoading] = useState(true)
 
-const recentPosts = [
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem ipsum dolor sit amet consectetur adipiscing',
-    date: '25/02/2020'
-  },
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem ipsum dolor sit amet consectetur adipiscing',
-    date: '25/02/2020'
-  },
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem ipsum dolor sit amet consectetur adipiscing',
-    date: '25/02/2020'
-  }
-]
-const keywords = ['Thể thao', 'Xu hướng', 'Trang sức', 'Man', 'Giày', 'Giày thể thao', 'Sport']
-
-const articles = [
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  }
-]
-
-const relatedPosts = [
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  },
-  {
-    img: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-    title: 'Lorem Ipsum dolor sit amet consectetur adipiscing',
-    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been...'
-  }
-]
-const DetailsNew = () => {
-  const [comment, setComment] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  })
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setComment({ ...comment, [e.target.name]: e.target.value })
+  // Hàm định dạng ngày
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Không có ngày'
+    const [datePart] = dateString.split('T')
+    const [year, month, day] = datePart.split('-')
+    return `${day}/${month}/${year}`
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log('Bình luận đã gửi:', comment)
-    alert('Bình luận của bạn đã được gửi!')
-    setComment({ name: '', email: '', phone: '', message: '' })
+  useEffect(() => {
+    const fetchNewsDetail = async () => {
+      try {
+        const detailResponse = await axios.get(`http://127.0.0.1:8000/api/news/${id}`)
+        setNews(detailResponse.data.data)
+
+        const allNewsResponse = await axios.get('http://127.0.0.1:8000/api/news')
+        const filteredNews = allNewsResponse.data.data.filter((item) => item.id !== parseInt(id)).slice(0, 3) // Giảm xuống 3 tin
+        setRelatedNews(filteredNews)
+
+        setLoading(false)
+      } catch (err) {
+        console.error('Lỗi khi lấy chi tiết tin tức:', err)
+        setLoading(false)
+      }
+    }
+    fetchNewsDetail()
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-indigo-600'></div>
+      </div>
+    )
   }
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 3
-
-  // Tính tổng số trang
-  const totalPages = Math.ceil(articles.length / itemsPerPage)
-
-  // Chia danh sách bài viết theo trang
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentArticles = articles.slice(indexOfFirstItem, indexOfLastItem)
-
-  // Chuyển trang
+  if (!news) {
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <p className='text-lg text-gray-600'>Không tìm thấy tin tức.</p>
+      </div>
+    )
+  }
 
   return (
-    <div>
-      <div className='container mt-5'>
-        <div className='row'>
-          {/* Cột bên trái - Danh mục Tin Tức */}
-          <div className='col-md-3'>
-            <div className='category-box p-3 rounded shadow-sm'>
-              <h5 className='fw-bold'>THƯ MỤC</h5>
-              <div className='category-line'></div>
-              <ul className='list-group'>
-                {categories.map((category, index) => (
-                  <li key={index} className='list-group-item d-flex justify-content-between align-items-center'>
-                    {category}
-                    <button className='btn btn-outline-secondary btn-sm'>
-                      <i className='bi bi-plus'></i>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+    <div className='min-h-screen flex flex-col'>
+      {/* Header */}
+      <header className='bg-white shadow-sm py-20'>
+        <div className='container mx-auto px-5 text-center'>
+          <h1 className='text-3xl d text-gray-900 '>{news.title}</h1>
+          <p className='mt-2 text-sm text-gray-600'>
+            {news.author || 'Đội ngũ Admin'} • {formatDate(news.created_at)}
+          </p>
+        </div>
+      </header>
 
-            {/* Bài đăng gần đây */}
-            <div className='recent-posts mt-4 p-3 rounded shadow-sm'>
-              <h5 className='fw-bold'>BÀI ĐĂNG GẦN ĐÂY</h5>
-              <div className='category-line'></div>
-              {recentPosts.map((post, index) => (
-                <div key={index} className='d-flex align-items-start mb-3'>
-                  <img src={post.img} className='img-thumbnail me-3' alt='Post' width='70' />
-                  <div>
-                    <p className='mb-1 post-title'>{post.title}</p>
-                    <p className='text-muted mb-0'>
-                      <i className='bi bi-calendar'></i> {post.date}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className='keywords mt-4 p-3 rounded shadow-sm'>
-              <h5 className='fw-bold'>TỪ KHÓA</h5>
-              <div className='category-line'></div>
-              <div className='d-flex flex-wrap'>
-                {keywords.map((keyword, index) => (
-                  <span key={index} className='badge bg-light text-dark keyword-badge'>
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Cột bên phải - Danh sách bài viết */}
-          <div className='col-md-9'>
-            <div className='product-detail'>
-              {/* Ảnh lớn sản phẩm */}
-              <img
-                src='https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400'
-                alt='Product'
-                className='img-fluid main-product-image'
-              />
-
-              {/* Tiêu đề sản phẩm */}
-              <h2 className='product-title mt-3'>Lorem ipsum dolor sit amet consectetur adipiscing</h2>
-
-              {/* Nội dung mô tả */}
-              <p className='product-description'>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                industry's standard dummy industry's standard. It has been used since the 1500s, making it one of the
-                oldest known dummy texts in existence. This example product represents a modern take on traditional shoe
-                design with high-tech materials and innovative manufacturing.
-              </p>
-
-              <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                industry's standard dummy text. Proin tincidunt, ipsum nec vehicula euismod, neque nibh pretium ipsum,
-                et morbi risus sem et risus. Curabitur pellentesque id.
-              </p>
-
-              {/* Hình ảnh bổ sung */}
-              <div className='additional-images mt-4'>
-                <img
-                  src='https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400'
-                  alt='Product detail'
-                  className='img-fluid'
-                />
-                <img
-                  src='https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400'
-                  alt='Product detail'
-                  className='img-fluid'
-                />
-              </div>
-            </div>
-            <div className='related-posts mt-5 mb-3'>
-              <h4 className='fw-bold mb-4'>Bài đăng tương tự</h4>
-              <div className='row'>
-                {relatedPosts.map((post, index) => (
-                  <div key={index} className='col-md-6'>
-                    <div className='card'>
-                      <img src={post.img} className='card-img-top' alt={post.title} />
-                      <div className='card-body'>
-                        <h6 className='card-title fw-bold'>{post.title}</h6>
-                        <p className='card-text'>{post.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className='comment-form mt-3 mb-3'>
-              <h4 className='fw-bold'>Để lại bình luận</h4>
-              <form onSubmit={handleSubmit}>
-                <div className='row'>
-                  <div className='col-md-4'>
-                    <input
-                      type='text'
-                      name='name'
-                      value={comment.name}
-                      onChange={handleChange}
-                      className='form-control'
-                      placeholder='Tên của bạn (*)'
-                      required
-                    />
-                  </div>
-                  <div className='col-md-4'>
-                    <input
-                      type='email'
-                      name='email'
-                      value={comment.email}
-                      onChange={handleChange}
-                      className='form-control'
-                      placeholder='Email của bạn (*)'
-                      required
-                    />
-                  </div>
-                  <div className='col-md-4'>
-                    <input
-                      type='text'
-                      name='phone'
-                      value={comment.phone}
-                      onChange={handleChange}
-                      className='form-control'
-                      placeholder='Điện thoại (*)'
-                      required
-                    />
-                  </div>
-                </div>
-                <div className='mt-3'>
-                  <textarea
-                    name='message'
-                    value={comment.message}
-                    onChange={handleChange}
-                    className='form-control'
-                    rows={5}
-                    placeholder='Gõ bình luận...'
-                    required
-                  ></textarea>
-                </div>
-                <button type='submit' className='btn btn-warning mt-3'>
-                  GỬI BÌNH LUẬN
-                </button>
-              </form>
-            </div>
+      <main className='flex-grow container mx-auto px-5 py-6'>
+        <div className='bg-white rounded-lg shadow-sm border border-gray-200 max-w-3xl mx-auto'>
+          <img
+            src={news.image || 'https://via.placeholder.com/600x300'}
+            alt={news.title}
+            className='w-full h-64 object-cover rounded-t-lg'
+          />
+          <div className='p-5'>
+            <div className='text-gray-700 text-base leading-relaxed'>{news.content}</div>
+            <Link
+              to='/news'
+              className='mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium'
+            >
+              <svg
+                className='w-4 h-4 mr-1'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M10 19l-7-7m0 0l7-7m-7 7h18' />
+              </svg>
+              Quay lại
+            </Link>
           </div>
         </div>
-      </div>
+
+        {relatedNews.length > 0 && (
+          <section className='mt-8 max-w-3xl mx-auto'>
+            <h2 className='text-xl font-semibold text-gray-900 mb-4'>Tin tức liên quan</h2>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+              {relatedNews.map((item) => (
+                <Link
+                  key={item.id}
+                  to={`/news/${item.id}`}
+                  className='bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors'
+                >
+                  <img
+                    src={item.image || 'https://via.placeholder.com/300x150'}
+                    alt={item.title}
+                    className='w-full h-32 object-cover'
+                  />
+                  <div className='p-3'>
+                    <h3 className='text-base font-medium text-gray-900 line-clamp-2'>{item.title}</h3>
+                    <p className='text-gray-600 text-xs mt-1 line-clamp-2'>{item.content.substring(0, 60)}...</p>
+                    <p className='text-gray-500 text-xs mt-2'>
+                      {news.author || 'Đội ngũ Admin'} • {formatDate(news.created_at)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
     </div>
   )
 }
 
-export default DetailsNew
+export default NewsDetail

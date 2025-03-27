@@ -26,6 +26,9 @@ import BackToTop from '../components/BackToTop'
 import AboutUs from '../components/Footer_Components/About'
 import PurchaseNotification from '../components/PurchaseNotification'
 import Checkout from '../pages/Checkout'
+import WarrantyPolicy from '../components/Footer_Components/PrivacyPolicy'
+import NewsList from '../pages/New'
+import NewsDetail from '../pages/DetailsNew'
 
 const RoutesConfig = () => {
   return (
@@ -56,11 +59,15 @@ const RoutesConfig = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/:slug' element={<ProductDetail />} />
         <Route path='/checkout' element={<Checkout />} />
+        <Route path='/news' element={<NewsList />} />
+        <Route path='/news/:id' element={<NewsDetail />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
         <Route path='/' element={<SearchContainer />} />
         <Route path='/search' element={<SearchResults />} />
+        {/* rau dưa footer */}
         <Route path='/about' element={<AboutUs />} />
+        <Route path='/privacy-policy' element={<WarrantyPolicy />} />
         {/* Bảo vệ router */}
         <Route element={<ProtectedRoute />}>
           <Route path='/profile' element={<ProfilePage />} />
