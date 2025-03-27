@@ -126,7 +126,6 @@
   "how_to_buy": "Hướng dẫn mua hàng",
   "subscribe": "Đăng ký nhận tin",
   "subscribe_description": "Nhận thông tin mới nhất về sản phẩm & khuyến mãi.",
-
   "submit": "Gửi",
   "subscription_success": "Đăng ký nhận tin thành công!",
   "copyright": "© {{year}} Sneakers. All rights reserved.",
@@ -136,5 +135,41 @@
   "signup_title": "Đăng ký nhận code",
 
   "signup_button": "Đăng Kí",
-  "promotion_text": "Nhận ngay <1>VOUCHER GIẢM GIÁ 100K</1> từ chúng tôi khi đăng kí nhận tin."
+  "promotion_text": "Nhận ngay <1>VOUCHER GIẢM GIÁ 100K</1> từ chúng tôi khi đăng kí nhận tin.",
+
+  "saving": "Đang lưu...",
+
+  "old_password_required": "Mật khẩu hiện tại là bắt buộc",
+  "new_password_required": "Mật khẩu mới là bắt buộc",
+  "confirm_new_password_required": "Xác nhận mật khẩu mới là bắt buộc",
+  "password_min_length": "Mật khẩu phải có ít nhất 6 ký tự",
+  "passwords_must_match": "Mật khẩu phải trùng khớp",
+  "change_password_success": "Đổi mật khẩu thành công",
+  "change_password_error": "Đổi mật khẩu thất bại",
+
+  "not_found_message": "Lỗi! Trang bạn tìm kiếm không tồn tại.",
+  "back_to_home": "Về Trang Chủ",
+
+  "about_us_title": "Về Chúng Tôi",
+  "about_us_subtitle": "Điểm đến tối thượng của bạn cho những đôi sneaker cao cấp và phong cách vượt thời gian.",
+  "who_we_are": "Chúng Tôi Là Ai",
+  "about_us_intro_1": "Chào mừng bạn đến với thiên đường sneaker của chúng tôi! Chúng tôi là một đội ngũ đam mê giày dép, sống và hít thở văn hóa sneaker. Hành trình của chúng tôi bắt đầu từ niềm đam mê chung với những đôi giày chất lượng, và hôm nay, chúng tôi tự hào mang đến cho bạn một bộ sưu tập sneaker xuất sắc từ các thương hiệu danh tiếng nhất thế giới.",
+  "about_us_intro_2": "Từ những mẫu streetwear cơ bản đến các thiết kế chú trọng hiệu suất, chúng tôi chọn lọc từng đôi giày một cách cẩn thận, đảm bảo mỗi đôi sneaker kể một câu chuyện về sự tinh tế, đổi mới và phong cách. Dù bạn đang theo đuổi xu hướng hay xây dựng một tủ đồ vượt thời gian, chúng tôi ở đây để giúp bạn nâng tầm phong cách của mình.",
+  "about_us_image_alt": "Bộ sưu tập sneaker ấn tượng",
+  "our_mission": "Sứ Mệnh Của Chúng Tôi",
+  "mission_description": "Sứ mệnh của chúng tôi là tái định nghĩa trải nghiệm mua sắm sneaker bằng cách cung cấp một bộ sưu tập giày hàng đầu được chọn lọc kỹ lưỡng, kết hợp giữa thời trang, sự thoải mái và độ bền. Chúng tôi muốn truyền cảm hứng tự tin và sáng tạo trong mỗi bước đi của bạn, mang đến những sản phẩm nâng tầm phong cách cá nhân đồng thời đáp ứng các tiêu chuẩn chất lượng cao nhất.",
+  "our_vision": "Tầm Nhìn Của Chúng Tôi",
+  "vision_description": "Chúng tôi hình dung một thế giới nơi mọi người yêu sneaker đều tìm thấy đôi giày hoàn hảo của mình. Bằng cách kết nối giữa các thiết kế biểu tượng và sự đổi mới hiện đại, chúng tôi nỗ lực trở thành nền tảng hàng đầu cho cả những người đam mê lẫn người mua thông thường, xây dựng một cộng đồng toàn cầu gắn kết bởi tình yêu với những đôi giày xuất sắc.",
+  "watch_our_story": "Xem Câu Chuyện Của Chúng Tôi",
+  "youtube_video_title": "Hành Trình Sneaker Của Chúng Tôi",
+  "our_commitment": "Cam Kết Của Chúng Tôi",
+  "commitment_description_1": "Chúng tôi không chỉ là một cửa hàng – chúng tôi là người bạn đồng hành của bạn trong thế giới sneaker. Cam kết của chúng tôi vượt xa việc cung cấp sản phẩm tuyệt vời; đó là tạo ra một trải nghiệm mua sắm mượt mà và thú vị. Từ giao hàng nhanh như chớp đến chính sách đổi trả dễ dàng, chúng tôi luôn hỗ trợ bạn ở mọi bước đi.",
+  "commitment_description_2": "Đội ngũ của chúng tôi luôn đặt sự hài lòng của khách hàng lên hàng đầu. Chúng tôi làm việc không mệt mỏi để đảm bảo mỗi đơn hàng được giao đúng hẹn, mỗi câu hỏi được trả lời nhanh chóng, và mỗi khách hàng rời đi với nụ cười. Sự tin tưởng của bạn là động lực cho đam mê của chúng tôi, và chúng tôi cam kết giành được điều đó với từng đôi giày chúng tôi gửi đến.",
+  "commitment_image_alt": "Cận cảnh một đôi sneaker cao cấp",
+  "join_us_title": "Bước Vào Tương Lai Cùng Chúng Tôi",
+  "join_us_description": "Sẵn sàng khám phá một thế giới sneaker phù hợp với phong cách của bạn? Hãy tham gia bộ sưu tập của chúng tôi và gia nhập cộng đồng những người tiên phong phong cách và đam mê sneaker ngay hôm nay!",
+  "shop_now": "Mua Sắm Ngay",
+  "logging_in": "Đang đăng nhập...",
+  "registering": "Đang đăng ký...",
+  "sending": "Đang gửi..."
 }

@@ -5,64 +5,75 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $users = User::all();
-        return response()->json($users);
-    }
+    // Các method khác giữ nguyên...
 
     /**
-     * Store a newly created resource in storage.
+     * Update the authenticated user's profile
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
+        // Lấy user đã authenticate (vì route có middleware auth:sanctum)
+        $user = $request->user();
         
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        User::destroy($id);
-        
-        return response()->json([], 204);
-    }
-
-    public function forceDestroy(string $id)
-    {
-        $user = User::find($id);
-
-        if ($user) {
-            $user->forceDelete();
-
-            return response()->json([], 204);
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated'
+            ], 401);
         }
 
-        return response()->json([
-            'message' => 'Không tồn tại bản ghi có ID là: ' . $id
-        ], 404);
+        // Validation rules
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'required|string|regex:/^[0-9]{10}$/',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048' 
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Chuẩn bị data để update
+            $data = [
+                'name' => $request->input('name'),
+                'address' => $request->input('address'),
+                'phone' => $request->input('phone'),
+            ];
+
+            // Xử lý avatar nếu có
+            if ($request->hasFile('avatar')) {
+                if ($user->avatar) {
+                    Storage::delete('public/avatars/' . $user->avatar);
+                }
+                $file = $request->file('avatar');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/avatars', $filename);
+                $data['avatar'] = $filename;
+            }
+
+            // Update user
+            $user->update($data);
+
+            return response()->json([
+                'message' => 'Profile updated successfully',
+                'data' => $user
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error updating profile',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
+    // Các method khác giữ nguyên...
 }
