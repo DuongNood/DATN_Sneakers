@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class UserController extends Controller
 {
@@ -16,7 +17,6 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        // Lấy user đã authenticate (vì route có middleware auth:sanctum)
         $user = $request->user();
         
         if (!$user) {
@@ -25,12 +25,11 @@ class UserController extends Controller
             ], 401);
         }
 
-        // Validation rules
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'phone' => 'required|string|regex:/^[0-9]{10}$/',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048' 
+            'image_user' => 'nullable|image|mimes:jpg,jpeg,png|max:2048' 
         ]);
 
         if ($validator->fails()) {
@@ -41,22 +40,22 @@ class UserController extends Controller
         }
 
         try {
-            // Chuẩn bị data để update
             $data = [
                 'name' => $request->input('name'),
                 'address' => $request->input('address'),
                 'phone' => $request->input('phone'),
             ];
 
-            // Xử lý avatar nếu có
-            if ($request->hasFile('avatar')) {
-                if ($user->avatar) {
-                    Storage::delete('public/avatars/' . $user->avatar);
-                }
-                $file = $request->file('avatar');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('public/avatars', $filename);
-                $data['avatar'] = $filename;
+            // Xử lý image_user với Cloudinary
+            if ($request->hasFile('image_user')) {
+                // Upload ảnh lên Cloudinary
+                $uploadedFile = $request->file('image_user');
+                $cloudinaryUpload = Cloudinary::upload($uploadedFile->getRealPath(), [
+                    'folder' => 'image_users'
+                ]);
+
+                // Lấy URL của ảnh đã upload
+                $data['image_user'] = $cloudinaryUpload->getSecurePath();
             }
 
             // Update user
