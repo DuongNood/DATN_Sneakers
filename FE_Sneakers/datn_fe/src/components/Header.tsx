@@ -62,7 +62,7 @@ const Header = () => {
           <Link to='/product-sale' className='nav-link'>
             {t('sale')}
           </Link>
-          <Link to='/ho-tro' className='nav-link'>
+          <Link to='/news' className='nav-link'>
             {t('news')}
           </Link>
           <Link to='/contact' className='nav-link'>
@@ -84,8 +84,8 @@ const Header = () => {
               <div className='w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer'>
                 <img
                   src={
-                    user?.avatar ||
-                    'https://gentlenobra.net/wp-content/uploads/2024/02/hinh-anh-gai-xinh-nude-3.jpg.webp'
+                    user?.image_user ||
+                    'https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-1/467739613_3965334987038469_313956456266942570_n.jpg?stp=dst-jpg_s100x100_tt6&_nc_cat=101&ccb=1-7&_nc_sid=e99d92&_nc_eui2=AeH-hyRvfCgg54fIXSTDPi6H9qdYqycIZez2p1irJwhl7Nm59pSiLrQ4AjKulneabvaMyVT1moxmyKYuCw6W851G&_nc_ohc=j_T3Yc2pZRIQ7kNvgGq3-q2&_nc_oc=Adn5wZkr2hJTI0tMtHglbBrBl_LFbh8SY5_0a3Tu2TikTqDBbpngqIBtIuM_dSv2d5E&_nc_zt=24&_nc_ht=scontent.fhan14-1.fna&_nc_gid=6UqNsEWUCaesObVKorEZtA&oh=00_AYHO5zoCOamqXWV_eItw5UMoAZvXXJzpDk9vMlA5Cs9BEA&oe=67EB20C0'
                   }
                   alt='Avatar'
                   className='w-full h-full rounded-full object-cover'
@@ -156,7 +156,7 @@ const Header = () => {
             <Link to='/product-sale' className='mobile-nav-link' onClick={handleLinkClick}>
               {t('sale')}
             </Link>
-            <Link to='/ho-tro' className='mobile-nav-link' onClick={handleLinkClick}>
+            <Link to='/news' className='mobile-nav-link' onClick={handleLinkClick}>
               {t('news')}
             </Link>
             <Link to='/contact' className='mobile-nav-link' onClick={handleLinkClick}>
