@@ -23,6 +23,9 @@ import ScrollToTop from '../components/ScrollToTop'
 import SearchContainer from '../components/Search'
 import SearchResults from '../components/SearchResults'
 import BackToTop from '../components/BackToTop'
+import AboutUs from '../components/Footer_Components/About'
+import PurchaseNotification from '../components/PurchaseNotification'
+import Checkout from '../pages/Checkout'
 
 const RoutesConfig = () => {
   return (
@@ -41,20 +44,23 @@ const RoutesConfig = () => {
               <ProductList />
               <TitleWithEffect1 />
               <ProductHot />
+              <PurchaseNotification />
             </>
           }
         />
-        <Route path='/products/:id' element={<ProductList />} />
+        <Route path='/' element={<ProductList />} />
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/detail-product/:id' element={<ProductDetail />} />
+        <Route path='/:slug' element={<ProductDetail />} />
+        <Route path='/checkout' element={<Checkout />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='*' element={<NotFound />} />
         <Route path='/' element={<SearchContainer />} />
         <Route path='/search' element={<SearchResults />} />
+        <Route path='/about' element={<AboutUs />} />
         {/* Bảo vệ router */}
         <Route element={<ProtectedRoute />}>
           <Route path='/profile' element={<ProfilePage />} />

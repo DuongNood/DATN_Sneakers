@@ -51,6 +51,7 @@ Route::get('/reset-password/{token}', function ($token) {
 
 // Xử lý đặt lại mật khẩu
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
 //danh sách sản phẩm
 Route::get('/products', [ProductController::class, 'index']);
 
@@ -68,7 +69,7 @@ Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByPr
 // route tin tức
 Route::resource('news', NewsController::class);
 // User
-Route::apiResource('users', UserController::class);
+Route::put('/user', [UserController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
 // Setting
 Route::get('settings', [SettingController::class, 'index']);

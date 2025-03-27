@@ -15,7 +15,7 @@ const schema = yup.object().shape({
 })
 
 const ProfilePage = () => {
-  const { t } = useTranslation() // Thêm useTranslation để dịch
+  const { t } = useTranslation()
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editField, setEditField] = useState({ name: false, address: false, phone: false })
@@ -26,17 +26,29 @@ const ProfilePage = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token')
+        if (!token) {
+          throw new Error('No token found in localStorage')
+        }
+
         const response = await fetch('http://127.0.0.1:8000/api/user', {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         })
 
         if (!response.ok) {
+          const errorText = await response.text()
+          console.error('Fetch error response:', {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorText
+          })
           throw new Error(t('fetch_error'))
         }
 
         const data = await response.json()
+        console.log('Fetched user data:', data)
         setUserData(data)
         setFormData({
           name: data.name || '',
@@ -45,7 +57,7 @@ const ProfilePage = () => {
         })
         setLoading(false)
       } catch (error) {
-        console.error('Error fetching user data:', error)
+        console.error('Error fetching user data:', error.message)
         setLoading(false)
       }
     }
@@ -67,7 +79,20 @@ const ProfilePage = () => {
       await schema.validate(formData, { abortEarly: false })
 
       const token = localStorage.getItem('token')
-      const response = await fetch('http://127.0.0.1:8000/api/users/{$id}', {
+      if (!token) {
+        throw new Error('No token found in localStorage')
+      }
+      if (!userData?.id) {
+        throw new Error('User ID not found in userData')
+      }
+
+      console.log('Sending update request:', {
+        url: `http://127.0.0.1:8000/api/user`,
+        data: formData,
+        token: token
+      })
+
+      const response = await fetch(`http://127.0.0.1:8000/api/user`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -77,10 +102,17 @@ const ProfilePage = () => {
       })
 
       if (!response.ok) {
-        throw new Error(t('update_error'))
+        const errorText = await response.text()
+        console.error('Update error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        })
+        throw new Error(`Server error: ${response.status} - ${errorText.substring(0, 100)}...`)
       }
 
       const updatedData = await response.json()
+      console.log('Updated user data:', updatedData)
       setUserData(updatedData)
       setEditField({ name: false, address: false, phone: false })
       toast.success(t('update_success'), { autoClose: 1000 })
@@ -88,17 +120,16 @@ const ProfilePage = () => {
       if (error instanceof yup.ValidationError) {
         const newErrors = { name: '', address: '', phone: '' }
         error.inner.forEach((err) => {
-          newErrors[err.path] = t(err.message) // Dịch lỗi từ schema
+          newErrors[err.path] = t(err.message)
         })
         setErrors(newErrors)
       } else {
-        console.error('Error updating profile:', error)
-        toast.error(t('update_error'))
+        console.error('Error updating profile:', error.message)
+        toast.error(error.message || t('update_error'), { autoClose: 2000 })
       }
     }
   }
 
-  // Skeleton loading khớp với layout thực tế
   const SkeletonLoading = () => (
     <div className='max-w-5xl mx-auto p-6 mt-6 flex flex-col md:flex-row gap-6 animate-pulse'>
       <div className='w-full md:w-1/4 bg-white shadow-md rounded-lg p-4'>

@@ -6,8 +6,8 @@ import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import axios from 'axios'
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 
 const schema = yup.object().shape({
@@ -23,6 +23,10 @@ const schema = yup.object().shape({
 const Register = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -31,10 +35,8 @@ const Register = () => {
     resolver: yupResolver(schema)
   })
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
   const onSubmit = async (data: any) => {
+    setIsLoading(true)
     try {
       await axios.post('http://localhost:8000/api/register', {
         name: data.name,
@@ -53,6 +55,8 @@ const Register = () => {
       } else {
         toast.error(t('system_error'), { autoClose: 2000 })
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -134,9 +138,27 @@ const Register = () => {
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.3 }}
             type='submit'
-            className='w-full bg-blue-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition'
+            disabled={isLoading}
+            className={`w-full bg-blue-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition flex items-center justify-center ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            {t('register_button')}
+            {isLoading ? (
+              <svg
+                className='animate-spin h-5 w-5 mr-2 text-white'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+              >
+                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                <path
+                  className='opacity-75'
+                  fill='currentColor'
+                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                ></path>
+              </svg>
+            ) : null}
+            {isLoading ? t('registering') : t('register_button')}
           </motion.button>
         </form>
 

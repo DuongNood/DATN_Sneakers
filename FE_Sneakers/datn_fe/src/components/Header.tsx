@@ -29,13 +29,12 @@ const Header = () => {
     localStorage.clear()
     toast.success(t('logout_success'), { autoClose: 1000 })
     navigate('/login')
-    setMenuOpen(false) 
+    setMenuOpen(false)
   }
 
-  
   const handleLinkClick = () => {
-    setMenuOpen(false) 
-    setMobileProductOpen(false) 
+    setMenuOpen(false)
+    setMobileProductOpen(false)
   }
 
   return (

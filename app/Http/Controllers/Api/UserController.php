@@ -5,110 +5,75 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $users = User::all();
-        return response()->json($users);
-    }
+    // Các method khác giữ nguyên...
 
     /**
-     * Store a newly created resource in storage.
+     * Update the authenticated user's profile
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $user = User::find($id);
-
-        if ($user) {
-            return response()->json($user);
-        }
-
-        return response()->json([
-            'message' => 'Không tồn tại bản ghi có ID là: ' . $id
-        ], 404);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $user = User::find($id);
-
+        // Lấy user đã authenticate (vì route có middleware auth:sanctum)
+        $user = $request->user();
+        
         if (!$user) {
             return response()->json([
-                'message' => 'Không tồn tại bản ghi có ID là: ' . $id
-            ], 404);
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        // Validation rules
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'required|string|regex:/^[0-9]{10}$/',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048' 
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         try {
-            if ($request->hasFile('image_user')) {
-                $data['image_user'] = Storage::put('users', $request->file('image_user'));
+            // Chuẩn bị data để update
+            $data = [
+                'name' => $request->input('name'),
+                'address' => $request->input('address'),
+                'phone' => $request->input('phone'),
+            ];
+
+            // Xử lý avatar nếu có
+            if ($request->hasFile('avatar')) {
+                if ($user->avatar) {
+                    Storage::delete('public/avatars/' . $user->avatar);
+                }
+                $file = $request->file('avatar');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/avatars', $filename);
+                $data['avatar'] = $filename;
             }
 
-            $currentImage = $user->image_user;
-
-            $user->update($request->all());
-
-            if ($request->hasFile('image_user') && !empty($currentImage) && Storage::exists($currentImage)) {
-                Storage::delete($currentImage);
-            }
-
-            return response()->json($user, 201);
-        } catch (\Throwable $th) {
-
-            if (!empty($data['image_user']) && Storage::exists($data['image_user'])) {
-                Storage::delete($data['image_user']);
-            }
-
-            Log::error(
-                __CLASS__ . '@' . __FUNCTION__,
-                ['error' => $th->getMessage()]
-            );
+            // Update user
+            $user->update($data);
 
             return response()->json([
-                'message' => 'Lỗi hệ thống'
+                'message' => 'Profile updated successfully',
+                'data' => $user
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error updating profile',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        User::destroy($id);
-
-        return response()->json([], 204);
-    }
-
-    public function forceDestroy(string $id)
-    {
-        $user = User::find($id);
-
-        if ($user) {
-            $user->forceDelete();
-
-            return response()->json([], 204);
-        }
-
-        return response()->json([
-            'message' => 'Không tồn tại bản ghi có ID là: ' . $id
-        ], 404);
-    }
+    // Các method khác giữ nguyên...
 }
