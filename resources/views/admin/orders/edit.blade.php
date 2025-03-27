@@ -11,8 +11,15 @@
                 {{ session('error') }}
             </div>
         @endif
+        
+        @if (session('success'))
+            <div class="alert alert-success" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
 
-        <form action="{{ route('admin.orders.update', $order->id) }}" method="POST" enctype="multipart/form-data" class="card p-4">
+        <form action="{{ route('admin.orders.update', $order->id) }}" method="POST" enctype="multipart/form-data"
+            class="card p-4">
             @csrf
             @method('PUT')
 
@@ -33,17 +40,36 @@
 
             <div class="mb-3">
                 <label class="form-label">Trạng Thái Thanh Toán</label>
-                <select name="payment_status" class="form-select" {{ $order->payment_status == 'Đã thanh toán' ? 'disabled' : '' }}>
-                    <option value="Chưa thanh toán" {{ $order->payment_status == 'Chưa thanh toán' ? 'selected' : '' }}>Chưa thanh toán</option>
-                    <option value="Đã thanh toán" {{ $order->payment_status == 'Đã thanh toán' ? 'selected' : '' }}>Đã thanh toán</option>
+                <select name="payment_status" class="form-select"
+                    {{ $order->payment_status == 'da_thanh_toan' ? 'disabled' : '' }}>
+                    <option value="chua_thanh_toan" {{ $order->payment_status == 'chua_thanh_toan' ? 'selected' : '' }}>Chưa
+                        thanh toán</option>
+                    <option value="da_thanh_toan" {{ $order->payment_status == 'da_thanh_toan' ? 'selected' : '' }}>Đã thanh
+                        toán</option>
                 </select>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Trạng Thái Đơn Hàng</label>
-                <select name="status" class="form-select">
-                    @foreach ($statusOptions as $status)
-                        <option value="{{ $status }}" {{ $order->status == $status ? 'selected' : '' }}>{{ $status }}</option>
+                <select name="status" class="form-select" {{ $order->status === 'huy_don_hang' ? 'disabled' : '' }}>
+                    <option value="{{ $order->status }}" selected>
+                        {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'], $order->status) }}
+                    </option>
+
+                    @php
+                        $validNextStatuses = [
+                            'cho_xac_nhan' => ['dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'],
+                            'dang_chuan_bi' => ['dang_van_chuyen', 'da_giao_hang'],
+                            'dang_van_chuyen' => ['da_giao_hang'],
+                            'da_giao_hang' => [],
+                            'huy_don_hang' => [],
+                        ];
+                    @endphp
+
+                    @foreach ($validNextStatuses[$order->status] ?? [] as $nextStatus)
+                        <option value="{{ $nextStatus }}">
+                            {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'], $nextStatus) }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -63,10 +89,10 @@
                 <tbody>
                     @foreach ($order->orderDetails as $detail)
                         <tr>
-                            <td>{{ $detail->product->product_code }}</td>
-                            <td>{{ $detail->product->product_name }}</td>
-                            <td><img src="{{ $detail->product->image }}" width="50"></td>
-                            <td>{{ $detail->productSize->name }}</td>
+                            <td>{{ $detail->productVariant->product->product_code }}</td>
+                            <td>{{ $detail->productVariant->product->product_name }}</td>
+                            <td><img src="{{ $detail->productVariant->product->image }}" width="50"></td>
+                            <td>{{ $detail->productVariant->productSize->name }}</td>
                             <td>{{ $detail->quantity }}</td>
                             <td>{{ number_format($detail->price, 0, ',', '.') }} VND</td>
                         </tr>

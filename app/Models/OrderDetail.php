@@ -12,24 +12,26 @@ class OrderDetail extends Model
     protected $fillable = [
 
         'order_id',
-        'product_id', //  Đảm bảo có dòng này
+        'product_variant_id',
         'quantity',
         'price',
     ];
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->hasOneThrough(
+            Product::class,
+            ProductVariant::class,
+            'id',  // Khóa chính của ProductVariant
+            'id',  // Khóa chính của Product
+            'product_variant_id',  // Khóa ngoại trong OrderDetail
+            'product_id'  // Khóa ngoại trong ProductVariant
+        );
     }
 
     public function productVariant()
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
-    }
-
-    public function productSize()
-    {
-        return $this->hasOneThrough(ProductSize::class, ProductVariant::class, 'product_id', 'id', 'product_id', 'product_size_id');
     }
 
     public function order()

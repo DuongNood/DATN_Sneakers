@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -144,39 +145,38 @@ class OrderController extends Controller
 
 
     public function confirmOrder($order_code)
-{
-    DB::beginTransaction();
-    try {
-        //  Tìm đơn hàng theo order_code
-        $order = Order::with('orderDetails')->where('order_code', $order_code)->first();
+    {
+        DB::beginTransaction();
+        try {
+            //  Tìm đơn hàng theo order_code
+            $order = Order::with('orderDetails')->where('order_code', $order_code)->first();
 
-        //  Kiểm tra nếu không tìm thấy đơn hàng
-        if (!$order) {
-            return response()->json(['message' => 'Không tìm thấy đơn hàng!'], 404);
+            //  Kiểm tra nếu không tìm thấy đơn hàng
+            if (!$order) {
+                return response()->json(['message' => 'Không tìm thấy đơn hàng!'], 404);
+            }
+
+            //  Kiểm tra trạng thái đơn hàng
+            if ($order->status !== 'cho_xac_nhan') {
+                return response()->json(['message' => 'Đơn hàng đã được xử lý trước đó'], 400);
+            }
+
+            $errors = [];
+
+
+
+            //  Cập nhật trạng thái đơn hàng
+            $order->status = 'da_xac_nhan';
+            $order->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Đơn hàng đã được xác nhận!'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Lỗi khi xác nhận đơn hàng',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        //  Kiểm tra trạng thái đơn hàng
-        if ($order->status !== 'cho_xac_nhan') {
-            return response()->json(['message' => 'Đơn hàng đã được xử lý trước đó'], 400);
-        }
-
-        $errors = [];
-
-        
-
-        //  Cập nhật trạng thái đơn hàng
-        $order->status = 'da_xac_nhan';
-        $order->save();
-
-        DB::commit();
-        return response()->json(['message' => 'Đơn hàng đã được xác nhận!'], 200);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Lỗi khi xác nhận đơn hàng',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
-
 }
