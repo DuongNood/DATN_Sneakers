@@ -44,7 +44,7 @@ class ProductController extends Controller
         });
     }
 
-    // 📦 Lọc theo biến thể (ví dụ: SKU, trạng thái)
+    //  Lọc theo biến thể (ví dụ: SKU, trạng thái)
     if ($request->filled('sku')) {
         $sku = $request->input('sku');
         $query->whereHas('variants', function ($q) use ($sku) {

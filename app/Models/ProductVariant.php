@@ -8,12 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class ProductVariant extends Model
 {
     use HasFactory;
-    protected $fillable =[
-        'product_id',
-        'product_size_id',
-        'quantity',
-        'status'
+    protected $fillable = [
+        'product_id', 'product_size_id', 'quantity', 'status'
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    public function productSize()
+    {
+        return $this->belongsTo(ProductSize::class, 'product_size_id');
+    }
     protected $casts =[
         'status'=>'boolean' 
     ];
@@ -23,8 +30,5 @@ class ProductVariant extends Model
         return $this->hasMany(OrderDetail::class);
     }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
+    
 }

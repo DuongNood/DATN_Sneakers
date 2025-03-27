@@ -9,9 +9,12 @@ class ProductSize extends Model
 {
     use HasFactory;
 
-    protected $fillable =[
-        'name',
-    ];
+    protected $fillable = ['name'];
+
+    public function productVariants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_size_id');
+    }
     protected $table = 'product_sizes'; // Đặt đúng tên bảng nếu cần
 }
 

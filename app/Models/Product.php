@@ -9,19 +9,17 @@ class Product extends Model
 {
     use HasFactory;
 
+   
     protected $fillable = [
-        'product_code',
-        'product_name',
-        'image',
-        'description',
-        'status',
-        'original_price',
-        'discounted_price',
-        'is_show_home',
-        'category_id',
-        'view'
-
+        'product_code', 'product_name', 'image', 'description', 
+        'original_price', 'discounted_price', 'category_id', 
+        'view', 'status', 'is_show_home'
     ];
+
+    public function productVariants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
+    }
     protected $casts = [
         'status' => 'boolean',
         'is_show_home' => 'boolean',

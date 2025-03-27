@@ -11,10 +11,15 @@ class Order extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        'user_id', 'order_code', 'recipient_name', 'recipient_phone', 'recipient_address',
-        'total_price', 'shipping_fee', 'payment_method', 'payment_status', 'status'
+        'user_id', 'order_code', 'recipient_name', 'recipient_phone',
+        'recipient_address', 'total_price', 'promotion', 'shipping_fee',
+        'payment_method', 'payment_status', 'status'
     ];
-    
+
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class, 'order_id');
+    }
 
     protected $casts = [
         'total_price' => 'decimal:2',
@@ -56,10 +61,6 @@ class Order extends Model
     /**
      * Quan hệ với bảng order_details
      */
-    public function orderDetails()
-    {
-        return $this->hasMany(OrderDetail::class);
-    }
 
     /**
      * Scope lọc đơn hàng theo trạng thái
