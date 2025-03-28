@@ -20,8 +20,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $data = User::latest('id')->paginate(5);
-
+        $data = User::with('role')->latest('id')->paginate(5);
         return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
     }
 

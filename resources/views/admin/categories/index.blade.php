@@ -1,84 +1,66 @@
 @extends('admin.layouts.master')
+
 @section('content')
-    <div class="container-xxl">
-
-        <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
-            <div class="flex-grow-1">
-
-                <h4 class="fs-18 fw-semibold m-0">Danh mục</h4>
-            </div>
-             <a href="{{route('admin.categories.create')}}" class="btn btn-success col-1">Thêm mới</a>
+    <div class="container-xxl mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-semibold">Danh Sách Danh Mục</h4>
+            <a href="{{ route('admin.categories.create') }}" class="btn btn-success">
+                <i class="bi bi-plus-lg"></i> Thêm mới
+            </a>
         </div>
 
-        <!-- start row -->
-        <div class="row">                     <!-- Basic Example -->
-            <div class="col-xl-12">
-                <div class="card">                   
-                    <div class="card-body">
-                        <div class="table-responsive">
-
-            
+        {{-- Hiển thị thông báo thành công --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-           
-        </div>
+        @endif
 
-        <!-- start row -->
-        <div class="row">   
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên Danh Mục</th>
+                                <th>Trạng Thái</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($category as $item)
+                                <tr>
+                                    <td>{{ $item->id }}</td>
+                                    <td class="text-start">{{ $item->category_name }}</td>
+                                    <td>
+                                        <span class="badge {{ $item->status == 0 ? 'bg-danger' : 'bg-success' }}">
+                                            {{ $item->status == 0 ? 'Inactive' : 'Active' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('admin.categories.edit', $item->id) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="mdi mdi-pencil"></i> Sửa
+                                        </a>
 
-            <div class="col-xl-12 ">
-                <div class="card">                   
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            @if (session('success'))
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    {{ session('success') }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-babel="Close">
-                                    </button>
-                                </div>
-                            @endif
-
-                            <table class="table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Category_name</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Act</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($category as $item)
-                                        <tr>
-                                            <th scope="row">{{$item->id}}</th>
-                                            <td>{{$item->category_name}}</td>                                                                                     
-                                            <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
-                                                {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('admin.categories.edit', $item->id) }}"><i
-                                                    class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
-                                                    <form action="{{ route('admin.categories.destroy', $item->id) }}" method="POST" class="d-inline me-2">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                                            <i class="mdi mdi-delete text-muted fs-14"></i>
-                                                        </button>
-                                                    </form>
-                                            </td>
-
-                                        </tr> 
-                                    @endforeach
-
-                                </tbody>
-                            </table>
-                        </div> 
-                    </div>
+                                        <form action="{{ route('admin.categories.destroy', $item->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                                <i class="mdi mdi-delete"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-            </div>                         
-        </div><!-- end row -->
-
-
-
+            </div>
+        </div>
     </div>
 @endsection
