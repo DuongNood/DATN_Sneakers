@@ -1,350 +1,330 @@
 import React, { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import axios from 'axios'
 
-// Định nghĩa interface
 interface Product {
   id: number
   name: string
-  original_price: string
   discounted_price: string
-  product_code: string
-  imageUrl: string | null
-  rating: number
-  description: string
+  imageUrl: string
   quantity: number
   variant: string
-}
-
-interface CheckoutState {
-  products: Product[]
-  quantity: number
+  product_size_id: number
 }
 
 const Checkout: React.FC = () => {
-  // Nhận dữ liệu sản phẩm từ ProductDetail qua useLocation
   const location = useLocation()
-  const { products: initialProducts, quantity: initialQuantity } = (location.state as CheckoutState) || {
+  const navigate = useNavigate()
+
+  const { products, quantity } = (location.state as { products: Product[]; quantity: number }) || {
     products: [],
-    quantity: 1
+    quantity: 0
   }
 
-  // Dữ liệu giả lập (mock data) với 3 sản phẩm
-  const mockProducts: Product[] = [
-    {
-      id: 1,
-      name: 'Son kem TINT Bóng Hàn Quốc Ro mand Juicy Lasting Tint 5.5g',
-      original_price: '180000',
-      discounted_price: '149000',
-      product_code: 'SONKEM001',
-      imageUrl: 'https://via.placeholder.com/80',
-      rating: 4.5,
-      description: 'Son kem chất lượng cao',
-      quantity: 2,
-      variant: '#13 Eat Dotori'
-    },
-    {
-      id: 2,
-      name: 'Mặt nạ dưỡng da Innisfree My Real Squeeze Mask',
-      original_price: '30000',
-      discounted_price: '25000',
-      product_code: 'MATNA001',
-      imageUrl: 'https://via.placeholder.com/80',
-      rating: 4.0,
-      description: 'Mặt nạ dưỡng da tự nhiên',
-      quantity: 3,
-      variant: 'Aloe'
-    },
-    {
-      id: 3,
-      name: 'Sữa rửa mặt Cetaphil Gentle Skin Cleanser 500ml',
-      original_price: '350000',
-      discounted_price: '320000',
-      product_code: 'SRM001',
-      imageUrl: 'https://via.placeholder.com/80',
-      rating: 4.8,
-      description: 'Sữa rửa mặt dịu nhẹ',
-      quantity: 1,
-      variant: 'Không mùi'
-    }
-  ]
+  const [formData, setFormData] = useState({
+    fullName: '',
+    address: '',
+    phone: '',
+    discountCode: '',
+    paymentMethod: 'cod'
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [discountAmount, setDiscountAmount] = useState(0)
 
-  // Sử dụng mock data nếu initialProducts rỗng
-  const [products, setProducts] = useState<Product[]>(
-    initialProducts.length > 0
-      ? initialProducts.map((product) => ({
-          ...product,
-          quantity: initialQuantity,
-          variant: product.variant || '#13 Eat Dotori'
-        }))
-      : mockProducts
-  )
+  const subtotal = products.reduce((sum, product) => sum + Number(product.discounted_price) * product.quantity, 0)
+  const shippingFee = 30000
 
-  // State cho checkbox chọn tất cả
-  const [selectAll, setSelectAll] = useState<boolean>(false)
-  // State cho danh sách sản phẩm được chọn
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([])
-
-  // Xử lý chọn từng sản phẩm
-  const handleSelectProduct = (productId: number) => {
-    setSelectedProducts((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
-    )
+  const calculateTotal = () => {
+    const baseTotal = subtotal + shippingFee
+    const finalTotal = baseTotal - discountAmount
+    console.log('calculateTotal - baseTotal:', baseTotal, 'discountAmount:', discountAmount, 'finalTotal:', finalTotal)
+    return finalTotal
   }
 
-  // Xử lý chọn tất cả
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedProducts([])
-    } else {
-      setSelectedProducts(products.map((product) => product.id))
-    }
-    setSelectAll(!selectAll)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  // Tính tổng tiền (chỉ tính các sản phẩm được chọn)
-  const calculateSubtotal = (): number => {
-    return products.reduce(
-      (total, product) =>
-        selectedProducts.includes(product.id) ? total + Number(product.discounted_price) * product.quantity : total,
-      0
-    )
-  }
-
-  // Tính tổng số lượng sản phẩm được chọn
-  const totalSelectedItems = products.reduce(
-    (total, product) => (selectedProducts.includes(product.id) ? total + product.quantity : total),
-    0
-  )
-
-  const shippingFee: number = 0 // Phí vận chuyển (miễn phí)
-  const discount: number = selectedProducts.length > 0 ? 44700 : 0 // Giả lập giảm giá
-  const total: number = calculateSubtotal() + shippingFee - discount
-  const savings: number =
-    products.reduce(
-      (total, product) =>
-        selectedProducts.includes(product.id) ? total + Number(product.original_price) * product.quantity : total,
-      0
-    ) -
-    calculateSubtotal() +
-    discount // Tiết kiệm
-
-  // Xử lý tăng số lượng
-  const handleIncreaseQuantity = (productId: number) => {
-    setProducts((prev) =>
-      prev.map((product) => (product.id === productId ? { ...product, quantity: product.quantity + 1 } : product))
-    )
-  }
-
-  // Xử lý giảm số lượng
-  const handleDecreaseQuantity = (productId: number) => {
-    setProducts((prev) =>
-      prev.map((product) =>
-        product.id === productId && product.quantity > 1 ? { ...product, quantity: product.quantity - 1 } : product
-      )
-    )
-  }
-
-  // Xử lý xóa sản phẩm
-  const handleDeleteProduct = (productId: number) => {
-    setProducts((prev) => prev.filter((product) => product.id !== productId))
-    setSelectedProducts((prev) => prev.filter((id) => id !== productId))
-  }
-
-  // Xử lý đặt hàng
-  const handlePlaceOrder = () => {
-    if (selectedProducts.length === 0) {
-      alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng!')
+  const applyDiscountCode = async () => {
+    if (!formData.discountCode.trim()) {
+      toast.error('Vui lòng nhập mã giảm giá', { autoClose: 2000 })
       return
     }
-    alert('Đặt hàng thành công!')
+
+    try {
+      const response = await axios.get('http://localhost:8000/api/promotions')
+      const promotions = response.data
+      console.log('Promotions from API:', promotions)
+
+      const currentDate = new Date('2025-03-28') // Ngày hiện tại
+      const validPromo = promotions.find((promo: any) => {
+        const startDate = new Date(promo.start_date)
+        const endDate = new Date(promo.end_date)
+        return (
+          promo.promotion_name === formData.discountCode &&
+          promo.status === 1 &&
+          startDate <= currentDate &&
+          currentDate <= endDate
+        )
+      })
+      console.log('Valid Promo:', validPromo)
+
+      if (validPromo) {
+        let discount = 0
+        if (validPromo.discount_type === 'Giảm số tiền') {
+          // Sửa để khớp với database
+          discount = Number(validPromo.discount_value) || 0
+          console.log('Discount (Giảm số tiền):', discount)
+        } else if (validPromo.discount_type === 'Giảm theo %') {
+          // Sửa để khớp với database
+          discount = (subtotal * Number(validPromo.discount_value)) / 100 || 0
+          console.log('Discount (Giảm theo % before max):', discount)
+          if (validPromo.max_discount_value && discount > Number(validPromo.max_discount_value)) {
+            discount = Number(validPromo.max_discount_value) || 0
+            console.log('Discount (Giảm theo % after max):', discount)
+          }
+        }
+
+        setDiscountAmount(discount)
+        console.log('Applied discountAmount:', discount, 'New total:', calculateTotal())
+        toast.success(`Áp dụng mã giảm giá thành công! Giảm ${discount.toLocaleString('vi-VN')}đ`, { autoClose: 2000 })
+      } else {
+        setDiscountAmount(0)
+        console.log('No valid promo, reset discountAmount to 0, Total:', calculateTotal())
+        toast.error('Mã giảm giá không hợp lệ hoặc đã hết hạn', { autoClose: 2000 })
+      }
+    } catch (error) {
+      console.error('Error fetching promotions:', error)
+      toast.error('Lỗi khi kiểm tra mã giảm giá', { autoClose: 2000 })
+      setDiscountAmount(0)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const { fullName, address, phone } = formData
+    if (!fullName.trim() || !address.trim() || !phone.trim()) {
+      toast.error('Vui lòng điền đầy đủ thông tin giao hàng', { autoClose: 2000 })
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        toast.error('Vui lòng đăng nhập trước', { autoClose: 2000 })
+        navigate('/login')
+        return
+      }
+
+      const productName = products[0].name
+      const orderData = {
+        quantity: products[0].quantity,
+        product_size_id: products[0].product_size_id,
+        recipient_name: formData.fullName,
+        recipient_phone: formData.phone,
+        recipient_address: formData.address,
+        discount_code: formData.discountCode || null,
+        payment_method: formData.paymentMethod === 'cod' ? 'COD' : formData.paymentMethod,
+        subtotal: subtotal,
+        discount_amount: discountAmount,
+        total: calculateTotal()
+      }
+
+      const response = await axios.post(
+        `http://localhost:8000/api/orders/buy/${encodeURIComponent(productName)}`,
+        orderData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+
+      if (response.data.status === 'success') {
+        toast.success('Đặt hàng thành công', { autoClose: 2000 })
+        navigate('/order-success')
+      } else {
+        toast.error(response.data.message || 'Lỗi khi đặt hàng', { autoClose: 2000 })
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Lỗi mạng', { autoClose: 2000 })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const total = calculateTotal()
+
+  console.log(
+    'Render - subtotal:',
+    subtotal,
+    'shippingFee:',
+    shippingFee,
+    'discountAmount:',
+    discountAmount,
+    'total:',
+    total
+  )
+
+  if (!products.length) {
+    return <p className='text-lg text-center text-gray-600'>Không có sản phẩm để thanh toán</p>
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 font-sans'>
-      <div className='container mx-auto px-4 py-6 lg:py-10 lg:px-20'>
-        {/* Header */}
-        <div className='hidden lg:flex items-center bg-white p-4 rounded-lg shadow-sm border-b border-gray-200 text-gray-700'>
-          <div className='w-1/12'>
-            <input
-              type='checkbox'
-              checked={selectAll}
-              onChange={handleSelectAll}
-              className='h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500'
-            />
-          </div>
-          <div className='w-4/12 font-medium text-sm'>Sản Phẩm</div>
-          <div className='w-2/12 font-medium text-sm text-center'>Đơn Giá</div>
-          <div className='w-2/12 font-medium text-sm text-center'>Số Lượng</div>
-          <div className='w-2/12 font-medium text-sm text-center'>Số Tiền</div>
-          <div className='w-1/12 font-medium text-sm text-center'>Thao Tác</div>
-        </div>
-
-        {/* Danh sách sản phẩm */}
-        {products.length === 0 ? (
-          <div className='p-6 text-center text-gray-500 bg-white rounded-lg shadow-sm mt-4'>Giỏ hàng trống</div>
-        ) : (
-          products.map((product) => (
-            <div
-              key={product.id}
-              className='flex flex-col lg:flex-row items-start lg:items-center p-4 bg-white rounded-lg shadow-sm mt-4 border border-gray-100 hover:shadow-md transition-shadow'
-            >
-              {/* Checkbox */}
-              <div className='w-full lg:w-1/12 flex items-center mb-3 lg:mb-0'>
-                <input
-                  type='checkbox'
-                  checked={selectedProducts.includes(product.id)}
-                  onChange={() => handleSelectProduct(product.id)}
-                  className='h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500'
-                />
-              </div>
-
-              {/* Sản phẩm (Hình ảnh + Tên + Phân loại) */}
-              <div className='w-full lg:w-4/12 flex items-center mb-3 lg:mb-0'>
+    <div className='container mx-auto px-[18px] py-[18px] bg-gray-50 min-h-screen'>
+      <h1 className='text-4xl font-extrabold text-gray-800 mb-10 text-center'>Thanh toán</h1>
+      <div className='grid grid-cols-1 lg:grid-cols-5 gap-8'>
+        <div className='lg:col-span-3'>
+          <div className='bg-white shadow-xl rounded-xl p-6 border border-gray-100'>
+            <h2 className='text-2xl font-semibold text-gray-800 mb-6 border-b pb-2'>Tóm tắt đơn hàng</h2>
+            {products.map((product) => (
+              <div key={product.id} className='flex items-center gap-4 py-4 border-b border-gray-200'>
                 <img
-                  src={product.imageUrl || 'https://via.placeholder.com/80'}
+                  src={product.imageUrl}
                   alt={product.name}
-                  className='w-16 h-16 lg:w-20 lg:h-20 object-cover rounded-lg mr-4 border border-gray-100'
+                  className='w-20 h-20 object-cover rounded-lg shadow-sm'
                 />
-                <div>
-                  <p className='text-sm lg:text-base font-medium text-gray-900'>{product.name}</p>
-                  <p className='text-xs text-gray-500 mt-1'>Phân Loại Hàng: {product.variant}</p>
-                </div>
-              </div>
-
-              {/* Đơn giá */}
-              <div className='w-full lg:w-2/12 flex lg:justify-center mb-3 lg:mb-0'>
-                <div>
-                  <p className='text-sm text-gray-400 line-through lg:text-center'>
-                    ₫{Number(product.original_price).toLocaleString('vi-VN')}
+                <div className='flex-1'>
+                  <h3 className='text-lg font-medium text-gray-800'>{product.name}</h3>
+                  <p className='text-sm text-gray-600'>
+                    Kích thước: {product.variant} | Số lượng: {product.quantity}
                   </p>
-                  <p className='text-sm lg:text-base font-medium text-gray-900 lg:text-center'>
-                    ₫{Number(product.discounted_price).toLocaleString('vi-VN')}
+                  <p className='text-lg font-semibold text-red-600 mt-1'>
+                    {Number(product.discounted_price).toLocaleString('vi-VN')}đ
                   </p>
                 </div>
               </div>
-
-              {/* Số lượng */}
-              <div className='w-full lg:w-2/12 flex lg:justify-center mb-3 lg:mb-0'>
-                <div className='flex items-center border border-gray-200 rounded-lg overflow-hidden'>
+            ))}
+            <div className='mt-6 space-y-3'>
+              <div className='flex justify-between text-lg text-gray-700'>
+                <span>Tạm tính</span>
+                <span>{subtotal.toLocaleString('vi-VN')}đ</span>
+              </div>
+              <div className='flex justify-between text-lg text-gray-700'>
+                <span>Phí vận chuyển</span>
+                <span>{shippingFee.toLocaleString('vi-VN')}đ</span>
+              </div>
+              {discountAmount > 0 && (
+                <div className='flex justify-between text-lg text-green-600'>
+                  <span>Giảm giá</span>
+                  <span>-{discountAmount.toLocaleString('vi-VN')}đ</span>
+                </div>
+              )}
+              <div className='flex justify-between text-xl font-bold text-gray-800 border-t pt-2'>
+                <span>Tổng cộng</span>
+                <span>{total.toLocaleString('vi-VN')}đ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className='lg:col-span-2'>
+          <div className='bg-white shadow-xl rounded-xl p-6 border border-gray-100'>
+            <h2 className='text-2xl font-semibold text-gray-800 mb-6 border-b pb-2'>Thông tin thanh toán</h2>
+            <form onSubmit={handleSubmit} className='space-y-8'>
+              <div className='space-y-4'>
+                <h3 className='text-lg font-medium text-gray-700'>Thông tin giao hàng</h3>
+                <div className='relative'>
+                  <label htmlFor='fullName' className='block text-sm font-medium text-gray-600 mb-1'>
+                    Họ và tên
+                  </label>
+                  <input
+                    id='fullName'
+                    type='text'
+                    name='fullName'
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    className='w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition shadow-sm hover:shadow-md'
+                    placeholder='Nhập họ và tên'
+                    required
+                  />
+                </div>
+                <div className='relative'>
+                  <label htmlFor='address' className='block text-sm font-medium text-gray-600 mb-1'>
+                    Địa chỉ
+                  </label>
+                  <input
+                    id='address'
+                    type='text'
+                    name='address'
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className='w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition shadow-sm hover:shadow-md'
+                    placeholder='Nhập địa chỉ'
+                    required
+                  />
+                </div>
+                <div className='relative'>
+                  <label htmlFor='phone' className='block text-sm font-medium text-gray-600 mb-1'>
+                    Số điện thoại
+                  </label>
+                  <input
+                    id='phone'
+                    type='text'
+                    name='phone'
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className='w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition shadow-sm hover:shadow-md'
+                    placeholder='Nhập số điện thoại'
+                    required
+                  />
+                </div>
+              </div>
+              <div className='space-y-4'>
+                <h3 className='text-lg font-medium text-gray-700'>Mã giảm giá</h3>
+                <div className='relative flex gap-2'>
+                  <input
+                    type='text'
+                    name='discountCode'
+                    value={formData.discountCode}
+                    onChange={handleInputChange}
+                    className='w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition shadow-sm hover:shadow-md'
+                    placeholder='Nhập mã giảm giá (nếu có)'
+                  />
                   <button
-                    onClick={() => handleDecreaseQuantity(product.id)}
-                    className='px-3 py-1 text-gray-600 hover:bg-gray-100 transition'
+                    type='button'
+                    onClick={applyDiscountCode}
+                    className='bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition'
                   >
-                    -
-                  </button>
-                  <span className='px-4 py-1 text-sm text-gray-900 border-x border-gray-200'>{product.quantity}</span>
-                  <button
-                    onClick={() => handleIncreaseQuantity(product.id)}
-                    className='px-3 py-1 text-gray-600 hover:bg-gray-100 transition'
-                  >
-                    +
+                    Áp dụng
                   </button>
                 </div>
               </div>
-
-              {/* Số tiền và Thao tác (nút Xóa) */}
-              <div className='w-full lg:w-3/12 flex flex-row justify-between lg:justify-center items-center mb-3 lg:mb-0'>
-                {/* Số tiền */}
-                <div className='text-orange-500 font-medium text-sm lg:text-base lg:text-center lg:w-2/3'>
-                  ₫{(Number(product.discounted_price) * product.quantity).toLocaleString('vi-VN')}
-                </div>
-                {/* Thao tác */}
-                <div className='lg:w-1/3 flex lg:justify-center'>
-                  <button
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className='text-orange-500 hover:text-orange-600 text-sm font-medium transition'
-                  >
-                    Xóa
-                  </button>
+              <div className='space-y-4'>
+                <h3 className='text-lg font-medium text-gray-700'>Phương thức thanh toán</h3>
+                <div className='space-y-3'>
+                  <label className='flex items-center gap-3 p-3 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition'>
+                    <input
+                      type='radio'
+                      name='paymentMethod'
+                      value='cod'
+                      checked={formData.paymentMethod === 'cod'}
+                      onChange={handleInputChange}
+                      className='w-5 h-5 text-blue-600 focus:ring-blue-500'
+                    />
+                    <span className='text-sm font-medium text-gray-700'>Thanh toán khi nhận hàng (COD)</span>
+                  </label>
+                  <label className='flex items-center gap-3 p-3 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition'>
+                    <input
+                      type='radio'
+                      name='paymentMethod'
+                      value='online'
+                      checked={formData.paymentMethod === 'online'}
+                      onChange={handleInputChange}
+                      className='w-5 h-5 text-blue-600 focus:ring-blue-500'
+                    />
+                    <span className='text-sm font-medium text-gray-700'>Thanh toán online (Đang phát triển)</span>
+                  </label>
                 </div>
               </div>
-            </div>
-          ))
-        )}
-
-        {/* Thông tin đơn hàng */}
-        <div className='mt-6 p-4 lg:p-6 bg-white rounded-lg shadow-sm border border-gray-100'>
-          {/* Địa điểm nhận hàng */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4'>
-            <div className='flex items-center mb-2 lg:mb-0'>
-              <span className='text-sm text-gray-600 font-medium'>Địa điểm nhận hàng:</span>
-              <span className='text-sm text-orange-500 ml-2 font-medium'>
-                {selectedProducts.length > 0 ? `Đã giảm ₫${discount.toLocaleString('vi-VN')}` : 'Chưa có giảm giá'}
-              </span>
-            </div>
-            <a href='#' className='text-sm text-blue-500 hover:underline font-medium'>
-              Xem thêm voucher
-            </a>
-          </div>
-
-          {/* Phí vận chuyển */}
-          <div className='flex items-center mb-4'>
-            <svg
-              className='w-5 h-5 text-gray-500 mr-2'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M20 7h-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM8 5h4v2H8V5zm-4 4h16v10H4V9z'
-              />
-            </svg>
-            <span className='text-sm text-gray-600 font-medium'>Giảm ₫500.000 phí vận chuyển đơn tối thiểu ₫0</span>
-          </div>
-
-          {/* Voucher */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4'>
-            <span className='text-sm text-gray-600 font-medium mb-2 lg:mb-0'>Shopee Voucher</span>
-            <button className='text-sm text-orange-500 border border-orange-500 px-3 py-1 rounded-lg hover:bg-orange-50 transition font-medium'>
-              Chọn hoặc nhập mã
-            </button>
-          </div>
-
-          {/* Shopee Xu */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4'>
-            <div className='flex items-center mb-2 lg:mb-0'>
-              <input
-                type='checkbox'
-                className='h-5 w-5 text-gray-500 mr-2 rounded border-gray-300 focus:ring-orange-500'
-                disabled
-              />
-              <span className='text-sm text-gray-600 font-medium'>Shopee Xu</span>
-            </div>
-            <span className='text-sm text-gray-600 font-medium'>Bạn chưa có Shopee Xu</span>
-          </div>
-
-          {/* Tổng thanh toán */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center border-t pt-4'>
-            <div className='flex flex-wrap items-center mb-4 lg:mb-0 gap-4'>
-              <div className='flex items-center'>
-                <input
-                  type='checkbox'
-                  checked={selectAll}
-                  onChange={handleSelectAll}
-                  className='h-5 w-5 text-orange-500 mr-2 rounded border-gray-300 focus:ring-orange-500'
-                />
-                <span className='text-sm text-gray-600 font-medium'>Chọn Tất Cả ({products.length})</span>
-              </div>
-              <button className='text-sm text-orange-500 hover:text-orange-600 font-medium transition'>Xóa</button>
-              <span className='text-sm text-gray-600 font-medium'>Lưu vào mục Đã thích...</span>
-            </div>
-            <div className='text-left lg:text-right w-full lg:w-auto'>
-              <p className='text-sm text-gray-600 font-medium'>
-                Tổng thanh toán ({totalSelectedItems} Sản phẩm):{' '}
-                <span className='text-xl text-orange-500 font-semibold'>₫{total.toLocaleString('vi-VN')}</span>
-              </p>
-              <p className='text-sm text-gray-600 font-medium'>Tiết kiệm: ₫{savings.toLocaleString('vi-VN')}</p>
               <button
-                onClick={handlePlaceOrder}
-                className='bg-orange-500 text-white px-6 py-2 rounded-lg mt-3 w-full lg:w-auto hover:bg-orange-600 transition font-medium shadow-sm'
+                type='submit'
+                disabled={isSubmitting}
+                className={`w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 rounded-lg hover:from-blue-600 hover:to-blue-800 transition font-semibold shadow-md ${
+                  isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Mua Hàng
+                {isSubmitting ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>

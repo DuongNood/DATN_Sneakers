@@ -6,11 +6,17 @@ use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\ProductVariant;
+use App\Models\ProductSize;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
-    // 🛒 Thêm sản phẩm vào giỏ hàng (KHÔNG vượt quá số lượng trong kho)
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
+
     public function addToCart(Request $request)
 {
     $request->validate([

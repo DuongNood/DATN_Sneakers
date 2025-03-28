@@ -66,9 +66,16 @@ Route::resource('news', NewsController::class);
 Route::apiResource('users', UserController::class);
 // Setting
 Route::get('settings', [SettingController::class, 'index']);
+
 // Promotion
 Route::get('/promotions', function () {
-    return response()->json(Promotion::where('status', 1)->get());
+    $today = now();
+    return response()->json(
+        Promotion::where('status', 1)
+            ->where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today)
+            ->get()
+    );
 });
 
 
@@ -89,9 +96,10 @@ Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('carts/add', [CartController::class, 'addToCart']);
-    Route::get('carts/list', [CartController::class, 'getCart']);
+    Route::get('carts', [CartController::class, 'getCart']);
     Route::put('carts/update', [CartController::class, 'updateCart']);
-    Route::delete('carts/remove/{cart_item_id}', [CartController::class, 'removeFromCart']);
+    Route::delete('carts/{cart_item_id}', [CartController::class, 'removeFromCart']);
+
     Route::get('/orders/{id}', [OrderController::class, 'orderDetails']);
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
     Route::post('/orders/confirm/{order_code}', [OrderController::class, 'confirmOrder']);
