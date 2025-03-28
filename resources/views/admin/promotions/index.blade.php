@@ -1,55 +1,80 @@
 @extends('admin.layouts.master')
+
 @section('title')
     Danh sách mã giảm giá
 @endsection
+
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-4">Danh sách mã giảm giá</h1>
-    
-    <div class="flex justify-end mb-4">
-        <a href="{{ route('admin.promotions.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Thêm mới</a>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-semibold">Danh Sách Mã Giảm Giá</h4>
+            <a href="{{ route('admin.promotions.create') }}" class="btn btn-success">
+                <i class="bi bi-plus-lg"></i> Thêm mới
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-bordered text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Tên mã</th>
+                            <th>Loại</th>
+                            <th>Giá trị</th>
+                            <th>Ngày bắt đầu</th>
+                            <th>Ngày kết thúc</th>
+                            <th>Giảm giá tối đa</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($data as $promotion)
+                            <tr>
+                                <td>{{ $promotion->id }}</td>
+                                <td>{{ $promotion->promotion_name }}</td>
+                                <td>{{ $promotion->discount_type }}</td>
+                                <td>
+                                    @if ($promotion->discount_type === 'Giảm theo %')
+                                        {{ $promotion->discount_value }}%
+                                    @else
+                                        {{ number_format($promotion->discount_value, 0, ',', '.') }} VND
+                                    @endif
+                                </td>
+                                <td>{{ date('d/m/Y', strtotime($promotion->start_date)) }}</td>
+                                <td>{{ date('d/m/Y', strtotime($promotion->end_date)) }}</td>
+                                <td>{{ number_format($promotion->max_discount_value, 0, ',', '.') }} VND</td>
+                                <td>
+                                    <span class="badge {{ $promotion->status ? 'bg-success' : 'bg-danger' }}">
+                                        {{ $promotion->status ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.promotions.edit', $promotion->id) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="mdi mdi-pencil"></i> Sửa
+                                        </a>
+
+                                        <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                                <i class="mdi mdi-delete"></i> Xóa
+                                            </button>
+                                        </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{-- Pagination --}}
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $data->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <table class="min-w-full table-auto border-collapse border border-gray-300">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="border px-4 py-2">#</th>
-                    <th class="border px-4 py-2">Tên mã</th>
-                    <th class="border px-4 py-2">Loại</th>
-                    <th class="border px-4 py-2">Giá trị</th>
-                    <th class="border px-4 py-2">Ngày bắt đầu</th>
-                    <th class="border px-4 py-2">Ngày kết thúc</th>
-                    <th class="border px-4 py-2">Trạng thái</th>
-                    <th class="border px-4 py-2">Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($promotions as $promotion)
-                <tr>
-                    <td class="border px-4 py-2">{{ $loop->iteration }}</td>
-                    <td class="border px-4 py-2">{{ $promotion->promotion_name }}</td>
-                    <td class="border px-4 py-2">{{ $promotion->discount_type == 'amount' ? 'Số tiền' : 'Phần trăm' }}</td>
-                    <td class="border px-4 py-2">{{ $promotion->discount_value }}</td>
-                    <td class="border px-4 py-2">{{ $promotion->start_date }}</td>
-                    <td class="border px-4 py-2">{{ $promotion->end_date }}</td>
-                    <td class="border px-4 py-2">
-                        <span class="{{ $promotion->status ? 'text-green-500' : 'text-red-500' }}">
-                            {{ $promotion->status ? 'Đang hoạt động' : 'Hết hạn' }}
-                        </span>
-                    </td>
-                    <td class="border px-4 py-2 flex space-x-2">
-                        <a href="{{ route('admin.promotions.edit', $promotion->id) }}" class="text-blue-500 hover:underline">Sửa</a>
-                        <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:underline">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
 @endsection
