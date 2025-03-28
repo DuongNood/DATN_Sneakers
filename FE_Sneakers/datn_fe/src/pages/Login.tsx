@@ -20,7 +20,7 @@ const Login = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) 
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -32,7 +32,7 @@ const Login = () => {
   })
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    setIsLoading(true) 
+    setIsLoading(true)
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/login', data)
 
@@ -51,7 +51,7 @@ const Login = () => {
         toast.error(t('system_error'), { autoClose: 2000 })
       }
     } finally {
-      setIsLoading(false) 
+      setIsLoading(false)
     }
   }
 
@@ -106,7 +106,7 @@ const Login = () => {
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.3 }}
             type='submit'
-            disabled={isLoading} 
+            disabled={isLoading}
             className={`w-full bg-blue-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition flex items-center justify-center ${
               isLoading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
