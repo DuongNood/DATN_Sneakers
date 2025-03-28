@@ -122,7 +122,7 @@ const ProductList = () => {
                         Number(product.original_price)
                       )}
                     </p>
-                    <p className='text-sm font-semibold text-red-500'>
+                    <p className='text-sm text-red-500 font-bold'>
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
                         Number(product.discounted_price)
                       )}
