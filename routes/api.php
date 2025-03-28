@@ -40,8 +40,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:san
 // Đổi mật khẩu
 Route::post('/change-password', [ChangePasswordController::class, 'changePassword'])
     ->middleware('auth:sanctum')->name('api.change-password');
-// Gửi email đặt lại mật khẩu
-Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+// Gửi email quên mật khẩu
+Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword'])->name('api.forgot-password');
 
 // Đặt lại mật khẩu bằng token
 Route::get('/reset-password/{token}', function ($token) {
