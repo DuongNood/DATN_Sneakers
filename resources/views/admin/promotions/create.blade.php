@@ -1,70 +1,63 @@
 @extends('admin.layouts.master')
-
 @section('title')
-    Thêm mã giảm giá
+    Danh sách mã giảm giá
 @endsection
-
 @section('content')
-    <div class="container mt-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0">Thêm mã giảm giá</h2>
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Thêm mã giảm giá</h2>
+        <form action="{{ route('admin.promotions.store') }}" method="POST">
+            @csrf
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Tên Mã Giảm Giá</label>
+                <input type="text" name="promotion_name" class="w-full p-2 border rounded-lg" required>
             </div>
-            <div class="card-body">
-                <form action="{{ route('admin.promotions.store') }}" method="POST">
-                    @csrf
 
-                    <div class="mb-3">
-                        <label class="form-label">Tên Mã Giảm Giá</label>
-                        <input type="text" name="promotion_name" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Loại Giảm Giá</label>
-                        <select name="discount_type" class="form-select">
-                            <option value="Giảm số tiền">Giảm số tiền</option>
-                            <option value="Giảm theo %">Giảm theo %</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Giá Trị Giảm Giá</label>
-                        <input type="number" name="discount_value" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Giảm giá tối đa</label>
-                        <input type="number" name="max_discount_value" step="0.01" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Ngày Bắt Đầu</label>
-                        <input type="date" name="start_date" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Ngày Kết Thúc</label>
-                        <input type="date" name="end_date" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Mô tả</label>
-                        <textarea name="description" class="form-control"></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Trạng Thái</label>
-                        <select name="status" class="form-select">
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
-                    </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check"></i> Thêm
-                        </button>
-                    </div>
-                </form>
+            <div class="mb-4">
+                <label class="block text-gray-700">Loại Giảm Giá</label>
+                <select name="discount_type" class="w-full p-2 border rounded-lg">
+                    <option value="SO_TIEN">Số Tiền</option>
+                    <option value="PHAN_TRAM">Phần Trăm</option>
+                </select>
             </div>
-        </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Giá Trị Giảm Giá</label>
+                <input type="number" name="discount_value" class="w-full p-2 border rounded-lg" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Giảm giá tối đa</label>
+                <input type="number" name="max_discount_value" step="0.01" class="w-full border p-2 rounded" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Ngày Bắt Đầu</label>
+                <input type="date" name="start_date" class="w-full p-2 border rounded-lg" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Ngày Kết Thúc</label>
+                <input type="date" name="end_date" class="w-full p-2 border rounded-lg" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Mô tả</label>
+                <textarea name="description" class="w-full border p-2 rounded"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Trạng Thái</label>
+                <select name="status" class="w-full p-2 border rounded-lg">
+                    <option value="1">Hoạt Động</option>
+                    <option value="0">Ngừng Hoạt Động</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <a href="{{ route('admin.promotions.index') }}" class="ml-4 text-blue-500">Quay lại</a>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Thêm</button>
+            </div>
+        </form>
     </div>
 @endsection

@@ -1,29 +1,30 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\Request;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
     const PATH_VIEW = "admin.news.";
 
-    public function index()
-    {
-        $data = News::latest('id')->paginate(10);
-        return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
+    public function index(){
+
+        $data = News::query()->latest()->paginate(10);
+
+        return view(self::PATH_VIEW . __FUNCTION__ , compact('data'));
     }
 
-    public function create()
-    {
+    public function create(){
+
         return view(self::PATH_VIEW . __FUNCTION__);
+
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $data = $request->validate([
             'title' => 'required',
             'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
@@ -32,56 +33,65 @@ class NewsController extends Controller
 
         try {
             if ($request->hasFile('image')) {
-                $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath());
-                $data['image'] = $uploadedFile->getSecurePath(); // Lấy URL của ảnh trên Cloudinary
+                // $data['image'] = Storage::put('news', $request->file('image'));
+                $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
+
             }
 
-            News::create($data);
+            News::query()->create($data);
+            // dd($data);
 
-            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Tin tức đã được tạo thành công!');
+            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'CCreate news successfully');
 
         } catch (\Throwable $th) {
+            //throw $th;
+            if (!empty($data['image']) && Storage::exists($data['image'])) {
+                Storage::dick('public')->delete($data['image']);
+            }
+
             return back()->with('error', $th->getMessage());
         }
     }
 
-    public function show(News $news)
-    {
-        //
-    }
-
-    public function edit(News $news)
-    {
+    public function show(News $news){
         return view(self::PATH_VIEW . __FUNCTION__, compact('news'));
     }
 
-    public function update(Request $request, News $news)
-    {
+    public function edit(News $news){
+        return view(self::PATH_VIEW . __FUNCTION__, compact('news'));
+    }
+
+    public function update(Request $request , News $news){
         $data = $request->validate([
             'title' => 'required',
-            'image' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
             'content' => 'required'
         ]);
-
         try {
             if ($request->hasFile('image')) {
-                // Xóa ảnh cũ trên Cloudinary nếu có
-                if ($news->image) {
-                    Cloudinary::destroy($news->image);
-                }
-
-                // Upload ảnh mới lên Cloudinary
-                $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath());
-                $data['image'] = $uploadedFile->getSecurePath(); // Lấy URL ảnh mới
-            } else {
-                $data['image'] = $news->image;
+                $data['image'] =  Storage::disk('public')->put('news', $request->file('image'));
             }
 
-            $news->update($data);
+            $currentimage = $news->image;
 
-            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Tin tức đã được cập nhật thành công!');
+            News::query()->update($data);
+
+            if (
+                $request->hasFile('image')
+                && !empty($currentimage)
+                && Storage::disk('public')->exists($currentimage)
+            ) {
+                Storage::disk('public')->delete($currentimage);
+            }
+
+            return back()->with('success', true);
 
         } catch (\Throwable $th) {
+            //throw $th;
+            if (!empty($data['image']) && Storage::exists($data['image'])) {
+                Storage::disk('public')->delete($data['image']);
+            }
+
             return back()->with('error', $th->getMessage());
         }
     }
@@ -89,17 +99,17 @@ class NewsController extends Controller
     public function destroy(News $news)
     {
         try {
-            // Xóa ảnh trên Cloudinary nếu có
-            if ($news->image) {
-                Cloudinary::destroy($news->image);
-            }
 
             $news->delete();
 
-            return back()->with('success', 'Tin tức đã được xóa!');
+            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Đã xóa thành công tin tức!');
 
         } catch (\Throwable $th) {
-            return back()->with('error', $th->getMessage());
+            return back()
+                ->with('success', true)
+                ->with('error', $th->getMessage());
+
         }
     }
+
 }

@@ -6,7 +6,7 @@
             <div class="flex-grow-1">
                 {{-- <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4> --}}
             </div>
-            <a href="{{ route('admin.news.create') }}" class="btn btn-success ">Create news</a>
+            {{-- <a href="{{ route('news.create') }}" class="btn btn-success ">Create news</a> --}}
         </div>
 
         <!-- start row -->
@@ -19,32 +19,33 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">ID</th>
-                                        <th scope="col">Title</th>
-                                        <th scope="col">Image</th>
-                                        {{-- <th scope="col">Content</th> --}}
+                                        <th scope="col">Content</th>
+                                        <th scope="col">User</th>
+                                        <th scope="col">Product</th>
+                                        <th scope="col">Product Image </th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($data as $news)
+                                    @foreach ($comments as $comment)
                                         <tr>
-                                            <th scope="row">{{ $news->id }}</th>
-                                            <td>{{ $news->title }}</td>
+                                            <th scope="row">{{ $comment->id }}</th>
+                                            <td>{{ $comment->content }}</td>
+                                            <td>{{ $comment->user->name }}</td>
+                                            <td>{{ $comment->product->product_name }}</td>
                                             <td>
-                                                @if ($news->image)
-                                                    <img src="{{ Storage::url($news->image) }}" alt=""
+                                                @if ($comment->product->image)
+                                                    <img src="{{ Storage::url($comment->product->image) }}" alt=""
                                                         width="100px">
                                                 @endif
                                             </td>
                                             
                                             <td>
-                                                <a href="{{ route('admin.news.edit', $news) }}">
-                                                    <i class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i>
-                                                </a>
-                                                <form action="{{ route('admin.news.destroy', $news) }}" method="POST" class="d-inline me-2">
+                                                
+                                                <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST" class="d-inline me-2">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bình luận?')">
                                                         <i class="mdi mdi-delete text-muted fs-14"></i>
                                                     </button>
                                                 </form>

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\UserController;
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
 use App\Http\Controllers\CartController;
@@ -60,6 +61,11 @@ Route::middleware('auth:sanctum')->get('/users', function (Request $request) {
     return $request->user();
 });
 
+
+// route bình luận
+Route::resource('comments', CommentController::class);
+// lấy ra bình luận theo id sản phẩm 
+Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
 // route tin tức
 Route::resource('news', NewsController::class);
 // User
