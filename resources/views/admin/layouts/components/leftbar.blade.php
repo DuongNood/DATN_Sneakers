@@ -94,23 +94,23 @@
                 </li>
 
                 <li>
-                    <a class='tp-link' href='{{ route('admin.news.index') }}'>
-                        <i data-feather="align-justify"></i>
-                        <span> Quản lý tin tức </span>
-                    </a>
-                </li>
-
-                <li>
-                    <a class='tp-link' href='{{ route('admin.promotions.index') }}'>
-                        <i data-feather="tag"></i>
-                        <span> Quản lý mã giảm giá </span>
-                    </a>
-                </li>
-
-                <li>
                     <a class='tp-link' href='{{ route('admin.statistics.index') }}'>
                         <i data-feather="bar-chart-2"></i>
                         <span> Quản lý thống kê </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class='tp-link' href='{{ route('admin.comments.index') }}'>
+                        <i data-feather="message-square"></i>
+                        <span> Quản lý bình luận </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class='tp-link' href='{{ route('admin.news.index') }}'>
+                        <i data-feather="align-justify"></i>
+                        <span> Quản lý tin tức </span>
                     </a>
                 </li>
 
