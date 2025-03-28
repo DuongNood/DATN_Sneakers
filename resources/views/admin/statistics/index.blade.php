@@ -38,6 +38,10 @@
                     <h4>🔥 Sản phẩm bán chạy</h4>
                     <ul id="bestSellers" class="list-group"></ul>
                 </div>
+                <div class="card p-3">
+                    <h4>👁️ Sản phẩm hot</h4>
+                    <ul id="hotProducts" class="list-group"></ul>
+                </div>
             </div>
             <div class="col-md-6">
                 <div class="card p-3">
@@ -58,7 +62,7 @@
                         <th>💰 Tổng tiền đã chi tiêu (VND)</th>
                     </tr>
                 </thead>
-                <tbody id="topCustomersTable"></tbody>
+                <tbody id="topUsers"></tbody>
             </table>
         </div>
     </div>
@@ -95,8 +99,9 @@
                 .then(data => {
                     updateSalesChart(data.sales);
                     updateBestSellers(data.best_sellers);
+                    updateHotProducts(data.hot_products);
                     updateCategoryChart(data.category_sales);
-                    updateTopCustomers(data.top_customers);
+                    updateTopUsers(data.top_users);
                 });
         }
 
@@ -133,6 +138,18 @@
             });
         }
 
+        function updateHotProducts(products) {
+            let list = document.getElementById('hotProducts');
+            list.innerHTML = '';
+            products.forEach(product => {
+                let li = document.createElement('li');
+                li.classList.add('list-group-item');
+                li.innerHTML =
+                    `👁️ <strong>${product.product_name}</strong> - <strong class="text-danger">${product.view}</strong> lượt xem`;
+                list.appendChild(li);
+            });
+        }
+
         function updateCategoryChart(categoryData) {
             let ctx = document.getElementById('categoryChart').getContext('2d');
 
@@ -149,15 +166,15 @@
             });
         }
 
-        function updateTopCustomers(customers) {
-            let table = document.getElementById('topCustomersTable');
+        function updateTopUsers(users) {
+            let table = document.getElementById('topUsers');
             table.innerHTML = '';
-            customers.forEach((customer, index) => {
+            users.forEach((user, index) => {
                 let row = `<tr>
                     <td>${index + 1}</td>
-                    <td>${customer.name}</td>
-                    <td>${customer.email}</td>
-                    <td>${new Intl.NumberFormat('vi-VN').format(customer.total_spent)} VND</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${new Intl.NumberFormat('vi-VN').format(user.total_spent)} VND</td>
                 </tr>`;
                 table.innerHTML += row;
             });

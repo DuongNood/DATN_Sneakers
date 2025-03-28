@@ -38,6 +38,12 @@ class StatisticsController extends Controller
             ->limit(5)
             ->get();
 
+        // Sản phẩm hot dựa trên số lượt xem
+        $hotProducts = Product::select('product_name', 'view')
+            ->orderByDesc('view')
+            ->limit(5)
+            ->get();
+
         // Thống kê theo danh mục (liên kết thông qua product_variants)
         $categorySales = OrderDetail::select('categories.category_name', DB::raw('SUM(order_details.quantity) as total_sold'))
             ->join('product_variants', 'order_details.product_variant_id', '=', 'product_variants.id')
@@ -48,7 +54,7 @@ class StatisticsController extends Controller
             ->get();
 
         // Top khách hàng theo tổng số tiền đã chi tiêu
-        $topCustomers = Order::select('users.name', 'users.email', DB::raw('SUM(orders.total_price) as total_spent'))
+        $topUsers = Order::select('users.name', 'users.email', DB::raw('SUM(orders.total_price) as total_spent'))
             ->join('users', 'orders.user_id', '=', 'users.id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->groupBy('users.id', 'users.name', 'users.email')
@@ -59,8 +65,9 @@ class StatisticsController extends Controller
         return response()->json([
             'sales' => $salesData,
             'best_sellers' => $bestSellingProducts,
+            'hot_products' => $hotProducts,
             'category_sales' => $categorySales,
-            'top_customers' => $topCustomers
+            'top_users' => $topUsers
         ]);
     }
 }
