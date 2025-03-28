@@ -19,7 +19,9 @@ class Promotion extends Model
         'status',
         
     ];
-    
+    protected $casts =[
+        'status'=>'boolean' 
+    ];
     const PHAN_TRAM= 'Giảm theo %';
     const SO_TIEN= 'Giảm số tiền';
 
