@@ -20,6 +20,10 @@ class Momo_transactions extends Model
         "requestType",
         "extraData",
         "signature",
+        "transId",
+        "payType",
+        "orderType",
+        "responseTime"
     ];
 
     protected $casts = [

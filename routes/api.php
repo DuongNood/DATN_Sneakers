@@ -110,8 +110,6 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 // MomoPayment 
 // tạo thanh toán momo
-Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);
+Route::post('/momo/payment/{order_id}', [MomopaymentController::class, 'createPayment']);
 // xử lí phản hồi từ momo
-Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
-// lấy danh sách giao dịch 
-Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
+Route::match(['get', 'post'], '/momo/callback', [MomopaymentController::class, 'callback'])->name('momo.callback');
