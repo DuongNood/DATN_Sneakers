@@ -17,11 +17,6 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-<<<<<<< Updated upstream
-        $data = User::latest('id')->paginate(5);
-
-        return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
-=======
         $query = User::query();
 
         // Xử lý tìm kiếm
@@ -43,7 +38,6 @@ class UserController extends Controller
         $data = $query->latest('id')->paginate(10);
 
         return view(self::PATH_VIEW . __FUNCTION__, compact('data', 'roles'));
->>>>>>> Stashed changes
     }
 
     // /**
