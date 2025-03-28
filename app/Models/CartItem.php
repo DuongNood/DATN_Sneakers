@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItem extends Model
 {
-    protected $fillable = ['cart_id', 'product_id', 'quantity'];
+    protected $fillable = ['cart_id', 'products_id', 'quantity'];
 
     public function cart()
     {
@@ -18,4 +18,8 @@ class CartItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function productVariant()
+{
+    return $this->belongsTo(ProductVariant::class, 'products_id');
+}
 }
