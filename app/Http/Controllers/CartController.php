@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    // Thêm sản phẩm vào giỏ hàng
     public function addToCart(Request $request)
     {
         $request->validate([
@@ -22,49 +21,68 @@ class CartController extends Controller
         ]);
 
         $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Bạn chưa đăng nhập'], 401);
+        }
+
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
-        $productVariant = ProductVariant::where('product_id', $request->product_id)
+        // Tìm biến thể sản phẩm dựa vào product_id và product_size_id
+        $variant = ProductVariant::where('product_id', $request->product_id)
             ->where('product_size_id', $request->product_size_id)
             ->first();
 
-        if (!$productVariant) {
-            return response()->json(['message' => 'Sản phẩm không tồn tại'], 404);
+        if (!$variant) {
+            return response()->json(['message' => 'Biến thể sản phẩm không tồn tại'], 404);
         }
 
-        if ($request->quantity > $productVariant->quantity) {
-            return response()->json(['message' => 'Số lượng yêu cầu vượt quá kho'], 400);
+        // Kiểm tra số lượng tồn kho
+        if ($request->quantity > $variant->quantity) {
+            return response()->json(['message' => 'Số lượng không đủ trong kho'], 400);
         }
-        
+
+        // Kiểm tra sản phẩm đã có trong giỏ hàng chưa (chỉ so sánh product_id)
         $cartItem = CartItem::where('cart_id', $cart->id)
-            ->where('products_id', $request->product_id)
-            ->where('product_size_id', $request->product_size_id)
+            ->where('product_id', $request->product_id)
             ->first();
-        
+
         if ($cartItem) {
-            return response()->json(['message' => 'Sản phẩm đã có trong giỏ hàng'], 400);
+            // Nếu cùng product_id nhưng khác size, thêm mới
+            if ($cartItem->product_size_id !== $request->product_size_id) {
+                CartItem::create([
+                    'cart_id' => $cart->id,
+                    'product_id' => $request->product_id,
+                    'quantity' => $request->quantity
+                ]);
+            } else {
+                // Nếu cùng product_id và product_size_id, cập nhật số lượng
+                $newQuantity = $cartItem->quantity + $request->quantity;
+
+                if ($newQuantity > $variant->quantity) {
+                    return response()->json(['message' => 'Số lượng không đủ trong kho'], 400);
+                }
+
+                $cartItem->update(['quantity' => $newQuantity]);
+            }
+        } else {
+            // Thêm sản phẩm mới vào giỏ hàng
+            CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $request->product_id,
+                'quantity' => $request->quantity
+            ]);
         }
 
+        // Lấy thông tin tên sản phẩm và kích thước
         $product = Product::find($request->product_id);
-        $productSize = ProductSize::find($request->product_size_id);
-
-        $newCartItem = CartItem::create([
-            'cart_id' => $cart->id,
-            'products_id' => $request->product_id,
-            'product_size_id' => $request->product_size_id,
-            'quantity' => $request->quantity,
-        ]);
-
+        $size = ProductSize::find($request->product_size_id);
+        $quantity = CartItem::find($request->quantity);
         return response()->json([
-            'message' => 'Thêm vào giỏ hàng thành công',
-            'cart_item' => [
-                'cart_id' => $newCartItem->cart_id,
-                'products_id' => $newCartItem->products_id,
-                'product_size_id' => $newCartItem->product_size_id,
-                'quantity' => $newCartItem->quantity,
-                'product_name' => $product->product_name,
-                'product_size' => $productSize->name,
-            ]
-        ], 200);
+            'message' => 'Đã thêm vào giỏ hàng',
+            'cart' => $cart,
+            'product_name' => $product->product_name ?? 'Không xác định',
+            'name' => $size->name ?? 'Không xác định',
+            'quantity' => $quantity->quantity ?? 'Không xác định'
+        ]);
     }
 }
