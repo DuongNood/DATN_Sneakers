@@ -20,9 +20,7 @@ class ProductVariantController extends Controller
     {
         //
         $title = "Biến thể sản phẩm";
-        $productVariant = ProductVariant::where('status', true)
-        ->orderBy('product_id') 
-        ->paginate(10);
+        $productVariant = ProductVariant::latest('id') ->paginate(10);
 
     return view('admin.product_variants.index', compact('title', 'productVariant'));;
     }

@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductPromotion;
 use App\Models\ProductVariant;
 use App\Models\Promotion;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,12 +21,42 @@ class OrderController extends Controller
 
     const PATH_VIEW = 'admin.orders.';
 
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('user')->orderBy('created_at', 'desc')->paginate(10);
+        $query = Order::query();
+
+        // 🔍 Xử lý tìm kiếm
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('order_code', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('recipient_name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('recipient_phone', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('recipient_address', 'LIKE', '%' . $request->search . '%');
+            });
+        }
+
+        // Lọc theo phương thức thanh toán (COD hoặc Online)
+        if ($request->has('payment_method') && in_array($request->payment_method, ['COD', 'Online'])) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        // Lọc theo trạng thái thanh toán (chưa thanh toán hoặc đã thanh toán)
+        if ($request->has('payment_status') && in_array($request->payment_status, ['chua_thanh_toan', 'da_thanh_toan'])) {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        // Lọc theo trạng thái vận chuyển
+        $validStatuses = ['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'];
+        if ($request->has('status') && in_array($request->status, $validStatuses)) {
+            $query->where('status', $request->status);
+        }
+
+        // Lấy danh sách đơn hàng và phân trang
+        $orders = $query->latest('id')->paginate(10);
 
         return view(self::PATH_VIEW . __FUNCTION__, compact('orders'));
     }
+
 
     /**
      * Show the form for editing the specified resource.

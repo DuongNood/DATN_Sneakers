@@ -18,10 +18,29 @@ class UserController extends Controller
 
     const PATH_VIEW = 'admin.users.';
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = User::with('role')->latest('id')->paginate(5);
-        return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
+        $query = User::query();
+
+        // Xử lý tìm kiếm
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('email', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('phone', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('address', 'LIKE', '%' . $request->search . '%');
+            });
+        }
+
+        // Xử lý lọc theo vai trò (role)
+        if ($request->has('role_id') && !empty($request->role_id)) {
+            $query->where('role_id', $request->role_id);
+        }
+
+        $roles = Role::all();
+        $data = $query->latest('id')->paginate(10);
+
+        return view(self::PATH_VIEW . __FUNCTION__, compact('data', 'roles'));
     }
 
     // /**

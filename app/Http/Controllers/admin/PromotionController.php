@@ -14,9 +14,32 @@ class PromotionController extends Controller
 
     const PATH_VIEW = 'admin.promotions.';
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = Promotion::latest('id')->paginate(10);
+        $query = Promotion::query();
+
+        // 🔍 Xử lý tìm kiếm
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('promotion_name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('discount_value', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('max_discount_value', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('recipient_address', 'LIKE', '%' . $request->search . '%');
+            });
+        }
+
+        // Lọc theo loại (Giảm theo % hoặc giảm số tiền)
+        if ($request->has('discount_type') && in_array($request->discount_type, ['Giảm theo %', 'Giảm số tiền'])) {
+            $query->where('discount_type', $request->discount_type);
+        }
+
+        // Xử lý lọc trạng thái (status: 0 = Inactive, 1 = Active)
+        if ($request->has('status') && in_array($request->status, ['0', '1'])) {
+            $query->where('status', $request->status);
+        }
+
+        // Lấy danh sách mã giảm giá và phân trang
+        $data = $query->latest('id')->paginate(10);
         return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
     }
 

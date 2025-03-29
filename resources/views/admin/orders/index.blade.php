@@ -14,19 +14,67 @@
             </div>
         @endif
 
+        {{-- Tìm kiếm và lọc --}}
+        <form method="GET" action="{{ request()->url() }}" class="row g-2 align-items-center mb-3">
+            {{-- Ô tìm kiếm --}}
+            <div class="col-lg-4 col-md-6">
+                <input type="text" name="search" class="form-control shadow-sm" placeholder="Nhập từ khóa..."
+                    value="{{ request('search') }}">
+            </div>
+
+            {{-- Danh sách bộ lọc --}}
+            @php
+                $filters = [
+                    'payment_method' => ['' => 'Phương thức TT', 'COD' => 'COD', 'Online' => 'Online'],
+                    'payment_status' => [
+                        '' => 'Trạng thái TT',
+                        'chua_thanh_toan' => 'Chưa thanh toán',
+                        'da_thanh_toan' => 'Đã thanh toán',
+                    ],
+                    'status' => [
+                        '' => 'Trạng thái đơn hàng',
+                        'cho_xac_nhan' => 'Chờ xác nhận',
+                        'dang_chuan_bi' => 'Đang chuẩn bị',
+                        'dang_van_chuyen' => 'Đang vận chuyển',
+                        'da_giao_hang' => 'Đã giao hàng',
+                        'huy_don_hang' => 'Hủy đơn hàng',
+                    ],
+                ];
+            @endphp
+
+            {{-- Duyệt danh sách bộ lọc --}}
+            @foreach ($filters as $name => $options)
+                <div class="col-lg-2 col-md-6">
+                    <select name="{{ $name }}" class="form-select shadow-sm">
+                        @foreach ($options as $value => $label)
+                            <option value="{{ $value }}" {{ request($name) == $value ? 'selected' : '' }}>
+                                {{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endforeach
+
+            {{-- Nút lọc và reset --}}
+            <div class="col-lg-2 col-md-6 text-end">
+                <button type="submit" class="btn btn-success shadow-sm"><i class="bi bi-funnel"></i> Lọc</button>
+                <a href="{{ request()->url() }}" class="btn btn-secondary shadow-sm"><i class="bi bi-arrow-clockwise"></i>
+                    Reset</a>
+            </div>
+        </form>
+
         <div class="card shadow">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-sm">
+                    <table class="table table-striped table-bordered table-hover table-sm small">
                         <thead class="table-dark text-center">
                             <tr>
-                                <th class="text-center small">STT</th>
+                                <th class="text-center small ">STT</th>
                                 <th class="text-center small">Mã Đơn Hàng</th>
                                 <th class="text-center small">Khách Hàng</th>
                                 <th class="text-center small">Giảm Giá</th>
                                 <th class="text-center small">Phí Ship</th>
                                 <th class="text-center small">Tổng Tiền</th>
-                                <th class="text-center small">Phương thức TT</th>
+                                <th class="text-center small">Phương Thức TT</th>
                                 <th class="text-center small">Trạng Thái TT</th>
                                 <th class="text-center small">Trạng Thái Đơn Hàng</th>
                                 <th class="text-center small">Ngày Đặt</th>
@@ -34,9 +82,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($orders as $index => $order)
+                            @foreach ($orders as $order)
                                 <tr class="align-middle">
-                                    <td class="text-center small">{{ $index + 1 }}</td>
+                                    <td class="text-center small">{{ $order->id }}</td>
                                     <td>{{ $order->order_code }}</td>
                                     <td>
                                         <strong>{{ $order->recipient_name }}</strong><br>

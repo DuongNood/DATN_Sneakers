@@ -30,6 +30,32 @@
             </div>
         @endif
 
+        {{-- Tìm kiếm và lọc --}}
+        <form method="GET" action="{{ request()->url() }}" class="row g-2 align-items-center mb-3">
+            {{-- Ô tìm kiếm --}}
+            <div class="col-lg-4 col-md-6">
+                <input type="text" name="search" class="form-control shadow-sm" placeholder="Nhập từ khóa..."
+                    value="{{ request('search') }}">
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <div class="input-group shadow-sm">
+                    <select name="status" class="form-select">
+                        <option value="">Trạng thái</option>
+                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
+                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Nút lọc và reset --}}
+            <div class="col-lg-6 col-md-6 text-end">
+                <button type="submit" class="btn btn-success shadow-sm"><i class="bi bi-funnel"></i> Lọc</button>
+                <a href="{{ request()->url() }}" class="btn btn-secondary shadow-sm"><i class="bi bi-arrow-clockwise"></i>
+                    Reset</a>
+            </div>
+        </form>
+
         <div class="card shadow">
             <div class="card-body">
                 <table class="table table-hover table-bordered text-center align-middle">
@@ -56,11 +82,13 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.banners.edit', $banner->id) }}" class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ route('admin.banners.edit', $banner->id) }}"
+                                        class="btn btn-sm btn-outline-primary">
                                         <i class="mdi mdi-pencil"></i> Sửa
                                     </a>
 
-                                    <form action="{{ route('admin.banners.destroy', $banner->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('admin.banners.destroy', $banner->id) }}" method="POST"
+                                        class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger"

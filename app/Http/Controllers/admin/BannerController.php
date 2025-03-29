@@ -19,9 +19,24 @@ class BannerController extends Controller
 
     const PATH_VIEW = 'admin.banners.';
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = Banner::latest('id')->paginate(5);
+        $query = Banner::query();
+
+        // 🔍 Xử lý tìm kiếm
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'LIKE', '%' . $request->search . '%');
+            });
+        }
+
+        // Xử lý lọc trạng thái (status: 0 = Inactive, 1 = Active)
+        if ($request->has('status') && in_array($request->status, ['0', '1'])) {
+            $query->where('status', $request->status);
+        }
+
+        // Lấy danh sách banner và phân trang
+        $data = $query->latest('id')->paginate(10);
 
         return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
     }

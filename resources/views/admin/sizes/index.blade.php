@@ -38,7 +38,7 @@
                                             </div>
                                         @endif
 
-                                        <table class="table mb-0">
+                                        <table class="table table-striped table-bordered table-hover table-sm">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">ID</th>

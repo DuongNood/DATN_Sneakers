@@ -13,9 +13,19 @@ class NewsController extends Controller
 {
     const PATH_VIEW = "admin.news.";
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = News::latest('id')->paginate(10);
+        $query = News::query();
+
+        // 🔍 Xử lý tìm kiếm
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'LIKE', '%' . $request->search . '%');
+            });
+        }
+
+        // Lấy danh sách new và phân trang
+        $data = $query->latest('id')->paginate(10);
         return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
     }
 

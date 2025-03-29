@@ -13,9 +13,54 @@
             </a>
         </div>
 
+        {{-- Tìm kiếm và lọc --}}
+        <form method="GET" action="{{ request()->url() }}" class="row g-2 align-items-center mb-3">
+            {{-- Ô tìm kiếm --}}
+            <div class="col-lg-4 col-md-6">
+                <input type="text" name="search" class="form-control shadow-sm" placeholder="Nhập từ khóa..."
+                    value="{{ request('search') }}">
+            </div>
+
+            {{-- Danh sách bộ lọc --}}
+            @php
+                $filters = [
+                    'discount_type' => ['' => 'Loại', 'Giảm theo %' => 'Giảm theo %', 'Giảm số tiền' => 'Giảm số tiền'],
+                ];
+            @endphp
+
+            {{-- Duyệt danh sách bộ lọc --}}
+            @foreach ($filters as $name => $options)
+                <div class="col-lg-2 col-md-6">
+                    <select name="{{ $name }}" class="form-select shadow-sm">
+                        @foreach ($options as $value => $label)
+                            <option value="{{ $value }}" {{ request($name) == $value ? 'selected' : '' }}>
+                                {{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endforeach
+
+            <div class="col-lg-2 col-md-6">
+                <div class="input-group shadow-sm">
+                    <select name="status" class="form-select">
+                        <option value="">Trạng thái</option>
+                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
+                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Nút lọc và reset --}}
+            <div class="col-lg-4 col-md-6 text-end">
+                <button type="submit" class="btn btn-success shadow-sm"><i class="bi bi-funnel"></i> Lọc</button>
+                <a href="{{ request()->url() }}" class="btn btn-secondary shadow-sm"><i class="bi bi-arrow-clockwise"></i>
+                    Reset</a>
+            </div>
+        </form>
+
         <div class="card shadow-sm">
             <div class="card-body">
-                <table class="table table-bordered text-center">
+                <table class="table table-striped table-bordered text-center">
                     <thead class="table-dark">
                         <tr>
                             <th>#</th>
@@ -52,19 +97,19 @@
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.promotions.edit', $promotion->id) }}"
-                                            class="btn btn-sm btn-outline-primary">
-                                            <i class="mdi mdi-pencil"></i> Sửa
-                                        </a>
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="mdi mdi-pencil"></i> Sửa
+                                    </a>
 
-                                        <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                                <i class="mdi mdi-delete"></i> Xóa
-                                            </button>
-                                        </form>
+                                    <form action="{{ route('admin.promotions.destroy', $promotion->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                            <i class="mdi mdi-delete"></i> Xóa
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

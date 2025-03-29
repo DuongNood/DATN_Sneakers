@@ -9,55 +9,27 @@
             </a>
         </div>
 
-<<<<<<< HEAD
-        <!-- start row -->
-        <div class="row"> <!-- Basic Example -->
-            <div class="col-xl-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Title</th>
-                                        <th scope="col">Image</th>
-                                        {{-- <th scope="col">Content</th> --}}
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($data as $news)
-                                        <tr>
-                                            <th scope="row">{{ $news->id }}</th>
-                                            <td>{{ $news->title }}</td>
-                                            <td>
-                                                @if ($news->image)
-                                                    <img src="{{ $news->image }}" alt=""
-                                                        width="100px">
-                                                @endif
-                                            </td>
-                                            
-                                            <td>
-                                                <a href="{{ route('admin.news.edit', $news) }}">
-                                                    <i class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i>
-                                                </a>
-                                                <form action="{{ route('admin.news.destroy', $news) }}" method="POST" class="d-inline me-2">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                                        <i class="mdi mdi-delete text-muted fs-14"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-=======
+        {{-- Tìm kiếm và lọc --}}
+        <form method="GET" action="{{ request()->url() }}" class="row g-2 align-items-center mb-3">
+            {{-- Ô tìm kiếm --}}
+            <div class="col-lg-4 col-md-6">
+                <input type="text" name="search" class="form-control shadow-sm" placeholder="Nhập từ khóa..."
+                    value="{{ request('search') }}">
+            </div>
+
+            {{-- Nút lọc và reset --}}
+            <div class="col-lg-8 col-md-6 text-end">
+                <button type="submit" class="btn btn-success shadow-sm"><i class="bi bi-funnel"></i> Lọc</button>
+                <a href="{{ request()->url() }}" class="btn btn-secondary shadow-sm"><i class="bi bi-arrow-clockwise"></i>
+                    Reset</a>
+            </div>
+        </form>
+
         <!-- Danh sách tin tức -->
         <div class="card shadow">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered mb-0">
+                    <table class="table table-striped table-bordered table-hover table-sm">
                         <thead class="table-dark">
                             <tr class="text-center">
                                 <th>ID</th>
@@ -82,7 +54,6 @@
                                             class="btn btn-sm btn-outline-primary">
                                             <i class="mdi mdi-pencil"></i> Sửa
                                         </a>
->>>>>>> parent of f0d2918 (Fix merge conflict in ProductController.php and api.php)
 
                                         <form action="{{ route('admin.news.destroy', $news) }}" method="POST"
                                             class="d-inline">

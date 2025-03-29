@@ -19,22 +19,51 @@
                 Thao tác thành công
             </div>
         @endif
+
+        {{-- Tìm kiếm và lọc --}}
+        <form method="GET" action="{{ request()->url() }}" class="row g-2 align-items-center mb-3">
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group shadow-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Nhập từ khóa..."
+                        value="{{ request('search') }}">
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <div class="input-group shadow-sm">
+                    <select name="role_id" class="form-select">
+                        <option value="">-- Chọn vai trò --</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->id }}" {{ request('role_id') == $role->id ? 'selected' : '' }}>
+                                {{ $role->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 text-end">
+                <button type="submit" class="btn btn-success shadow-sm"><i class="bi bi-funnel"></i> Lọc</button>
+                <a href="{{ request()->url() }}" class="btn btn-secondary shadow-sm"><i class="bi bi-arrow-clockwise"></i>
+                    Reset</a>
+            </div>
+        </form>
+
         <div class="card shadow">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover table-bordered text-center align-middle">
+                    <table class="table table-striped table-hover table-bordered text-center align-middle small">
                         <thead class="table-dark">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Image</th>
+                                <th scope="col">Tên</th>
+                                <th scope="col">Avatar</th>
                                 <th scope="col">Email</th>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Address</th>
-                                <th scope="col">Role</th>
-                                <th scope="col">Created at</th>
-                                <th scope="col">Updated at</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">SĐT</th>
+                                <th scope="col">Địa chỉ</th>
+                                <th scope="col">Vai trò</th>
+                                <th scope="col">Thời gian tạo</th>
+                                <th scope="col">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,9 +80,9 @@
                                     <td>{{ $user->address }}</td>
                                     <td>{{ $user->role->name }}</td>
                                     <td>{{ $user->created_at->format('d-m-Y H:i') }}</td>
-                                    <td>{{ $user->updated_at->format('d-m-Y H:i') }}</td>
                                     <td class="d-flex flex-column gap-2">
-                                        <form action="{{ route('admin.users.destroy', $user) }}" method="post" class="d-inline">
+                                        <form action="{{ route('admin.users.destroy', $user) }}" method="post"
+                                            class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -62,7 +91,8 @@
                                             </button>
                                         </form>
 
-                                        <form action="{{ route('admin.users.forceDestroy', $user) }}" method="post" class="d-inline">
+                                        <form action="{{ route('admin.users.forceDestroy', $user) }}" method="post"
+                                            class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-dark"
