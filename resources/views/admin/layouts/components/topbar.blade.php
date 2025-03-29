@@ -168,11 +168,11 @@
                     <a class="nav-link dropdown-toggle nav-user me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
                         
-                        <img src="{{ asset('admins/images/users/user-11.jpg') }}" alt="user-image"
+                        <img src="{{ asset('admins/images/users/z6095385138238_4912ad06eb733cd58dbfffb3134f5dd5.jpg') }}" alt="user-image"
                             class="rounded-circle">
 
                         <span class="pro-user-name ms-1">
-                            Christian <i class="mdi mdi-chevron-down"></i>
+                            Admin <i class="mdi mdi-chevron-down"></i>
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
@@ -196,11 +196,14 @@
                         <div class="dropdown-divider"></div>
 
                         <!-- item-->
-                        <a class='dropdown-item notify-item' href='auth-logout.html'>
-                            <i class="mdi mdi-location-exit fs-16 align-middle"></i>
-                            <span>Logout</span>
-                        </a>
 
+                        <form action="{{ route('admin.auth.logout') }}" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class='dropdown-item notify-item'>
+                                <i class="mdi mdi-location-exit fs-16 align-middle"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
                     </div>
                 </li>
 

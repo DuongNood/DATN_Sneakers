@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\AuthController;
 use App\Http\Controllers\admin\StatisticsController;
 
 use App\Http\Controllers\admin\OrderController;
@@ -38,9 +39,15 @@ use App\Models\Banner;
 Route::prefix('admin')
     ->as('admin.')
     ->group(function () {
-        Route::get('/', function () {
-            return view('admin.index');
-        })->name('index');
+        Route::get('/login', [AuthController::class, 'showLoginForm'])->name('auth.login');
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('auth');
+
+        Route::middleware(['auth', 'admin'])->group(function () {
+            Route::get('/', function () {
+                return view('admin.index');
+            })->name('index');
+        });
 
         Route::prefix('categories')
             ->as('categories.')
