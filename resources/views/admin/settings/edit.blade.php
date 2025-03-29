@@ -31,7 +31,7 @@
             @method('PUT')
 
             <div class="table-responsive">
-                <table class="table table-bordered align-middle">
+                <table class="table table-striped table-bordered align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th style="width: 5%;">STT</th>

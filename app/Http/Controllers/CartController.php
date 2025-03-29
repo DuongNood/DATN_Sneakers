@@ -20,6 +20,7 @@ class CartController extends Controller
             'product_size_id' => 'nullable|exists:product_sizes,id'
         ]);
 
+
         $user = Auth::user();
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
@@ -64,6 +65,7 @@ class CartController extends Controller
         ];
 
         return response()->json($responseData, 200);
+
     }
     public function listCart()
 {
