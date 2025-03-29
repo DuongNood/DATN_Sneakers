@@ -59,7 +59,10 @@ class Product extends Model
     {
         return $this->discounted_price ?? $this->original_price;
     }
-
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
     // public function getDiscountedPriceAttribute()
     // {
     //     return $this->variants()->min('promotional_price') ?? $this->variants()->min('price');

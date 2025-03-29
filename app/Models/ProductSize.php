@@ -15,6 +15,11 @@ class ProductSize extends Model
     {
         return $this->hasMany(ProductVariant::class, 'product_size_id');
     }
+    public function cartItems()
+{
+    return $this->hasMany(CartItem::class);
+}
+
     protected $table = 'product_sizes'; // Đặt đúng tên bảng nếu cần
 }
 
