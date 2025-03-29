@@ -12,7 +12,7 @@ class OrderDetail extends Model
     protected $fillable = [
 
         'order_id',
-        'product_id', //  Đảm bảo có dòng này
+        'product_variant_id',
         'quantity',
         'price',
     ];
