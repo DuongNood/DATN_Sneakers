@@ -4,17 +4,15 @@
 
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>              
+                <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4>
             </div>
-
-
         </div>
 
         <!-- start row -->
-        <div class="row">   
+        <div class="row">
 
             <div class="col-xl-12 ">
-                <div class="card">                   
+                <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
                             @if (session('success'))
@@ -29,39 +27,39 @@
                                     <tr>
                                         <th scope="col">STT</th>
                                         <th scope="col">Product id</th>
-                                        <th scope="col">Product size id</th>                                  
-                                        <th scope="col">quantity</th>
+                                        <th scope="col">Size</th>
+                                        <th scope="col">Quantity</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Act</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($productVariant as $index => $item)
+                                    @foreach ($productVariant as $item)
                                         <tr>
-                                            <th scope="row">{{$index + 1}}</th>>
-                                            <td>{{$item->product->product_name}}</td>
-                                            <td>{{$item->product_size_id}}</td>>
-                                            <td>{{$item->quantity}}</td>                                          
+                                            <th scope="row">{{ $item->id }}</th>>
+                                            <td>{{ $item->product->product_name }}</td>
+                                            <td>{{ $item->productSize->name }}</td>>
+                                            <td>{{ $item->quantity }}</td>
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
                                             </td>
                                             <td>
                                                 <a href="{{ route('admin.product_variants.edit', $item->id) }}"><i
-                                                    class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>                                         
+                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
                                             </td>
-                                        </tr> 
+                                        </tr>
                                     @endforeach
 
                                 </tbody>
                             </table>
-                        </div> 
+                        </div>
                     </div>
-                    {{ $productVariant->links() }}
+                    {{-- Pagination --}}
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $productVariant->links('pagination::bootstrap-5') }}
+                    </div>
                 </div>
-            </div>                         
-        </div><!-- end row -->
-
-
-
+            </div>
+        </div>
     </div>
 @endsection

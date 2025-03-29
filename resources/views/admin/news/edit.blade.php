@@ -1,80 +1,83 @@
 @extends('admin.layouts.master')
-
 @section('content')
     <div class="container-xxl">
-        <div class="py-3 d-flex justify-content-between align-items-center">
-            <h4 class="fw-bold">Chỉnh sửa Tin Tức</h4>
-        </div>
 
-        <!-- Form Chỉnh Sửa -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <form action="{{ route('admin.news.update', $news) }}" enctype="multipart/form-data" method="POST">
-                            @csrf
-                            @method('PUT')
-
-                            <!-- Tiêu đề -->
-                            <div class="mb-3">
-                                <label for="title" class="form-label">Tiêu đề</label>
-                                <input type="text" id="title"
-                                    class="form-control @error('title') is-invalid @enderror" name="title"
-                                    value="{{ old('title', $news->title) }}">
-                                @error('title')
-                                    <p class="text-danger mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Ảnh -->
-                            <div class="mb-3">
-                                <label for="image" class="form-label">Hình ảnh</label>
-                                <input type="file" id="image" name="image" class="form-control"
-                                    onchange="showImage(event)">
-                                <img id="img_news" src="{{ $news->image ? Storage::url($news->image) : '' }}"
-                                    class="border rounded mt-2 {{ $news->image ? '' : 'd-none' }}" style="width: 150px;">
-                                @error('image')
-                                    <p class="text-danger mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Nội dung -->
-                            <div class="mb-3">
-                                <label for="content" class="form-label">Nội dung</label>
-                                <div id="quill-editor" style="height: 400px;"></div>
-                                <textarea name="content" id="editor_content" class="d-none">@php echo old('content', $news->content); @endphp</textarea>
-                                @error('content')
-                                    <p class="text-danger mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Nút hành động -->
-                            <button type="submit" class="btn btn-success">
-                                <i class="mdi mdi-check"></i> Cập nhật
-                            </button>
-                            <a href="{{ route('admin.news.index') }}" class="btn btn-light">
-                                <i class="mdi mdi-arrow-left"></i> Quay lại
-                            </a>
-                        </form>
-                    </div>
-                </div>
+        <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
+            <div class="flex-grow-1">
+                {{-- <h4 class="fs-18 fw-semibold m-0">{{ $title }}</h4> --}}
             </div>
         </div>
+
+        <!-- start row -->
+        <div class="row"> <!-- Basic Example -->
+            <div class="col-12">
+                <div class="card">
+
+                    {{-- <div class="card-header">
+                        <h5 class="card-title mb-0">Create category</h5>
+                    </div><!-- end card header --> --}}
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <form action="{{ route('admin.news.update', $news) }}" enctype="multipart/form-data"
+                                    method="POST">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <div class="mb-3">
+                                        <label for="simpleinput" class="form-label">Title</label>
+                                        <input type="text" id="simpleinput"
+                                            class="form-control @error('title')
+                                        is-invalid @enderror"
+                                            name="title" value="{{ $news->title }}">
+                                        @error('title')
+                                            <p>{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="example-email" class="form-label">Image</label>
+                                        <input type="file" id="example-email" name="image" class="form-control mb-1"
+                                            onchange="showIamge(event)">
+                                        <img id="img_news" src="{{ Storage::url($news->image) }}" alt="hinh anh"
+                                            style="width:150px">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="mo_ta_ngan" class="form-label">Content</label> <br>
+                                        <div id="quill-editor" style="height: 400px;">
+
+                                        </div>
+                                        <textarea name="content" id="editor_content" class="d-none">{{ $news->content }}</textarea>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <a href="{{ route('admin.news.index') }}" class="btn btn-light">
+                                        Quay lại
+                                    </a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div><!-- end row -->
     </div>
 @endsection
-
 @section('js')
     <script>
-        function showImage(event) {
+        function showIamge(event) {
             const img_news = document.getElementById('img_news');
             const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function() {
+                img_news.src = reader.result;
+                img_news.style.display = 'block';
+            }
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    img_news.src = e.target.result;
-                    img_news.classList.remove('d-none');
-                };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file)
             }
         }
     </script>
@@ -86,16 +89,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             var quill = new Quill("#quill-editor", {
                 theme: "snow",
-            });
+            })
 
-            // Hiển thị nội dung cũ nếu có
-            var oldContent = `{!! old('content', $news->content) !!}`;
-            quill.root.innerHTML = oldContent;
+            // Hiển thị nội dung cũ 
+            var old_content = `{!! $news->content !!}`;
+            quill.root.innerHTML = old_content
 
-            // Cập nhật lại textarea ẩn khi nội dung thay đổi
+            // Cập nhật lại textarea ẩn khi nội dung của  quill-editor thay đổi
             quill.on('text-change', function() {
-                document.getElementById('editor_content').value = quill.root.innerHTML;
-            });
-        });
+                var html = quill.root.innerHTML;
+                document.getElementById('editor_content').value = html
+            })
+        })
     </script>
 @endsection

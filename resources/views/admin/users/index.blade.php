@@ -4,9 +4,6 @@
 @endsection
 @section('content')
     <div class="container">
-        <div class="py-3 d-flex align-items-center justify-content-between">
-            <h4 class="fs-18 fw-semibold m-0">Danh Sách Người Dùng</h4>
-        </div>
 
         @if (session()->has('success') && !session()->get('success'))
             <div class="alert alert-danger">
@@ -19,6 +16,42 @@
                 Thao tác thành công
             </div>
         @endif
+
+        <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
+            <div class="flex-grow-1">
+                <h4 class="fs-18 fw-semibold m-0">Danh sách người dùng</h4>
+            </div>
+        </div>
+
+        {{-- Tìm kiếm và lọc --}}
+        <form method="GET" action="{{ request()->url() }}" class="row g-2 align-items-center mb-3">
+            <div class="col-lg-4 col-md-6">
+                <div class="input-group shadow-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Nhập từ khóa..."
+                        value="{{ request('search') }}">
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <div class="input-group shadow-sm">
+                    <select name="role_id" class="form-select">
+                        <option value="">-- Chọn vai trò --</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->id }}" {{ request('role_id') == $role->id ? 'selected' : '' }}>
+                                {{ $role->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 text-end">
+                <button type="submit" class="btn btn-success shadow-sm"><i class="bi bi-funnel"></i> Lọc</button>
+                <a href="{{ request()->url() }}" class="btn btn-secondary shadow-sm"><i class="bi bi-arrow-clockwise"></i>
+                    Reset</a>
+            </div>
+        </form>
+
         <div class="card shadow">
             <div class="card-body">
                 <div class="table-responsive">
@@ -53,7 +86,8 @@
                                     <td>{{ $user->created_at->format('d-m-Y H:i') }}</td>
                                     <td>{{ $user->updated_at->format('d-m-Y H:i') }}</td>
                                     <td class="d-flex flex-column gap-2">
-                                        <form action="{{ route('admin.users.destroy', $user) }}" method="post" class="d-inline">
+                                        <form action="{{ route('admin.users.destroy', $user) }}" method="post"
+                                            class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -62,7 +96,8 @@
                                             </button>
                                         </form>
 
-                                        <form action="{{ route('admin.users.forceDestroy', $user) }}" method="post" class="d-inline">
+                                        <form action="{{ route('admin.users.forceDestroy', $user) }}" method="post"
+                                            class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-dark"

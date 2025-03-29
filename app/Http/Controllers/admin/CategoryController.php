@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -16,8 +17,8 @@ class CategoryController extends Controller
     public function index()
     {
         //
-        $title = "Danh sách danh mục";
-        $category = Category::latest('id')->paginate(10);    
+        $title = "Category";
+        $category = Category::get();    
         return view(self::PATH_VIEW . __FUNCTION__, compact('category','title'));
 
     }
@@ -29,7 +30,7 @@ class CategoryController extends Controller
     {
         //
 
-        $title = "Thêm danh mục";
+        $title = "Category";
         return view(self::PATH_VIEW . __FUNCTION__,compact('title'));
 
     }
@@ -39,15 +40,21 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        //
+
+       
         $params = $request->validate([
-            'category_name' => 'required|max:255|unique:categories',
+            'category_name'=> 'required|max:255|unique:categories',
         ]);
-
-        $params['status'] = isset($request->status) ? 1 : 0;
-
+        if ($request->has('status')) {
+            $params['status'] = 1;
+        } 
+        
+       
         Category::create($params);
+        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Add new Success List!');
 
-        return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công!');
+
     }
 
     /**
@@ -65,8 +72,8 @@ class CategoryController extends Controller
     {
         //
 
-        $title = "Chỉnh sửa danh mục";
-        $category = Category::findOrFail($id);
+        $title = "Category";
+        $category = Category::find($id);
         return view(self::PATH_VIEW . 'edit',compact('title','category'));
     }
 
@@ -75,16 +82,35 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $category = Category::findOrFail($id);
+        //
 
-        $params = $request->validate([
-            'category_name' => 'required|max:255|unique:categories,category_name,' . $category->id,
+        
+        $category = Category::find($id);
+
+        if (!$category) {
+            return redirect()->route('categories.index')->with('error', 'Category Does Not Exist!');
+        }
+
+        
+        $param = $request->validate([
+            'category_name' => 'required|max:255|unique:categories,category_name,'. $category->id,           
             'status' => 'required|in:0,1'
         ]);
+        if($request->hasFile('image')){
+                if ($category->image && Storage::disk('public')->exists($category->image)) {
+                Storage::disk('public')->delete($category->image);
+            }
+            $param['image'] = $request->file('image')->store('uploads/category', 'public');
+        }else{
+               $param['image'] = $category->image;
+        }
+        $param['status'] = $request->status ? 1 : 0;
 
-        $category->update($params);
+        
+        $category->update($param);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công!');
+        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Update List Successfully!');
+
     }
 
     /**
@@ -92,15 +118,18 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $category = Category::findOrFail($id);
+        //
 
-        // Kiểm tra xem danh mục có sản phẩm không (nếu có liên kết với products)
-        if ($category->product()->count() > 0) {
-            return redirect()->route('admin.categories.index')
-                ->with('error', 'Danh mục đang được sử dụng, không thể xóa!');
+        $category = Category::find($id);
+        if (!$category) {
+            return redirect()->route('categories.index')->with('error', 'Danh Mục Không Tồn Tại!');
         }
-
+        // if (Category::find($id)->products->count() > 0) {
+        //     return redirect()->route('categories.index')
+        //         ->with('error', 'Category được sử dụng trong các sản phẩm. Bạn không thể xóa nó.');
+        // }
         $category->delete();
-        return redirect()->route('admin.categories.index')->with('success', 'Xóa danh mục thành công!');
+        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Xóa Danh Mục Thành Công!');
+
     }
 }

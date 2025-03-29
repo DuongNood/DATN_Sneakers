@@ -27,7 +27,7 @@ const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
-  const itemsPerPage = 12
+  const itemsPerPage = 6
 
   useEffect(() => {
     const fetchProducts = async () => {
