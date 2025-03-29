@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Intervention\Image\Facades\Image;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class BannerController extends Controller
@@ -34,30 +37,44 @@ class BannerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'title' => 'required|max:255',
-            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
-            'status' => ['nullable', Rule::in([0, 1])],
-        ]);
+     public function store(Request $request)
+{
+    $data = $request->validate([
+        'title' => 'required|string|max:255',
+        'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'status' => ['nullable', Rule::in([0, 1])],
+    ]);
 
-        try {
-            if ($request->hasFile('image')) {
-                $uploadedFile = $request->file('image');
-                $uploadResult = Cloudinary::upload($uploadedFile->getRealPath());
-                $data['image'] = $uploadResult->getSecurePath();
-            }
+    try {
+        DB::beginTransaction(); // Sử dụng transaction để đảm bảo dữ liệu nhất quán
 
-            $data['status'] ??= 1;
+        if ($request->hasFile('image')) {
+            $uploadedFile = $request->file('image');
+            $uploadResult = Cloudinary::upload($uploadedFile->getRealPath(), [
+                'folder' => 'banners', // Đưa vào thư mục banners trên Cloudinary
+                'quality' => 'auto', // Tự động giảm chất lượng để tối ưu tốc độ
+                'fetch_format' => 'auto', // Chọn định dạng tối ưu (webp, jpg, png, ...)
+                'crop' => 'scale' // Cắt ảnh theo tỷ lệ
+            ]);
 
-            Banner::create($data);
-
-            return redirect()->route('admin.banners.index')->with('success', 'Thêm mới banner thành công!');
-        } catch (\Throwable $th) {
-            return back()->with('success', false)->with('error', $th->getMessage());
+            $data['image'] = $uploadResult->getSecurePath(); // Lấy đường dẫn ảnh từ Cloudinary
         }
+
+        // Xử lý trạng thái mặc định nếu không có
+        $data['status'] = $data['status'] ?? 1;
+
+        // Tạo mới banner
+        Banner::create($data);
+
+        DB::commit();
+
+        return redirect()->route('admin.banners.index')->with('success', 'Thêm mới banner thành công!');
+    } catch (\Exception $e) {
+        DB::rollBack(); // Rollback nếu có lỗi
+        Log::error('Lỗi khi thêm banner: ' . $e->getMessage()); // Ghi log để debug
+        return back()->with('error', 'Thêm banner thất bại! Lỗi: ' . $e->getMessage());
     }
+}
 
     /**
      * Display the specified resource.

@@ -82,6 +82,7 @@ Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
 Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
+Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
 // mua hàng
 
 Route::middleware('auth:sanctum')->group(function () {
