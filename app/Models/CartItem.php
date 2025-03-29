@@ -19,9 +19,4 @@ class CartItem extends Model
     public function productVariant()
     {
         return $this->belongsTo(ProductVariant::class, 'products_id');
-    }
-    public function productVariant()
-{
-    return $this->belongsTo(ProductVariant::class, 'products_id');
-}
-}
+    }}
