@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class NewsController extends Controller
 {
@@ -26,31 +27,25 @@ class NewsController extends Controller
 
     public function store(Request $request){
         $data = $request->validate([
-            'title' => 'required',
-            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
-            'content' => 'required'
-        ]);
+        'title' => 'required|string|max:255',
+        'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'content' => 'required|string'
+    ]);
 
-        try {
-            if ($request->hasFile('image')) {
-                // $data['image'] = Storage::put('news', $request->file('image'));
-                $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
-
-            }
-
-            News::query()->create($data);
-            // dd($data);
-
-            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'CCreate news successfully');
-
-        } catch (\Throwable $th) {
-            //throw $th;
-            if (!empty($data['image']) && Storage::exists($data['image'])) {
-                Storage::dick('public')->delete($data['image']);
-            }
-
-            return back()->with('error', $th->getMessage());
+    try {
+        if ($request->hasFile('image')) {
+            // ✅ Upload ảnh lên Cloudinary
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $data['image'] = $uploadedFileUrl;
         }
+
+        // ✅ Tạo bản ghi trong bảng `news`
+        News::create($data);
+
+        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Create news successfully');
+    } catch (\Throwable $th) {
+        return back()->with('error', $th->getMessage());
+    }
     }
 
     public function show(News $news){
@@ -61,40 +56,37 @@ class NewsController extends Controller
         return view(self::PATH_VIEW . __FUNCTION__, compact('news'));
     }
 
-    public function update(Request $request , News $news){
+    public function update(Request $request, News $news) {
         $data = $request->validate([
-            'title' => 'required',
-            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
-            'content' => 'required'
+            'title' => 'required|string|max:255',
+            'image' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048',
+            'content' => 'required|string'
         ]);
+
         try {
+            $currentImage = $news->image;
+
+            // ✅ Nếu có file mới được upload
             if ($request->hasFile('image')) {
-                $data['image'] =  Storage::disk('public')->put('news', $request->file('image'));
+                // ⭐ Xóa ảnh cũ trên Cloudinary nếu tồn tại
+                if ($currentImage) {
+                    Cloudinary::destroy($currentImage);
+                }
+
+                // ⭐ Upload ảnh mới lên Cloudinary
+                $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+                $data['image'] = $uploadedFileUrl;
             }
 
-            $currentimage = $news->image;
+            // ✅ Cập nhật thông tin bản ghi
+            $news->update($data);
 
-            News::query()->update($data);
-
-            if (
-                $request->hasFile('image')
-                && !empty($currentimage)
-                && Storage::disk('public')->exists($currentimage)
-            ) {
-                Storage::disk('public')->delete($currentimage);
-            }
-
-            return back()->with('success', true);
-
+            return back()->with('success', 'Update news successfully!');
         } catch (\Throwable $th) {
-            //throw $th;
-            if (!empty($data['image']) && Storage::exists($data['image'])) {
-                Storage::disk('public')->delete($data['image']);
-            }
-
             return back()->with('error', $th->getMessage());
         }
     }
+
 
     public function destroy(News $news)
     {

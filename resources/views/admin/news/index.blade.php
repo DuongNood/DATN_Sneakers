@@ -32,7 +32,7 @@
                                             <td>{{ $news->title }}</td>
                                             <td>
                                                 @if ($news->image)
-                                                    <img src="{{ Storage::url($news->image) }}" alt=""
+                                                    <img src="{{ $news->image }}" alt=""
                                                         width="100px">
                                                 @endif
                                             </td>
