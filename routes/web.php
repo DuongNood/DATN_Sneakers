@@ -1,9 +1,5 @@
 <?php
 
-
-use App\Http\Controllers\admin\CommentController;
-
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\StatisticsController;
 
 use App\Http\Controllers\admin\OrderController;
@@ -62,7 +58,6 @@ Route::prefix('admin')
 
 
         Route::resource('news', NewsController::class);
-        Route::resource('comments', CommentController::class);
 
         Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
         Route::get('statistics/data', [StatisticsController::class, 'getData'])->name('statistics.data');

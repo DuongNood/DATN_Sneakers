@@ -14,10 +14,10 @@ class Banner extends Model
         'image',
         'status',
     ];
-    protected $casts =[
-        'status'=>'boolean' 
-    ];
 
+    public $attributes = [
+        'status' => 0,
+    ];
 
     // protected $fillable = ['title', 'image', ];
 

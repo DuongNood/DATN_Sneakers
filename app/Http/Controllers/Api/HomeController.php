@@ -55,4 +55,16 @@ class HomeController extends Controller
             'data' => $products
         ]);
     }
+    public function getTopViewedProducts()
+    {
+        $products = Product::where('status', true) // Chỉ lấy sản phẩm đang hoạt động
+            ->orderByDesc('view') // Sắp xếp theo lượt xem giảm dần          
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Top viewed products retrieved successfully',
+            'data' => $products
+        ]);
+    }
 }

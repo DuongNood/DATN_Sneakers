@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
+<<<<<<< HEAD
+    
+    // Thêm sản phẩm vào giỏ hàng
+=======
     // 🛒 Thêm sản phẩm vào giỏ hàng (KHÔNG vượt quá số lượng trong kho)
+>>>>>>> parent of f0d2918 (Fix merge conflict in ProductController.php and api.php)
     public function addToCart(Request $request)
     {
         $request->validate([
@@ -19,6 +24,67 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
+<<<<<<< HEAD
+        $user = Auth::user();
+        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+        $productVariant = ProductVariant::where('product_id', $request->product_id)
+            ->where('product_size_id', $request->product_size_id)
+            ->first();
+
+        if (!$productVariant) {
+            return response()->json(['message' => 'Sản phẩm không tồn tại'], 404);
+        }
+
+        if ($request->quantity > $productVariant->quantity) {
+            return response()->json(['message' => 'Số lượng yêu cầu vượt quá kho'], 400);
+        }
+        
+        $cartItem = CartItem::where('cart_id', $cart->id)
+            ->where('products_id', $request->product_id)
+            ->where('product_size_id', $request->product_size_id)
+            ->first();
+        
+        if ($cartItem) {
+            return response()->json(['message' => 'Sản phẩm đã có trong giỏ hàng'], 400);
+        }
+
+        $product = Product::find($request->product_id);
+        $productSize = ProductSize::find($request->product_size_id);
+
+        $newCartItem = CartItem::create([
+            'cart_id' => $cart->id,
+            'products_id' => $request->product_id,
+            'product_size_id' => $request->product_size_id,
+            'quantity' => $request->quantity,
+        ]);
+
+        return response()->json([
+            'message' => 'Thêm vào giỏ hàng thành công',
+            'cart_item' => [
+                'cart_id' => $newCartItem->cart_id,
+                'products_id' => $newCartItem->products_id,
+                'product_size_id' => $newCartItem->product_size_id,
+                'quantity' => $newCartItem->quantity,
+                'product_name' => $product->product_name,
+                'product_size' => $productSize->name,
+            ]
+        ], 200);
+    }
+
+    // Cập nhật số lượng sản phẩm trong giỏ hàng
+    public function updateCartItem(Request $request, $id)
+    {
+        $request->validate(['quantity' => 'required|integer|min:1']);
+        
+        $cartItem = CartItem::findOrFail($id);
+        $variant = ProductVariant::where('product_id', $cartItem->product_id)
+            ->where('product_size_id', $cartItem->product_size_id)
+            ->first();
+
+        if ($variant->quantity < $request->quantity) {
+            return response()->json(['message' => 'Không đủ hàng trong kho'], 400);
+=======
         // Lấy thông tin sản phẩm từ kho
         $productVariant = ProductVariant::findOrFail($request->products_id);
 
@@ -47,6 +113,7 @@ class CartController extends Controller
                 'products_id' => $request->products_id,
                 'quantity' => $request->quantity
             ]);
+>>>>>>> parent of f0d2918 (Fix merge conflict in ProductController.php and api.php)
         }
 
         return response()->json(['message' => 'Đã thêm vào giỏ hàng', 'cartItem' => $cartItem]);

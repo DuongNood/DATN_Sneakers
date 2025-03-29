@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\ImageProduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Database\QueryException;
@@ -75,7 +77,7 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công!');
+        return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công!');
     } catch (QueryException $e) {
         if ($e->errorInfo[1] == 1062) {
             // 👉 Lỗi trùng lặp khóa duy nhất
@@ -118,79 +120,94 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, string $id)
 {
-    // Lấy tất cả dữ liệu trừ `_token` và `_method`
     $params = $request->except('_token', '_method');
 
     // Tìm sản phẩm theo ID
     $product = Product::findOrFail($id);
+    
     if (!isset($params['is_show_home'])) {
         $params['is_show_home'] = $product->is_show_home;
     }
 
-    // Xử lý ảnh đại diện (upload lên Cloudinary)
-    if ($request->hasFile('image')) {
-        // Xóa ảnh cũ trên Cloudinary nếu có
-        if ($product->image) {
-            Cloudinary::destroy($product->image);
+    try {
+        DB::beginTransaction();
+
+        // ⭐ Xử lý ảnh đại diện (upload lên Cloudinary)
+        if ($request->hasFile('image')) {
+            // Xóa ảnh cũ trên Cloudinary nếu tồn tại
+            if ($product->image) {
+                try {
+                    Cloudinary::destroy($product->image);
+                } catch (\Exception $e) {
+                    Log::error('Lỗi khi xóa ảnh trên Cloudinary: ' . $e->getMessage());
+                }
+            }
+
+            // Upload ảnh mới lên Cloudinary
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+            $params['image'] = $uploadedFileUrl;
         }
 
-        // Upload ảnh mới lên Cloudinary
-        $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-        $params['image'] = $uploadedFileUrl;
-    } else {
-        $params['image'] = $product->image;
-    }
+        // ⭐ Xử lý ảnh album (list_image)
+        $currentImages = $product->imageProduct()->pluck('id')->toArray();
 
-    // Xử lý ảnh album (list_image)
-    $currentImages = $product->imageProduct()->pluck('id')->toArray();
-    $arrayCombine = array_combine($currentImages, $currentImages);
+        // Kiểm tra nếu `list_image` không tồn tại thì gán thành mảng rỗng
+        $listImages = $request->list_image ?? [];
 
-    // Kiểm tra nếu `list_image` không tồn tại trong request, gán thành mảng rỗng để tránh lỗi
-    $listImages = $request->list_image ?? [];
-
-    // Xóa ảnh không còn trong danh sách `list_image`
-    foreach ($arrayCombine as $key => $value) {
-        if (!array_key_exists($key, $listImages)) {
-            $hinhAnhSp = ImageProduct::find($key);
-            if ($hinhAnhSp) {
-                // Xóa ảnh trên Cloudinary nếu tồn tại
-                Cloudinary::destroy($hinhAnhSp->image_product);
-                $hinhAnhSp->delete();
+        // ✅ Xóa ảnh không còn trong danh sách `list_image`
+        foreach ($currentImages as $imageId) {
+            if (!isset($listImages[$imageId])) {
+                $hinhAnhSp = ImageProduct::find($imageId);
+                if ($hinhAnhSp) {
+                    try {
+                        Cloudinary::destroy($hinhAnhSp->image_product);
+                        $hinhAnhSp->delete();
+                    } catch (\Exception $e) {
+                        Log::error('Lỗi khi xóa ảnh cũ: ' . $e->getMessage());
+                    }
+                }
             }
         }
-    }
 
-    // Thêm hoặc cập nhật ảnh mới vào album
-    foreach ($listImages as $key => $image) {
-        if (!array_key_exists($key, $arrayCombine)) { 
-            // Nếu là ảnh mới
+        // ✅ Thêm hoặc cập nhật ảnh mới vào album
+        foreach ($listImages as $key => $image) {
             if ($request->hasFile("list_image.$key")) {
                 $uploadedFileUrl = Cloudinary::upload($request->file("list_image.$key")->getRealPath())->getSecurePath();
-                $product->imageProduct()->create([
-                    'product_id' => $id,
-                    'image_product' => $uploadedFileUrl
-                ]);
-            }
-        } elseif (is_file($image) && $request->hasFile("list_image.$key")) {
-            // Nếu là ảnh đã tồn tại và cần cập nhật
-            $hinhAnhSp = ImageProduct::find($key);
-            if ($hinhAnhSp) {
-                // Xóa ảnh cũ trên Cloudinary
-                Cloudinary::destroy($hinhAnhSp->image_product);
 
-                // Upload ảnh mới lên Cloudinary
-                $uploadedFileUrl = Cloudinary::upload($request->file("list_image.$key")->getRealPath())->getSecurePath();
-                $hinhAnhSp->update([
-                    'image_product' => $uploadedFileUrl
-                ]);
+                // Nếu là ảnh mới
+                if (!in_array($key, $currentImages)) {
+                    $product->imageProduct()->create([
+                        'product_id' => $id,
+                        'image_product' => $uploadedFileUrl
+                    ]);
+                } else {
+                    // Nếu là ảnh đã tồn tại
+                    $hinhAnhSp = ImageProduct::find($key);
+                    if ($hinhAnhSp) {
+                        try {
+                            Cloudinary::destroy($hinhAnhSp->image_product);
+                            $hinhAnhSp->update([
+                                'image_product' => $uploadedFileUrl
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Lỗi khi cập nhật ảnh: ' . $e->getMessage());
+                        }
+                    }
+                }
             }
         }
+
+        // ✅ Cập nhật thông tin sản phẩm
+        $product->update($params);
+
+        DB::commit();
+
+        return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
+        return back()->with('error', 'Cập nhật sản phẩm thất bại! Lỗi: ' . $e->getMessage());
     }
-
-    // Cập nhật sản phẩm
-    $product->update($params);
-
-    return redirect()->route('admin.products.index')->with('success', 'Successfully updated product');
 }
 
 

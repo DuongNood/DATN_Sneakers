@@ -27,7 +27,7 @@ const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
-  const itemsPerPage = 6
+  const itemsPerPage = 12
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -122,7 +122,7 @@ const ProductList = () => {
                         Number(product.original_price)
                       )}
                     </p>
-                    <p className='text-sm font-semibold text-red-500'>
+                    <p className='text-sm text-red-500 font-bold'>
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
                         Number(product.discounted_price)
                       )}

@@ -15,7 +15,6 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\UserController;
 
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
 use App\Http\Controllers\CartController;
@@ -33,7 +32,7 @@ Route::apiResource('banners', BannerController::class);
 
 // Đăng ký tài khoản
 Route::post('/register', [RegisterController::class, 'register'])->name('api.register');
-        
+
 // Đăng nhập và đăng xuất
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
@@ -61,11 +60,6 @@ Route::middleware('auth:sanctum')->get('/users', function (Request $request) {
     return $request->user();
 });
 
-
-// route bình luận
-Route::resource('comments', CommentController::class);
-// lấy ra bình luận theo id sản phẩm 
-Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
 // route tin tức
 Route::resource('news', NewsController::class);
 // User
@@ -83,14 +77,12 @@ Route::get('/statistics/total-orders', [StatisticsController::class, 'totalOrder
 Route::get('/statistics/best-selling-products', [StatisticsController::class, 'bestSellingProducts']);
 Route::get('/statistics/top-customers', [StatisticsController::class, 'topCustomers']);
 
-
-
-
 Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
 Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
 Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
+Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
 // mua hàng
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -109,7 +101,3 @@ Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);
 Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
 // lấy danh sách giao dịch 
 Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
-
-
-
-

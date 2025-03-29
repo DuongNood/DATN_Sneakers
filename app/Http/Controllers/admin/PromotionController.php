@@ -16,8 +16,8 @@ class PromotionController extends Controller
 
     public function index()
     {
-        $promotions = Promotion::latest()->paginate(10);
-        return view(self::PATH_VIEW . __FUNCTION__, compact('promotions'));
+        $data = Promotion::latest('id')->paginate(10);
+        return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
     }
 
     /**
@@ -41,7 +41,7 @@ class PromotionController extends Controller
             'end_date' => 'required|date|after:start_date',
             'max_discount_value' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'status' => 'required|boolean',
+            'status' => 'required|in:0,1',
         ]);
 
         Promotion::create($request->all());
@@ -72,7 +72,7 @@ class PromotionController extends Controller
             'end_date' => 'required|date|after:start_date',
             'max_discount_value' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'status' => 'required|boolean',
+            'status' => 'required|in:0,1',
         ]);
 
         $promotion->update($request->all());

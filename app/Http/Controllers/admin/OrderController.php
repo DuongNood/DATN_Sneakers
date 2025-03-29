@@ -22,7 +22,7 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
+        $orders = Order::with('user')->orderBy('created_at', 'desc')->paginate(10);
 
         return view(self::PATH_VIEW . __FUNCTION__, compact('orders'));
     }
