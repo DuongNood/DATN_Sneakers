@@ -10,20 +10,11 @@ class Momo_transactions extends Model
     use HasFactory;
 
     protected $fillable = [
-        "partnerCode",
-        "requestId",
-        "amount",
-        "orderId",
-        "orderInfo",
-        "redirectUrl",
-        "ipnUrl",
-        "requestType",
-        "extraData",
-        "signature",
-        "transId",
-        "payType",
-        "orderType",
-        "responseTime"
+        'order_id',
+        'amount',
+        'trans_id',
+        'status',
+        'response_data'
     ];
 
     protected $casts = [

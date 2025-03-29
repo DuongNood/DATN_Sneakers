@@ -13,10 +13,8 @@ class Category extends Model
         'image',
         'status'
     ];
-    protected $casts =[
-        'status'=>'boolean' 
-    ];
-    public function Product(){
-        return $this->hasMany(Product::class);
+
+    public function product(){
+        return $this->hasMany(Product::class, 'category_id');
     }
 }

@@ -4,36 +4,32 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordController extends Controller
 {
-    public function forgotPassword(Request $request)
+    /**
+     * Gửi link đặt lại mật khẩu đến email người dùng
+     */
+    public function sendResetLinkEmail(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|email',
         ]);
 
-        // Tìm user theo email
-        $user = User::where('email', $request->email)->first();
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
 
-        // Tạo mật khẩu tạm thời
-        $temporaryPassword = Str::random(8);
-        $user->password = Hash::make($temporaryPassword);
-        $user->save();
-
-        // Gửi email chứa mật khẩu tạm thời
-        Mail::send('emails.reset-password', ['user' => $user, 'temporaryPassword' => $temporaryPassword], function ($message) use ($user) {
-            $message->to($user->email);
-            $message->subject('Khôi phục mật khẩu');
-        });
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'message' => 'Đã gửi email đặt lại mật khẩu!',
+            ], 200);
+        }
 
         return response()->json([
-            'message' => 'Mật khẩu tạm thời đã được gửi đến email của bạn.'
-        ], 200);
+            'message' => 'Không thể gửi email đặt lại mật khẩu!',
+        ], 400);
     }
 }
      

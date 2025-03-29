@@ -15,7 +15,6 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\UserController;
 
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
 use App\Http\Controllers\CartController;
@@ -41,9 +40,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:san
 // Đổi mật khẩu
 Route::post('/change-password', [ChangePasswordController::class, 'changePassword'])
     ->middleware('auth:sanctum')->name('api.change-password');
-
-// Gửi email quên mật khẩu
-Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword'])->name('api.forgot-password');
+// Gửi email đặt lại mật khẩu
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 
 // Đặt lại mật khẩu bằng token
 Route::get('/reset-password/{token}', function ($token) {
@@ -62,27 +60,15 @@ Route::middleware('auth:sanctum')->get('/users', function (Request $request) {
     return $request->user();
 });
 
-
-// route bình luận
-Route::resource('comments', CommentController::class);
-// lấy ra bình luận theo id sản phẩm 
-Route::get('getCmtByProductId/{product}', [CommentController::class, 'getCmtByProductId'])->name('api.showCmt');
 // route tin tức
 Route::resource('news', NewsController::class);
 // User
 Route::apiResource('users', UserController::class);
 // Setting
 Route::get('settings', [SettingController::class, 'index']);
-
 // Promotion
 Route::get('/promotions', function () {
-    $today = now();
-    return response()->json(
-        Promotion::where('status', 1)
-            ->where('start_date', '<=', $today)
-            ->where('end_date', '>=', $today)
-            ->get()
-    );
+    return response()->json(Promotion::where('status', 1)->get());
 });
 
 
@@ -101,16 +87,17 @@ Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts'
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('carts/add', [CartController::class, 'addToCart']);
-    Route::get('carts', [CartController::class, 'getCart']);
+    Route::get('carts/list', [CartController::class, 'getCart']);
     Route::put('carts/update', [CartController::class, 'updateCart']);
-    Route::delete('carts/{cart_item_id}', [CartController::class, 'removeFromCart']);
-
+    Route::delete('carts/remove/{cart_item_id}', [CartController::class, 'removeFromCart']);
     Route::get('/orders/{id}', [OrderController::class, 'orderDetails']);
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
     Route::post('/orders/confirm/{order_code}', [OrderController::class, 'confirmOrder']);
 });
 // MomoPayment 
 // tạo thanh toán momo
-Route::post('/momo/payment/{order_id}', [MomopaymentController::class, 'createPayment']);
+Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);
 // xử lí phản hồi từ momo
-Route::match(['get', 'post'], '/momo/callback', [MomopaymentController::class, 'callback'])->name('momo.callback');
+Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
+// lấy danh sách giao dịch 
+Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
