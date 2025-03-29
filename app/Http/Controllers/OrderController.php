@@ -16,35 +16,23 @@ use App\Models\ProductSize;
 class OrderController extends Controller
 {
     public function buyProductByName(Request $request, $product_name)
-<<<<<<< HEAD
 
-{
-    $request->validate([
-        'product_size_id' => 'required|integer',
-        'quantity' => 'required|integer|min:1',
-        'promotion_name' => 'nullable|string'
-    ]);
-=======
     {
         $request->validate([
             'product_size_id' => 'required|integer',
             'quantity' => 'required|integer|min:1',
             'promotion_name' => 'nullable|string'
         ]);
->>>>>>> parent of 164656d (..)
 
         $user = Auth::user();
-
-<<<<<<< HEAD
     // Kiểm tra nếu user chưa có thông tin phone hoặc address
     if (!$user->phone || !$user->address) {
         return response()->json(['message' => 'Vui lòng cập nhật số điện thoại và địa chỉ trước khi mua hàng!'], 400);
 
     }
-=======
+
         // Tìm sản phẩm theo tên
         $product = Product::where('product_name', $product_name)->firstOrFail();
->>>>>>> parent of 164656d (..)
 
         // Kiểm tra biến thể sản phẩm (size)
         $productVariant = ProductVariant::where([
@@ -197,12 +185,5 @@ class OrderController extends Controller
         ], 500);
     }
 }
-
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> parent of 164656d (..)
 }
 
