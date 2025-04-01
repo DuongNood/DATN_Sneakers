@@ -23,6 +23,7 @@ class NewsController extends Controller
                 $q->where('title', 'LIKE', '%' . $request->search . '%');
             });
         }
+        $data = News::query()->latest('id')->paginate(10);
 
         // Lấy danh sách new và phân trang
         $data = $query->latest('id')->paginate(10);
@@ -54,6 +55,7 @@ class NewsController extends Controller
 
         return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Create news successfully');
     } catch (\Throwable $th) {
+        dd($th);
         return back()->with('error', $th->getMessage());
     }
     }
