@@ -21,26 +21,17 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <form action="{{route('admin.categories.update', $category->id)}}" enctype="multipart/form-data"
-                                    method="POST">
+                                <form action="{{ route('admin.sizes.update', $productSize->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <div class="mb-3">
-                                        <label for="simpleinput" class="form-label">Category name</label>
-                                        <input type="text" id="simpleinput" class="form-control @error('category_name')
-                                        is-invalid @enderror" name="category_name"
-                                            value="{{$category->category_name}}">
-                                        @error('category_name')
-                                            <p>{{ $message }}</p>
+                                        <label for="simpleinput" class="form-label">Size</label>
+                                        <input type="text" id="simpleinput" class="form-control @error('name') is-invalid @enderror" 
+                                        name="name" value="{{$productSize->name}}">
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="example-email" class="form-label">Image</label>
-                                        <input type="file" id="example-email" name="image" class="form-control mb-1"
-                                            onchange="showIamge(event)">
-                                        <img id="img_category" src="{{ Storage::url($category->image) }}" alt="hinh anh"
-                                            style="width:150px">
-                                    </div>                                  
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>
                             </div>

@@ -37,14 +37,6 @@
                                                     <div id="variant-table">
                                                         <div class="variant-row row align-items-end mb-3">
                                                             <div class="col-md-2">
-                                                                <label for="simpleinput" class="form-label">variant name</label>
-                                                                <input type="text" class="form-control  @error('sku') is-invalid @enderror"
-                                                                    name="sku" placeholder="variant name" value="{{$productVariant->sku}}">
-                                                                    @error('sku')
-                                                                        <p class="text-danger">{{ $message }}</p>
-                                                                    @enderror
-                                                            </div>
-                                                            <div class="col-md-2">
                                                                 <label for="simpleinput" class="form-label">Product name</label>
                                                                 <select class="form-select" aria-label="Default select example"
                                                                     name="product_id">
@@ -55,15 +47,16 @@
                                                                     @endforeach
                                                                 </select>
                                                             </div>
+
                                                             <div class="col-md-2">
-                                                                <label for="simpleinput" class="form-label">Price</label>
-                                                                <input type="number" class="form-control @error('sku') is-invalid @enderror"
-                                                                    name="price" step="0.01" 
-                                                                    placeholder="Price" value="{{$productVariant->price}}">
-                                                                    @error('price')
-                                                                        <p class="text-danger">{{ $message }}</p>
-                                                                    @enderror
+                                                                <label for="simpleinput" class="form-label">Size</label>
+                                                                <input type="number" class="form-control @error('product_size_id') is-invalid @enderror" name="product_size_id" placeholder="quantity"
+                                                                    value="{{$productVariant->product_size_id}}">
+                                                                @error('product_size_id')
+                                                                    <p class="text-danger">{{ $message }}</p>
+                                                                @enderror
                                                             </div>
+
                                                             <div class="col-md-2">
                                                                 <label for="simpleinput" class="form-label">quantity</label>
                                                                 <input type="number" class="form-control @error('sku') is-invalid @enderror"
@@ -73,6 +66,7 @@
                                                                         <p class="text-danger">{{ $message }}</p>
                                                                     @enderror
                                                             </div>
+
                                                             <div class="col-md-2">                                                                
                                                                     <label for="example-password" class="form-label">Status</label>
                                                                     <select class="form-select" aria-label="Default select example" name="status">
@@ -83,7 +77,7 @@
                                                         </div>
 
                                                     </div>
-                                                    <button type="submit" class="btn btn-primary mt-2">Change Variable</button>
+                                                    <button type="submit" class="btn btn-primary mt-2">Lưu</button>
                                                 </form>
                                             </div>
                                         </div>

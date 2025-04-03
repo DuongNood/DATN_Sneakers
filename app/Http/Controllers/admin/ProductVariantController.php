@@ -131,15 +131,9 @@ class ProductVariantController extends Controller
         }
 
         // Validate dữ liệu gửi lên từ form
-        $param = $request->validate([
-            'sku' => ['required','string','max:50',     
-                Rule::unique('product_variants')->where(function ($query) use ($request) {
-                    return $query->where('product_id', $request->product_id);
-                })->ignore($id),
-            ],
-            'product_id' => 'required|exists:products,id',
-            'price' => 'required|numeric|min:0',
-            'promotional_price' => 'nullable|numeric|min:0|lte:price',
+        $param = $request->validate([        
+            'product_id' => 'required|exists:products,id',  
+            'product_size_id' => 'required',        
             'quantity' => 'required|integer|min:0',
             'status' => 'required|in:0,1'
         ]);

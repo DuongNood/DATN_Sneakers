@@ -53,10 +53,10 @@
                                                         <th scope="row">{{ $item->id }}</th>
                                                         <td>{{ $item->name }}</td>
                                                         <td>
-                                                            <a href="{{ route('admin.categories.edit', $item->id) }}"><i
+                                                            <a href="{{ route('admin.sizes.edit', $item->id) }}"><i
                                                                     class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
                                                             <form
-                                                                action="{{ route('admin.categories.destroy', $item->id) }}"
+                                                                action="{{ route('admin.sizes.destroy', $item->id) }}"
                                                                 method="POST" class="d-inline me-2">
                                                                 @csrf
                                                                 @method('DELETE')

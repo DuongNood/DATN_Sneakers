@@ -19,7 +19,11 @@
                                     @csrf
                                     <div class="mb-3">
                                         <label for="simpleinput" class="form-label">Size</label>
-                                        <input type="text" id="simpleinput" class="form-control" name="name">
+                                        <input type="text" id="simpleinput" class="form-control @error('name') 
+                                        is-invalid @enderror" name="name" value="{{ old('name') }}">
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>

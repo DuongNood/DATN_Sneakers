@@ -36,6 +36,24 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label for="example-email" class="form-label">Original price</label>
+                                        <input type="number" id="example-email" class="form-control @error('original_price') is-invalid @enderror"
+                                            name="original_price" value="{{$product->original_price}}">
+                                        @error('original_price')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="example-email" class="form-label">Discounted price</label>
+                                        <input type="number" id="example-email" class="form-control @error('discounted_price') is-invalid @enderror"
+                                            name="discounted_price" value="{{$product->discounted_price}}">
+                                        @error('discounted_price')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label for="example-password" class="form-label">Category</label>
                                         <select class="form-select" aria-label="Default select example" name="category_id">
                                             @foreach ($category as $item)
@@ -47,16 +65,16 @@
                                     <div class="mb-3">
                                         <label for="example-password" class="form-label">Is show home</label>
                                         <select class="form-select" aria-label="Default select example" name="is_show_home">
-                                            <option value="1" {{ $item->is_show_home == 0 ? 'selected' : '' }}>Display</option>
-                                            <option value="0" {{ $item->is_show_home == 1 ? 'selected' : '' }}>Hide</option>
+                                            <option value="1" {{ $product->is_show_home == 1 ? 'selected' : '' }}>Display</option>
+                                            <option value="0" {{ $product->is_show_home == 0 ? 'selected' : '' }}>Hide</option>
                                         </select>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="example-password" class="form-label">Status</label>
                                         <select class="form-select" aria-label="Default select example" name="status">
-                                            <option value="1" {{ $item->status == 1 ? 'selected' : '' }}>active</option>
-                                            <option value="0" {{ $item->status == 0 ? 'selected' : '' }}>inactive</option>
+                                            <option value="1" {{ $product->status == 1 ? 'selected' : '' }}>active</option>
+                                            <option value="0" {{ $product->status == 0 ? 'selected' : '' }}>inactive</option>
                                         </select>
                                     </div>
                                 </div>
@@ -87,7 +105,7 @@
                                                                 src="{{$image->image_product}}"
                                                                 alt="hinh anh" style="width:50px" class="me-3">
                                                             <input type="file" id="hinh_anh" name="list_image[{{$image->id}}]" class="form-control" onchange="previewImage(this,{{$index}})">
-                                                            <input type="hidden" name="list_image[{{$image->id}}]" value="{{$image->id}}">
+                                                            <input type="hidden" name="list_image_ids[]" value="{{$image->id}}">
                                                         </td>
                                                         <td class="">
                                                             <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1" style="cursor: pointer"

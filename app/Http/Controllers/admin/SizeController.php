@@ -37,6 +37,10 @@ class SizeController extends Controller
         //
         $params = $request->validate([
             'name'=> 'required|max:255|unique:product_sizes',
+        ], [
+        'name.required' => 'Tên kích thước không được để trống.', // Tùy chỉnh thông báo khi trường 'name' bị thiếu
+        'name.max' => 'Tên kích thước không được vượt quá 255 ký tự.', // Tùy chỉnh thông báo khi trường 'name' vượt quá 255 ký tự
+        'name.unique' => 'Tên kích thước này đã tồn tại. Vui lòng chọn tên khác.', // Tùy chỉnh thông báo khi tên đã tồn tại trong cơ sở dữ liệu
         ]);
         ProductSize::create($params);
         return redirect()->route('admin.sizes.index')->with('success', 'Add new Success List!');
@@ -56,6 +60,9 @@ class SizeController extends Controller
     public function edit(string $id)
     {
         //
+         $title ="Size giày";
+        $productSize = ProductSize::findOrFail($id);
+        return view('admin.sizes.edit', compact('productSize','title'));
     }
 
     /**
@@ -64,6 +71,15 @@ class SizeController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $params = $request->validate([
+            'name'=> 'required|max:255|unique:product_sizes',
+        ],[
+        'name.required' => 'Tên kích thước không được để trống.', // Tùy chỉnh thông báo khi trường 'name' bị thiếu
+        'name.max' => 'Tên kích thước không được vượt quá 255 ký tự.', // Tùy chỉnh thông báo khi trường 'name' vượt quá 255 ký tự
+        'name.unique' => 'Tên kích thước này đã tồn tại. Vui lòng chọn tên khác.', // Tùy chỉnh thông báo khi tên đã tồn tại trong cơ sở dữ liệu
+        ]);
+            ProductSize::findOrFail($id)->update($params);
+            return redirect()->route('admin.sizes.index')->with('success','Sửa đổi size thành công');
     }
 
     /**
