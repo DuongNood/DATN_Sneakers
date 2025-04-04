@@ -72,7 +72,19 @@ Route::prefix('admin')
         Route::resource('users', UserController::class);
         Route::delete('users/{user}/forceDestroy', [UserController::class, 'forceDestroy'])->name('users.forceDestroy');
 
-        Route::resource('orders', OrderController::class);
+        Route::prefix('orders')
+            ->as('orders.')
+            ->group(function () {
+                Route::get('/', [OrderController::class, 'index'])->name('index');
+                Route::get('{order}/edit', [OrderController::class, 'edit'])->name('edit');
+                Route::put('update/{order}', [OrderController::class, 'update'])->name('update');
+                // Routes cho quy trình hủy
+                Route::get('pending-cancellation', [OrderController::class, 'indexPendingCancellations'])->name('pending_cancellation');
+                Route::post('{order}/cancel-direct', [OrderController::class, 'cancelOrderDirectly'])->name('cancel_direct');
+                Route::post('{order}/confirm-cancellation', [OrderController::class, 'confirmCancellation'])->name('confirm_cancellation');
+                Route::post('{order}/reject-cancellation', [OrderController::class, 'rejectCancellation'])->name('reject_cancellation');
+                Route::get('order-cancellation', [OrderController::class, 'indexOrderCancellations'])->name('order_cancellation');
+            });
 
         Route::resource('banners', BannerController::class);
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,8 +13,18 @@ class Order extends Model
 
     protected $fillable = [
 
-        'user_id', 'order_code', 'recipient_name', 'recipient_phone', 'recipient_address', 'promotion', 'shipping_fee',
-        'total_price', 'payment_method', 'payment_status', 'status'
+        'user_id',
+        'order_code',
+        'recipient_name',
+        'recipient_phone',
+        'recipient_address',
+        'promotion',
+        'shipping_fee',
+        'total_price',
+        'payment_method',
+        'payment_status',
+        'status',
+        'cancellation_reason'
     ];
 
     public function orderDetails()
@@ -39,6 +50,7 @@ class Order extends Model
         'dang_van_chuyen' => 'Đang vận chuyển',
         'da_giao_hang' => 'Đã giao hàng',
         'huy_don_hang' => 'Hủy đơn hàng',
+        'cho_xac_nhan_huy' => 'Chờ xác nhận hủy'
     ];
 
     // Định nghĩa trạng thái
@@ -47,6 +59,7 @@ class Order extends Model
     const DANG_VAN_CHUYEN = 'dang_van_chuyen';
     const DA_GIAO_HANG = 'da_giao_hang';
     const HUY_DON_HANG = 'huy_don_hang';
+    const CHO_XAC_NHAN_HUY = 'cho_xac_nhan_huy';
     const CHUA_THANH_TOAN = 'chua_thanh_toan';
     const DA_THANH_TOAN = 'da_thanh_toan';
 
@@ -94,9 +107,18 @@ class Order extends Model
         return self::ORDER_STATUS[$this->status] ?? 'Không xác định';
     }
     public function productSize()
-{
-    return $this->belongsTo(ProductSize::class, 'product_size_id');
-}
+    {
+        return $this->belongsTo(ProductSize::class, 'product_size_id');
+    }
 
-}
+    public function canBeCancelledByUser(): bool
+    {
+        // Chỉ cho hủy khi đang chờ xử lý
+        return in_array($this->status, [self::CHO_XAC_NHAN, self::DANG_CHUAN_BI]);
+    }
 
+    public function canProcessCancellation(): bool
+    {
+        return $this->status === self::CHO_XAC_NHAN_HUY;
+    }
+}

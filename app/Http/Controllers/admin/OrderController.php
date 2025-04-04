@@ -12,6 +12,7 @@ use App\Models\Promotion;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -57,7 +58,6 @@ class OrderController extends Controller
         return view(self::PATH_VIEW . __FUNCTION__, compact('orders'));
     }
 
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -87,10 +87,7 @@ class OrderController extends Controller
                 // Nếu chuyển sang trạng thái hủy đơn hàng, hoàn lại số lượng sản phẩm
 
                 if ($request->status === 'huy_don_hang') {
-                    foreach ($order->orderDetails as $detail) {
-                        $variant = ProductVariant::findOrFail($detail->product_variant_id);
-                        $variant->increment('quantity', $detail->quantity);
-                    }
+                    $this->restoreStock($order);
                 }
                 $order->status = $request->status;
             }
@@ -113,7 +110,7 @@ class OrderController extends Controller
     private function canUpdateShippingStatus($currentStatus, $newStatus)
     {
         $validTransitions = [
-            'cho_xac_nhan'    => ['dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'],
+            'cho_xac_nhan'    => ['dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang'],
             'dang_chuan_bi'   => ['dang_van_chuyen', 'da_giao_hang'],
             'dang_van_chuyen' => ['da_giao_hang'],
             'da_giao_hang'    => [], // Không thể cập nhật
@@ -121,5 +118,170 @@ class OrderController extends Controller
         ];
 
         return isset($validTransitions[$currentStatus]) && in_array($newStatus, $validTransitions[$currentStatus]);
+    }
+
+    // Hiển thị danh sách đơn hàng chờ xác nhận hủy
+    public function indexPendingCancellations()
+    {
+        $data = Order::with('user')
+            ->where('status', Order::CHO_XAC_NHAN_HUY)
+            ->orderBy('updated_at', 'asc')
+            ->paginate(15);
+
+        return view('admin.orders.pending_cancellation', compact('data'));
+    }
+
+    public function indexOrderCancellations()
+    {
+        $data = Order::with('user')
+            ->where('status', Order::HUY_DON_HANG)
+            ->orderBy('updated_at', 'asc')
+            ->paginate(10);
+
+        return view('admin.orders.order_cancellation', compact('data'));
+    }
+
+    // Admin xác nhận yêu cầu hủy của khách
+    public function confirmCancellation(Order $order)
+    {
+        if (!$order->canProcessCancellation()) {
+            return redirect()->route('admin.orders.pending_cancellation')->with('error', 'Trạng thái đơn hàng không hợp lệ.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $order->status = Order::HUY_DON_HANG;
+            $order->previous_status = null;
+
+            $order->save();
+
+            $this->restoreStock($order);
+
+            DB::commit();
+
+            // (Tùy chọn) Gửi thông báo cho khách hàng
+            // $order->user->notify(new OrderCancelledByAdmin($order, $request->input('cancellation_reason')));
+
+            return redirect()->route('admin.orders.pending_cancellation')->with('success', "Đã xác nhận hủy đơn hàng #{$order->order_code}.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to confirm cancellation for order {$order->order_code}: " . $e->getMessage());
+            return redirect()->route('admin.orders.pending_cancellation')->with('error', 'Xác nhận hủy thất bại, vui lòng thử lại.');
+        }
+    }
+
+    // Admin từ chối yêu cầu hủy của khách
+    public function rejectCancellation(Request $request, Order $order)
+    {
+        if (!$order->canProcessCancellation()) {
+            return redirect()->route('admin.orders.pending_cancellation')->with('error', 'Trạng thái đơn hàng không hợp lệ.');
+        }
+
+        $request->validate([
+            'rejection_reason' => ['nullable', 'string', 'max:500'], // Lý do từ chối của admin (tùy chọn)
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Quay lại trạng thái trước đó đã lưu
+            $order->status = $order->previous_status ?? Order::CHO_XAC_NHAN;
+
+            // Xử lý lý do
+            $adminReason = $request->input('rejection_reason');
+            $newReason = "Yêu cầu hủy bị từ chối.";
+            if ($adminReason) {
+                $newReason .= " Lý do từ Admin: " . $adminReason;
+            }
+
+            $order->cancellation_reason = $newReason; // Ghi đè lý do từ chối của admin
+            $order->previous_status = null; // Xóa trạng thái trước đó đi
+            $order->save();
+
+            DB::commit();
+
+            // (Tùy chọn) Gửi thông báo cho khách hàng
+            // $order->user->notify(new CancellationRejected($order, $adminReason));
+
+            return redirect()->route('admin.orders.pending_cancellation')->with('success', "Đã từ chối yêu cầu hủy đơn hàng #{$order->id}.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to reject cancellation for order {$order->id}: " . $e->getMessage());
+            return redirect()->route('admin.orders.pending_cancellation')->with('error', 'Từ chối hủy thất bại, vui lòng thử lại.');
+        }
+    }
+
+    // Admin hủy đơn hàng trực tiếp
+    public function cancelOrderDirectly(Request $request, Order $order)
+    {
+        // Kiểm tra xem đơn hàng có đang ở trạng thái có thể bị hủy không (tránh hủy đơn đã hoàn thành/đã hủy)
+        if (in_array($order->status, [Order::HUY_DON_HANG, Order::DA_GIAO_HANG])) {
+            return back()->with('error', 'Không thể hủy đơn hàng ở trạng thái này.');
+        }
+
+        $request->validate([
+            'cancellation_reason' => ['required', 'string', 'min:5', 'max:500'],
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $order->status = Order::HUY_DON_HANG;
+            $order->cancellation_reason = $request->input('cancellation_reason') . ' (Hủy bởi Admin)';
+            $order->previous_status = null;
+            $order->save();
+
+            $this->restoreStock($order);
+
+            DB::commit();
+
+            // (Tùy chọn) Gửi thông báo cho khách hàng
+            // $order->user->notify(new OrderCancelledByAdmin($order, $request->input('cancellation_reason')));
+
+            return redirect()->route('admin.orders.edit', $order)->with('success', "Đã hủy đơn hàng #{$order->order_code} bởi Admin.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Admin không thể hủy đơn hàng {$order->order_code}:" . $e->getMessage());
+            return back()->with('error', 'Hủy đơn hàng thất bại, vui lòng thử lại.');
+        }
+    }
+
+    // public function destroy(Order $order)
+    // {
+    //     // Logic xóa đơn hàng vĩnh viễn hiện tại của bạn...
+    //     // Cẩn thận: Nên kiểm tra trạng thái trước khi cho xóa hẳn?
+    //     try {
+    //         // Xóa các chi tiết đơn hàng trước (nếu có ràng buộc khóa ngoại)
+    //         // $order->orderDetails()->delete();
+    //         // $order->delete();
+    //         // Hoặc nếu dùng SoftDeletes thì $order->forceDelete();
+    //         // return redirect()->route('admin.orders.index')->with('success', 'Xóa đơn hàng thành công.');
+
+    //         // !! Quan trọng: Nếu destroy() đang được dùng để thay đổi status thành CANCELLED thì bạn cần sửa lại
+    //         // Hãy dùng hàm cancelOrderDirectly() mới cho việc đó.
+
+    //     } catch (\Exception $e) {
+    //         Log::error("Failed to delete order {$order->id}: " . $e->getMessage());
+    //         return back()->with('error', 'Xóa đơn hàng thất bại.');
+    //     }
+    // }
+
+    protected function restoreStock(Order $order)
+    {
+        // Lấy tất cả chi tiết đơn hàng
+        $orderDetails = OrderDetail::where('order_id', $order->id)->get();
+
+        foreach ($orderDetails as $detail) {
+            $variant = ProductVariant::find($detail->product_variant_id);
+            if ($variant) {
+                // Cộng lại số lượng đã trừ khi đặt hàng
+                $variant->quantity += $detail->quantity;
+                $variant->save();
+                Log::info("Đã khôi phục kho cho ID biến thể {$variant->id}. Đã thêm: {$detail->quantity}. Số lượng mới: {$variant->quantity}");
+            } else {
+                Log::warning("Không tìm thấy ProductVariant cho OrderDetail ID {$detail->id} khi khôi phục kho cho đơn hàng đã hủy {$order->id}.");
+            }
+        }
     }
 }

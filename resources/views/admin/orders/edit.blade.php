@@ -74,17 +74,16 @@
 
                     @php
                         $validNextStatuses = [
-                            'cho_xac_nhan' => ['dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'],
+                            'cho_xac_nhan' => ['dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang'],
                             'dang_chuan_bi' => ['dang_van_chuyen', 'da_giao_hang'],
                             'dang_van_chuyen' => ['da_giao_hang'],
                             'da_giao_hang' => [],
-                            'huy_don_hang' => [],
                         ];
                     @endphp
 
                     @foreach ($validNextStatuses[$order->status] ?? [] as $nextStatus)
                         <option value="{{ $nextStatus }}">
-                            {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'], $nextStatus) }}
+                            {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng'], $nextStatus) }}
                         </option>
                     @endforeach
                 </select>
@@ -161,10 +160,41 @@
                 <a href="{{ route('admin.orders.index') }}" class="btn btn-light">
                     <i class="mdi mdi-arrow-left"></i> Quay lại
                 </a>
-                <button type="submit" class="btn btn-success">
-                    <i class="mdi mdi-check"></i> Cập nhật
-                </button>
+                <div>
+                    @if ($order->status !== 'huy_don_hang' && $order->status !== 'da_giao_hang')
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#cancelOrderModal">
+                            <i class="mdi mdi-cancel"></i> Hủy đơn hàng
+                        </button>
+                    @endif
+                    <button type="submit" class="btn btn-success">
+                        <i class="mdi mdi-check"></i> Cập nhật
+                    </button>
+                </div>
             </div>
         </form>
+    </div>
+
+    {{-- Modal Hủy Đơn Hàng --}}
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel">Xác Nhận Hủy Đơn Hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('admin.orders.cancel_direct', $order->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <p>Nhập lý do hủy đơn hàng:</p>
+                        <textarea name="cancellation_reason" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection

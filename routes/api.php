@@ -2,17 +2,17 @@
 
 
 use App\Http\Controllers\api\DetailController;
-use App\Http\Controllers\Api\MomopaymentController;
-use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\api\MomopaymentController;
+use App\Http\Controllers\api\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\api\BannerController;
 
 
 use App\Http\Controllers\api\HomeController;
-use App\Http\Controllers\Api\NewsController;
-use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\api\NewsController;
+use App\Http\Controllers\api\UserController;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -21,7 +21,7 @@ use App\Http\Controllers\CartController;
 
 use App\Http\Controllers\Auth\RegisterController;
 
-use App\Http\Controllers\Api\StatisticsController;
+use App\Http\Controllers\api\StatisticsController;
 
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
@@ -70,6 +70,11 @@ Route::get('settings', [SettingController::class, 'index']);
 Route::get('/promotions', function () {
     return response()->json(Promotion::where('status', 1)->get());
 });
+
+// Order
+Route::apiResource('orders', OrderController::class);
+// Route yêu cầu hủy đơn hàng
+Route::post('/orders/{order}/request-cancellation', [OrderController::class, 'requestCancellation'])->middleware('can:requestCancellation,order');
 
 
 Route::get('/statistics/total-revenue', [StatisticsController::class, 'totalRevenue']);

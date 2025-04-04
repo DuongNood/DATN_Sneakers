@@ -37,12 +37,12 @@
                 <li class="menu-title">Pages</li>
 
                 <li>
-                    <a href="#sidebarError" data-bs-toggle="collapse">
+                    <a href="#sidebarProduct" data-bs-toggle="collapse">
                         <i data-feather="list"></i>
                         <span> Quản lý sản phẩm </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarError">
+                    <div class="collapse" id="sidebarProduct">
                         <ul class="nav-second-level">
                             <li>
                                 <a class='tp-link' href='{{ route('admin.products.index') }}'>Danh sách sản phẩm</a>
@@ -80,10 +80,24 @@
                 </li>
 
                 <li>
-                    <a class='tp-link' href='{{ route('admin.orders.index') }}'>
+                    <a href="#sidebarOrder" data-bs-toggle="collapse">
                         <i data-feather="package"></i>
                         <span> Quản lý đơn hàng </span>
+                        <span class="menu-arrow"></span>
                     </a>
+                    <div class="collapse" id="sidebarOrder">
+                        <ul class="nav-second-level">
+                            <li>
+                                <a class='tp-link' href='{{ route('admin.orders.index') }}'>Danh sách đơn hàng</a>
+                            </li>
+                            <li>
+                                <a class='tp-link' href='{{ route('admin.orders.pending_cancellation') }}'>Danh sách đơn hàng chờ xác nhận hủy</a>
+                            </li>
+                            <li>
+                                <a class='tp-link' href='{{ route('admin.orders.order_cancellation') }}'>Danh sách đơn hàng đã hủy</a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
                 <li>
