@@ -121,19 +121,23 @@
                     </a>
                 </li>
 
+                @if (Auth::user()->hasPermission('manage_statistics'))
                 <li>
                     <a class='tp-link' href='{{ route('admin.statistics.index') }}'>
                         <i data-feather="bar-chart-2"></i>
                         <span> Quản lý thống kê </span>
                     </a>
                 </li>
+                @endif
 
+                @if (Auth::user()->hasPermission('manage_settings'))
                 <li>
                     <a class='tp-link' href='{{ route('admin.settings.edit') }}'>
                         <i data-feather="settings"></i>
                         <span> Quản lý cài đặt </span>
                     </a>
                 </li>
+                @endif
             </ul>
         </div>
         <!-- End Sidebar -->

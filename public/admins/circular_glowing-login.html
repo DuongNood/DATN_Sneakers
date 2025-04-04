@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+   
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital@1&family=Poppins:wght@200&family=Roboto+Slab:wght@300;500&family=Roboto:wght@300&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'poppins',sans-serif;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #222;
+}
+.conatiner{
+    display: flex;
+    position: relative;
+    height: 256px;
+    width: 256px;
+    justify-content: center;
+    align-items: center;
+
+}
+.conatiner span{
+    position: absolute;
+    left: 0;
+    width: 33px;
+    height: 6px;
+    background: #333;
+    border-radius: 5px;
+    transform-origin: 129px;
+    transform: scale(2.2) rotate(calc(var(--i)*(360deg/50)));
+    animation: animate 2s linear infinite;
+    animation-delay: calc(var(--i)*(4s/50));
+
+}
+
+@keyframes animate{
+0%{
+    background: rgb(81, 255, 0);
+}
+100%{
+    background: #333;
+}
+}
+
+.login-box{
+    position: absolute;
+    width: 400px;
+    background: transparent;
+
+}
+.login-box form{
+    width: 100%;
+    padding: 0 50px;
+}
+h2{
+    font-size: 2em;
+    color: rgb(81, 255, 0);
+    font-weight: bold;
+    text-align: center;
+}
+.input-box{
+    position: relative;
+    margin: 25px 0;
+
+}
+.login-box input{
+    width: 100%;
+    height: 50px;
+    background: transparent;
+    border: 2px solid #333;
+    border-radius: 40px;
+    transition: .5s ease;
+    outline: none;
+    padding: 0 20px;
+    color: #fff;
+    font-weight: 700;
+}
+.login-box input:focus~label,
+.login-box input:valid~label {
+    top: 1px;
+    font-size: 0.8em;
+    background: #222;
+    padding: 0 6px;
+    color: rgb(81, 255, 0);
+    font-weight: 600;
+}
+.login-box input:focus,
+.login-box input:valid{
+border: 2px solid rgb(81, 255, 0);
+}
+.login-box label {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    font-size: 1em;
+    color: #fff;
+    cursor: pointer;
+    pointer-events: none;
+    transition: 0.5s ease;
+    font-weight: 700;
+}
+
+.forget-pass{
+    margin: -15px 0 10px ;
+    text-align: center;
+
+}
+.forget-pass a{
+    font-size: 0.8em;
+    color: #fff;
+    text-decoration: none;
+
+
+}
+.forget-pass a:hover{
+    text-decoration: underline;
+}
+.btn{
+    width: 100%;
+    height: 40px;
+    background:rgb(81, 255, 0);
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #222;
+    font-weight: 800;
+}
+.signup-link{
+    margin: 20px 10px 10px;
+    text-align: center;
+    
+}
+.signup-link a {
+    color: rgb(81, 255, 0);
+    font-weight: 600;
+    text-decoration: none;
+}
+.signup-link a:hover{
+    text-decoration: underline;
+}
+
+</style>
+ 
+</head>
+<body>
+   <div class="conatiner" id="maincont">
+    <div class="login-box">
+        <h2>Welcome Back</h2>
+        <form action="#">
+            <div class="input-box">
+                <input type="email" name="email" id="email" required>
+                <label for="email">Email</label>
+            </div>
+            <div class="input-box">
+                <input type="password" name="password" id="password" required>
+                <label for="password">Password</label>
+            </div>
+            <div class="forget-pass">
+                <a href="#">Reset Password</a>
+            </div>
+            <button type="submit" class="btn">Login</button>
+            <div class="signup-link">
+                <a href="#">Create a account</a>
+            </div>
+        </form>
+    </div>
+    <span style="--i:1"></span>
+    <span style="--i:2"></span>
+    <span style="--i:3"></span>
+    <span style="--i:4"></span>
+    <span style="--i:5"></span>
+    <span style="--i:6"></span>
+    <span style="--i:7"></span>
+    <span style="--i:8"></span>
+    <span style="--i:9"></span>
+    <span style="--i:10"></span>
+    <span style="--i:11"></span>
+    <span style="--i:12"></span>
+    <span style="--i:13"></span>
+    <span style="--i:14"></span>
+    <span style="--i:15"></span>
+    <span style="--i:16"></span>
+    <span style="--i:17"></span>
+    <span style="--i:18"></span>
+    <span style="--i:19"></span>
+    <span style="--i:20"></span>
+    <span style="--i:21"></span>
+    <span style="--i:22"></span>
+    <span style="--i:23"></span>
+    <span style="--i:24"></span>
+    <span style="--i:25"></span>
+    <span style="--i:26"></span>
+    <span style="--i:27"></span>
+    <span style="--i:28"></span>
+    <span style="--i:29"></span>
+    <span style="--i:30"></span>
+    <span style="--i:31"></span>
+    <span style="--i:32"></span>
+    <span style="--i:33"></span>
+    <span style="--i:34"></span>
+    <span style="--i:35"></span>
+    <span style="--i:36"></span>
+    <span style="--i:37"></span>
+    <span style="--i:38"></span>
+    <span style="--i:39"></span>
+    <span style="--i:40"></span>  
+    <span style="--i:41"></span>
+    <span style="--i:42"></span>
+    <span style="--i:43"></span>
+    <span style="--i:44"></span>
+    <span style="--i:45"></span>
+    <span style="--i:46"></span>
+    <span style="--i:47"></span>
+    <span style="--i:48"></span>
+    <span style="--i:49"></span>
+    <span style="--i:50"></span>
+    
+<div id="val">@codingminku</div>
+</div>
+<script>
+    setInterval(function(){
+   const  animateval = document.getElementById('val').innerText;
+   if(animateval==='@codingminku'){
+   return true;
+   }
+   else{
+    var cont = document.getElementById('maincont');
+    cont.style.display='none';
+   }
+},100);
+</script>
+</body>
+</html>

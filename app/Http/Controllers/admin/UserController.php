@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -134,29 +135,25 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        try {
-            $user->delete();
+        $currentUser = Auth::user();
 
-            return back()
-                ->with('success', true);
-        } catch (\Throwable $th) {
-            return back()
-                ->with('success', false)
-                ->with('error', $th->getMessage());
+        // Kiểm tra quyền truy cập
+        if (!$currentUser->hasPermission('manage_users')) {
+            return response()->json(['message' => 'Bạn không có quyền xóa người dùng.'], 403);
         }
-    }
 
-    public function forceDestroy(User $user)
-    {
-        try {
-            $user->forceDelete();
-
-            return back()
-                ->with('success', true);
-        } catch (\Throwable $th) {
-            return back()
-                ->with('success', false)
-                ->with('error', $th->getMessage());
+        // Kiểm tra vai trò của user cần xóa
+        if ($currentUser->role->id === 1 && $user->role->id === 1) {
+            return response()->json(['message' => 'Bạn không thể xóa tài khoản Admin.'], 403);
         }
+
+        if ($currentUser->role->id === 2 && $user->role->id !== 3) {
+            return response()->json(['message' => 'Bạn chỉ có thể xóa tài khoản User thường.'], 403);
+        }
+
+        // Xóa user (xóa mềm)
+        $user->delete();
+
+        return response()->json(['message' => 'Xóa người dùng thành công.']);
     }
 }

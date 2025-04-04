@@ -80,26 +80,28 @@
                                     <td>{{ $user->address }}</td>
                                     <td>{{ $user->role->name }}</td>
                                     <td>{{ $user->created_at->format('d-m-Y H:i') }}</td>
-                                    <td class="d-flex flex-column gap-2">
-                                        <form action="{{ route('admin.users.destroy', $user) }}" method="post"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Bạn có chắc chắn muốn xóa không?')">
-                                                <i class="mdi mdi-delete"></i> XM
-                                            </button>
-                                        </form>
-
-                                        <form action="{{ route('admin.users.forceDestroy', $user) }}" method="post"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-dark"
-                                                onclick="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn không?')">
-                                                <i class="mdi mdi-delete"></i> XC
-                                            </button>
-                                        </form>
+                                    <td class="">
+                                        @if (Auth::user()->role->id === 1 && $user->role->id !== 1)
+                                            <form action="{{ route('admin.users.destroy', $user) }}" method="post"
+                                                  class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa không?')">
+                                                    <i class="mdi mdi-delete"></i> Xóa
+                                                </button>
+                                            </form>
+                                        @elseif (Auth::user()->role->id === 2 && $user->role->id === 3)
+                                            <form action="{{ route('admin.users.destroy', $user) }}" method="post"
+                                                  class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa không?')">
+                                                    <i class="mdi mdi-delete"></i> Xóa
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

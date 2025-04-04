@@ -18,12 +18,16 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required'
+        ], [
+            'email.required' => 'Email không được để trống.',
+            'email.email' => 'Email không đúng định dạng.',
+            'password.required' => 'Mật khẩu không được để trống.'
         ]);
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            if ($user->role->id === 1) {
+            if ($user->role->id === 1 || $user->role->id === 2) {
                 return redirect()->route('admin.index');
             }
 
@@ -31,7 +35,14 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Bạn không có quyền truy cập!']);
         }
 
-        return back()->withErrors(['email' => 'Sai thông tin đăng nhập.']);
+        // Kiểm tra riêng email và mật khẩu để đưa ra thông báo lỗi chi tiết hơn
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email không tồn tại.']);
+        }
+
+        return back()->withErrors(['password' => 'Mật khẩu không đúng.']);
     }
 
     public function logout(Request $request)
