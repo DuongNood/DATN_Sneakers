@@ -16,32 +16,32 @@ use App\Models\ProductSize;
 class OrderController extends Controller
 {
     public function buyProductByName(Request $request, $product_name)
+{
+    $request->validate([
+        'product_size_id' => 'required|integer',
+        'quantity' => 'required|integer|min:1',
+        'promotion_name' => 'nullable|string'
+    ]);
 
-    {
-        $request->validate([
-            'product_size_id' => 'required|integer',
-            'quantity' => 'required|integer|min:1',
-            'promotion_name' => 'nullable|string'
-        ]);
+    $user = Auth::user();
 
-        $user = Auth::user();
+    // Kiểm tra nếu user chưa có thông tin phone hoặc address
+    if (!$user->phone || !$user->address) {
+        return response()->json(['message' => 'Vui lòng cập nhật số điện thoại và địa chỉ trước khi mua hàng!'], 400);
+    }
 
-        // Kiểm tra nếu user chưa có thông tin phone hoặc address
-        if (!$user->phone || !$user->address) {
-            return response()->json(['message' => 'Vui lòng cập nhật số điện thoại và địa chỉ trước khi mua hàng!'], 400);
-        }
+    // Tìm sản phẩm theo tên
+    $product = Product::firstWhere('product_name', $product_name);
+    if (!$product) {
+        return response()->json(['message' => 'Sản phẩm không tồn tại!'], 404);
+    }
 
-        // Tìm sản phẩm theo tên
-        $product = Product::firstWhere('product_name', $product_name);
-        if (!$product) {
-            return response()->json(['message' => 'Sản phẩm không tồn tại!'], 404);
-        }
-
-        // Kiểm tra biến thể sản phẩm (size)
-        $productVariant = ProductVariant::where([
-            ['product_id', $product->id],
-            ['product_size_id', $request->product_size_id]
-        ])->first();
+    return DB::transaction(function () use ($request, $product, $user) {
+        // Khóa sản phẩm tránh trường hợp đặt hàng cùng lúc
+        $productVariant = ProductVariant::where('product_id', $product->id)
+            ->where('product_size_id', $request->product_size_id)
+            ->lockForUpdate()
+            ->first();
 
         if (!$productVariant) {
             return response()->json(['message' => 'Không tìm thấy biến thể sản phẩm!'], 404);
@@ -114,7 +114,7 @@ class OrderController extends Controller
             'price' => $price,
         ]);
 
-        //  TRỪ KHO
+        // Trừ kho
         $productVariant->decrement('quantity', $request->quantity);
 
         return response()->json([
@@ -142,5 +142,7 @@ class OrderController extends Controller
                 ]
             ],
         ], 201);
-    }
+    });
+}
+
 }

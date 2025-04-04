@@ -87,8 +87,8 @@ Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts'
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('carts/add', [CartController::class, 'addToCart']);
-    Route::get('carts/list', [CartController::class, 'listCart']);
-    Route::put('carts/update', [CartController::class, 'updateCart']);
+    Route::get('carts/list', [CartController::class, 'getCart']);
+    Route::put('carts/update', action: [CartController::class, 'updateCart']);
     Route::delete('carts/remove/{cart_item_id}', [CartController::class, 'removeFromCart']);
     Route::get('/orders/{id}', [OrderController::class, 'orderDetails']);
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
