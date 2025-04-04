@@ -34,7 +34,6 @@ Route::prefix('admin')
             })->name('index');
         });
 
-                Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::middleware(['auth', 'permission:manage_banners'])->group(function () {
             Route::resource('banners', BannerController::class);
         });
