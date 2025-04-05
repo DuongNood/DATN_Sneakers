@@ -77,11 +77,12 @@
             if (filterType === 'month') {
                 startDateInput.value = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
             } else if (filterType === 'quarter') {
-                let quarterStart = Math.floor(today.getMonth() / 3) * 3;
-                startDateInput.value = new Date(today.getFullYear(), quarterStart, 1).toISOString().split('T')[0];
+                let quarterStartMonth = Math.floor(today.getMonth() / 3) * 3;
+                startDateInput.value = new Date(today.getFullYear(), quarterStartMonth, 1).toISOString().split('T')[0];
             } else if (filterType === 'year') {
                 startDateInput.value = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
             }
+
             endDateInput.value = today.toISOString().split('T')[0];
         }
 
