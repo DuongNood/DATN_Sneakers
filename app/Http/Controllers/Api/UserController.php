@@ -1,78 +1,93 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    // Các method khác giữ nguyên...
-
-    /**
-     * Update the authenticated user's profile
-     */
     public function update(Request $request)
     {
         $user = $request->user();
-        
         if (!$user) {
-            return response()->json([
-                'message' => 'Unauthenticated'
-            ], 401);
+            return response()->json(['message' => 'Unauthenticated'], 401);
         }
+
+        // Log toàn bộ dữ liệu nhận được
+        Log::info('Request data received:', [
+            'all' => $request->all(),
+            'files' => $request->files->all(),
+            'headers' => $request->headers->all(),
+            'content_type' => $request->header('Content-Type'),
+        ]);
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'phone' => 'required|string|regex:/^[0-9]{10}$/',
-            'image_user' => 'nullable|image|mimes:jpg,jpeg,png|max:2048' 
+            'image_user' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($validator->fails()) {
+            Log::error('Validation failed', [
+                'errors' => $validator->errors()->all(),
+                'request_data' => $request->all(),
+            ]);
             return response()->json([
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
-            $data = [
-                'name' => $request->input('name'),
-                'address' => $request->input('address'),
-                'phone' => $request->input('phone'),
-            ];
+            $data = $request->only('name', 'address', 'phone');
 
-            // Xử lý image_user với Cloudinary
             if ($request->hasFile('image_user')) {
-                // Upload ảnh lên Cloudinary
-                $uploadedFile = $request->file('image_user');
-                $cloudinaryUpload = Cloudinary::upload($uploadedFile->getRealPath(), [
-                    'folder' => 'image_users'
+                $file = $request->file('image_user');
+                Log::info('Image file detected:', [
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime' => $file->getMimeType(),
+                    'path' => $file->getRealPath(),
                 ]);
 
-                // Lấy URL của ảnh đã upload
+                $cloudinaryUpload = Cloudinary::upload($file->getRealPath(), [
+                    'folder' => 'image_users',
+                    'public_id' => 'user_' . $user->id . '_' . time(),
+                    'overwrite' => true,
+                ]);
                 $data['image_user'] = $cloudinaryUpload->getSecurePath();
+                Log::info('Image uploaded to Cloudinary:', ['url' => $data['image_user']]);
+            } else {
+                Log::info('No image file detected in request');
             }
 
-            // Update user
             $user->update($data);
 
             return response()->json([
                 'message' => 'Profile updated successfully',
-                'data' => $user
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'address' => $user->address,
+                    'image_user' => $user->image_user,
+                    'role_id' => $user->role_id,
+                ],
             ], 200);
-
         } catch (\Exception $e) {
+            Log::error('Error updating profile', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'message' => 'Error updating profile',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
-
-    // Các method khác giữ nguyên...
 }

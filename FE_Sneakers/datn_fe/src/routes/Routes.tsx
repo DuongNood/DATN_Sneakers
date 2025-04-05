@@ -27,8 +27,12 @@ import AboutUs from '../components/Footer_Components/About'
 import PurchaseNotification from '../components/PurchaseNotification'
 import Checkout from '../pages/Checkout'
 import WarrantyPolicy from '../components/Footer_Components/PrivacyPolicy'
-// import NewsList from '../pages/New'
 import NewsDetail from '../pages/DetailsNew'
+import NewsList from '../pages/New'
+import ProductCate from '../components/product_categories/ShoeCategories'
+import Payment from '../pages/Payment'
+import MomoCallback from '../pages/MomoCallback'
+import OrderSuccess from '../components/SuccesOrder'
 
 const RoutesConfig = () => {
   return (
@@ -59,12 +63,16 @@ const RoutesConfig = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/:slug' element={<ProductDetail />} />
         <Route path='/checkout' element={<Checkout />} />
-        {/* <Route path='/news' element={<NewsList />} /> */}
+        <Route path='/news' element={<NewsList />} />
+        <Route path='/category/:id' element={<ProductCate />} />
         <Route path='/news/:id' element={<NewsDetail />} />
         <Route path='/cart' element={<Cart />} />
+        <Route path='/payment' element={<Payment />} />
         <Route path='*' element={<NotFound />} />
         <Route path='/' element={<SearchContainer />} />
+        <Route path='/momo-callback' element={<MomoCallback />} />
         <Route path='/search' element={<SearchResults />} />
+        <Route path='/order-success' element={<OrderSuccess />} />
         {/* rau dưa footer */}
         <Route path='/about' element={<AboutUs />} />
         <Route path='/privacy-policy' element={<WarrantyPolicy />} />

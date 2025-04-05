@@ -18,50 +18,54 @@ const ProfilePage = () => {
   const { t } = useTranslation()
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [editField, setEditField] = useState({ name: false, address: false, phone: false })
-  const [formData, setFormData] = useState({ name: '', address: '', phone: '' })
+  const [formData, setFormData] = useState({ name: '', address: '', phone: '', image_user: null })
   const [errors, setErrors] = useState({ name: '', address: '', phone: '' })
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        if (!token) {
-          throw new Error('No token found in localStorage')
-        }
+  const defaultImage = 'https://m.yodycdn.com/blog/anh-dai-dien-hai-yodyvn77.jpg'
 
-        const response = await fetch('http://127.0.0.1:8000/api/user', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
+  const fetchUserData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
 
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error('Fetch error response:', {
-            status: response.status,
-            statusText: response.statusText,
-            body: errorText
-          })
-          throw new Error(t('fetch_error'))
-        }
-
-        const data = await response.json()
-        console.log('Fetched user data:', data)
-        setUserData(data)
-        setFormData({
-          name: data.name || '',
-          address: data.address || '',
-          phone: data.phone || ''
-        })
-        setLoading(false)
-      } catch (error) {
-        console.error('Error fetching user data:', error.message)
-        setLoading(false)
+      const token = localStorage.getItem('token')
+      if (!token) {
+        throw new Error(t('no_token'))
       }
-    }
 
+      const response = await fetch('http://127.0.0.1:8000/api/user', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || `${t('fetch_error')}: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('Fetched user data:', data)
+      setUserData(data)
+      setFormData({
+        name: data.name || '',
+        address: data.address || '',
+        phone: data.phone || '',
+        image_user: null
+      })
+    } catch (error) {
+      setError(error.message)
+      toast.error(error.message || t('fetch_error'), { autoClose: 2000 })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchUserData()
   }, [t])
 
@@ -71,60 +75,68 @@ const ProfilePage = () => {
   }
 
   const handleInputChange = (e, field) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }))
+    const value = field === 'image_user' ? e.target.files[0] : e.target.value
+    console.log(`Input changed - ${field}:`, value instanceof File ? `${value.name} (${value.size} bytes)` : value)
+    if (field === 'image_user') {
+      toast.warn('Vui lòng nạp VIP để thay đổi ảnh.', { autoClose: 3000 })
+      return
+    }
+    setFormData((prev) => {
+      const newFormData = { ...prev, [field]: value }
+      console.log('Updated formData:', newFormData)
+      return newFormData
+    })
   }
 
   const handleSaveChanges = async () => {
     try {
-      await schema.validate(formData, { abortEarly: false })
+      await schema.validate(
+        { name: formData.name, address: formData.address, phone: formData.phone },
+        { abortEarly: false }
+      )
 
       const token = localStorage.getItem('token')
-      if (!token) {
-        throw new Error('No token found in localStorage')
-      }
-      if (!userData?.id) {
-        throw new Error('User ID not found in userData')
-      }
+      if (!token) throw new Error(t('no_token'))
 
-      console.log('Sending update request:', {
-        url: `http://127.0.0.1:8000/api/user`,
-        data: formData,
-        token: token
-      })
+      const jsonData = {
+        name: formData.name,
+        address: formData.address,
+        phone: formData.phone
+      }
+      console.log('JSON data to send:', jsonData)
 
-      const response = await fetch(`http://127.0.0.1:8000/api/user`, {
+      const response = await fetch('http://127.0.0.1:8000/api/user', {
         method: 'PUT',
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Accept: 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(jsonData)
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Update error response:', {
-          status: response.status,
-          statusText: response.statusText,
-          body: errorText
-        })
-        throw new Error(`Server error: ${response.status} - ${errorText.substring(0, 100)}...`)
+        const errorData = await response.json()
+        console.log('Error response:', errorData)
+        if (errorData.errors) {
+          const backendErrors = Object.values(errorData.errors).flat().join(', ')
+          throw new Error(backendErrors)
+        }
+        throw new Error(errorData.message || `${t('update_error')}: ${response.status}`)
       }
 
       const updatedData = await response.json()
-      console.log('Updated user data:', updatedData)
-      setUserData(updatedData)
+      setUserData(updatedData.data)
+      setFormData((prev) => ({ ...prev, image_user: null }))
       setEditField({ name: false, address: false, phone: false })
       toast.success(t('update_success'), { autoClose: 1000 })
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         const newErrors = { name: '', address: '', phone: '' }
-        error.inner.forEach((err) => {
-          newErrors[err.path] = t(err.message)
-        })
+        error.inner.forEach((err) => (newErrors[err.path] = t(err.message)))
         setErrors(newErrors)
+        toast.error(t('validation_error'), { autoClose: 2000 })
       } else {
-        console.error('Error updating profile:', error.message)
         toast.error(error.message || t('update_error'), { autoClose: 2000 })
       }
     }
@@ -140,48 +152,36 @@ const ProfilePage = () => {
         </div>
       </div>
       <div className='w-full md:w-3/4 bg-white shadow-md rounded-lg p-6'>
-        <div className='h-6 w-1/4 bg-gray-300 rounded mb-6'></div>
         <div className='space-y-6'>
           <div className='flex flex-col items-center'>
             <div className='w-32 h-32 bg-gray-300 rounded-full mb-4'></div>
-            <div className='h-10 w-40 bg-gray-300 rounded'></div>
+            {/* <div className='h-10 w-40 bg-gray-300 rounded'></div> */}
           </div>
-          <div>
-            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
-            <div className='relative'>
+          {['name', 'email', 'address', 'phone'].map((field) => (
+            <div key={field} className='space-y-2'>
+              <div className='h-4 w-20 bg-gray-300 rounded'></div>
               <div className='w-full h-12 bg-gray-300 rounded-md'></div>
             </div>
-          </div>
-          <div>
-            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
-            <div className='relative'>
-              <div className='w-full h-12 bg-gray-300 rounded-md'></div>
-            </div>
-          </div>
-          <div>
-            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
-            <div className='relative'>
-              <div className='w-full h-12 bg-gray-300 rounded-md'></div>
-            </div>
-          </div>
-          <div>
-            <div className='h-4 w-20 bg-gray-300 rounded mb-1'></div>
-            <div className='relative'>
-              <div className='w-full h-12 bg-gray-300 rounded-md'></div>
-            </div>
-          </div>
+          ))}
           <div className='w-full h-12 bg-gray-300 rounded-lg'></div>
         </div>
       </div>
     </div>
   )
 
-  if (loading) {
-    return <SkeletonLoading />
+  if (loading) return <SkeletonLoading />
+  if (error) {
+    return (
+      <div className='max-w-5xl mx-auto p-6 mt-6 text-center'>
+        <p className='text-red-500 text-lg'>{error}</p>
+        <button onClick={fetchUserData} className='mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700'>
+          {t('retry')}
+        </button>
+      </div>
+    )
   }
-
   if (!userData) {
-    return <p className='text-center text-lg'>{t('no_user_data')}</p>
+    return <div className='max-w-5xl mx-auto p-6 mt-6 text-center'>{t('no_user_data')}</div>
   }
 
   return (
@@ -202,22 +202,20 @@ const ProfilePage = () => {
 
       <div className='w-full md:w-3/4 bg-white shadow-md rounded-lg p-6'>
         <h2 className='text-xl font-semibold mb-6'>{t('my_account')}</h2>
-
         <div className='space-y-6'>
           <div className='flex flex-col items-center'>
             <img
-              src={
-                userData.avatar ||
-                'https://gentlenobra.net/wp-content/uploads/2024/02/hinh-anh-gai-xinh-nude-3.jpg.webp'
-              }
+              src={defaultImage} // Hiển thị ảnh mặc định
               alt='Avatar'
               className='w-32 h-32 rounded-full object-cover mb-4 border-2 border-gray-300'
             />
-            <input
+            {/* <input
               type='file'
+              name='image_user'
               accept='.jpg,.jpeg,.png'
+              onChange={(e) => handleInputChange(e, 'image_user')}
               className='text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
-            />
+            /> */}
           </div>
 
           <div className='relative'>
@@ -226,7 +224,6 @@ const ProfilePage = () => {
               <input
                 type='text'
                 className='w-full p-3 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder={t('name_placeholder')}
                 value={formData.name}
                 onChange={(e) => handleInputChange(e, 'name')}
                 readOnly={!editField.name}
@@ -245,8 +242,7 @@ const ProfilePage = () => {
             <label className='block text-sm font-medium text-gray-700 mb-1'>{t('email')}</label>
             <input
               type='email'
-              className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder={t('email_placeholder')}
+              className='w-full p-3 border border-gray-300 rounded-md bg-gray-100 focus:outline-none'
               value={userData.email || ''}
               readOnly
             />
@@ -258,7 +254,6 @@ const ProfilePage = () => {
               <input
                 type='text'
                 className='w-full p-3 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder={t('address_placeholder')}
                 value={formData.address}
                 onChange={(e) => handleInputChange(e, 'address')}
                 readOnly={!editField.address}
@@ -279,7 +274,6 @@ const ProfilePage = () => {
               <input
                 type='text'
                 className='w-full p-3 pr-20 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder={t('phone_placeholder')}
                 value={formData.phone}
                 onChange={(e) => handleInputChange(e, 'phone')}
                 readOnly={!editField.phone}
