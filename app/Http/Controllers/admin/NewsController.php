@@ -2,31 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
-
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class NewsController extends Controller
 {
     const PATH_VIEW = "admin.news.";
 
-    public function index(Request $request)
+    public function index()
     {
-        $query = News::query();
-
-        // 🔍 Xử lý tìm kiếm
-        if ($request->has('search') && !empty($request->search)) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'LIKE', '%' . $request->search . '%');
-            });
-        }
-        $data = News::query()->latest('id')->paginate(10);
-
-        // Lấy danh sách new và phân trang
-        $data = $query->latest('id')->paginate(10);
+        $data = News::latest('id')->paginate(10);
         return view(self::PATH_VIEW . __FUNCTION__, compact('data'));
     }
 
@@ -38,26 +25,24 @@ class NewsController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-        'title' => 'required|string|max:255',
-        'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-        'content' => 'required|string'
-    ]);
+            'title' => 'required',
+            'image' => 'required|mimes:jpg,jpeg,png,webp|max:2048',
+            'content' => 'required'
+        ]);
 
-    try {
-        if ($request->hasFile('image')) {
-            // ✅ Upload ảnh lên Cloudinary
-            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            $data['image'] = $uploadedFileUrl;
+        try {
+            if ($request->hasFile('image')) {
+                $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath());
+                $data['image'] = $uploadedFile->getSecurePath(); // Lấy URL của ảnh trên Cloudinary
+            }
+
+            News::create($data);
+
+            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Tin tức đã được tạo thành công!');
+
+        } catch (\Throwable $th) {
+            return back()->with('error', $th->getMessage());
         }
-
-        // ✅ Tạo bản ghi trong bảng `news`
-        News::create($data);
-
-        return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Create news successfully');
-    } catch (\Throwable $th) {
-        dd($th);
-        return back()->with('error', $th->getMessage());
-    }
     }
 
     public function show(News $news)
@@ -70,38 +55,36 @@ class NewsController extends Controller
         return view(self::PATH_VIEW . __FUNCTION__, compact('news'));
     }
 
-    public function update(Request $request, News $news) {
+    public function update(Request $request, News $news)
+    {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required',
             'image' => 'nullable|mimes:jpg,jpeg,png,webp|max:2048',
-            'content' => 'required|string'
+            'content' => 'required'
         ]);
 
         try {
-            $currentImage = $news->image;
-
-            // ✅ Nếu có file mới được upload
             if ($request->hasFile('image')) {
-
-                // ⭐ Xóa ảnh cũ trên Cloudinary nếu tồn tại
-                if ($currentImage) {
-                    Cloudinary::destroy($currentImage);
+                // Xóa ảnh cũ trên Cloudinary nếu có
+                if ($news->image) {
+                    Cloudinary::destroy($news->image);
                 }
 
-                // ⭐ Upload ảnh mới lên Cloudinary
-                $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-                $data['image'] = $uploadedFileUrl;
+                // Upload ảnh mới lên Cloudinary
+                $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath());
+                $data['image'] = $uploadedFile->getSecurePath(); // Lấy URL ảnh mới
+            } else {
+                $data['image'] = $news->image;
             }
 
-            // ✅ Cập nhật thông tin bản ghi
             $news->update($data);
 
-            return back()->with('success', 'Update news successfully!');
+            return redirect()->route(self::PATH_VIEW . 'index')->with('success', 'Tin tức đã được cập nhật thành công!');
+
         } catch (\Throwable $th) {
             return back()->with('error', $th->getMessage());
         }
     }
-
 
     public function destroy(News $news)
     {

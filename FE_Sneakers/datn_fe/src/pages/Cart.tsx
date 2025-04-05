@@ -1,192 +1,439 @@
-import { useState, useEffect } from 'react'
-import { FaTrash, FaMinus, FaPlus } from 'react-icons/fa'
-import { Link, useNavigate } from 'react-router-dom'
-import toast, { Toaster } from 'react-hot-toast'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
+import { useCart } from '../contexts/CartContext'
 
-const CartPage = () => {
-  const { t } = useTranslation() 
-  const [cart, setCart] = useState([
-    {
-      id: 1,
-      name: 'Phạm Ngọc Thi',
-      price: 2000000,
-      discount: 1500000,
-      quantity: 1,
-      image:
-        'https://scontent.fhan14-3.fna.fbcdn.net/v/t39.30808-6/482032633_1688198495386207_8034474104949924030_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEHSZ4c3uZtwA9bKev0gDCIirsaIka0kIOKuxoiRrSQg4DbWJWLFBP1N1SN2vI9l9Z8R55CPzXlrM7mc5Os0FmG&_nc_ohc=6ery4nlHW2wQ7kNvgFQVYlC&_nc_oc=AdlYvlzOLhkDb9DlKNMLKO9a9hvWwoc_guYf38YjquwhY0ZZpBs2yjsS8_RJtcleamI&_nc_zt=23&_nc_ht=scontent.fhan14-3.fna&_nc_gid=uLJp0ANoqJVqdBdvlUTmcw&oh=00_AYGOzfRzSqZ1lZMJ_mCSSGL6Ky2RDXT5zJSVDFMsyKu1NA&oe=67E04F8E',
-      selected: false
-    },
-    {
-      id: 2,
-      name: 'Thi Ngọc Phạm',
-      price: 2200000,
-      discount: 1800000,
-      quantity: 1,
-      image:
-        'https://scontent.fhan14-3.fna.fbcdn.net/v/t39.30808-6/482345942_1688198892052834_3992485807903702783_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeHuvQ7S2p718O3FiLG2I0sMOsOqkQSgEso6w6qRBKASyujUSKdl_uW605T2iGzApe-SKaPgPRpljs71pNEXDH59&_nc_ohc=SQWUACzhBv4Q7kNvgEbfqeF&_nc_oc=AdlzfSgBdNvgunmQNR_MIKmuWEQyFLdN5aBVdQhBnK7yeVxZ3dgn01PL1OroWz_YJMo&_nc_zt=23&_nc_ht=scontent.fhan14-3.fna&_nc_gid=fgzRdhcAY_TcjrfWnYSAsw&oh=00_AYGQtilvaXpvQPt1Yccp3g3e-Lik00vE09JMYUCryxhT1w&oe=67E046F1',
-      selected: false
-    }
-  ])
-  const [discountCode, setDiscountCode] = useState('')
-  const [discountAmount, setDiscountAmount] = useState(0)
-  const [discountValid, setDiscountValid] = useState(true)
+interface CartItem {
+  id: number
+  product_id: number
+  product_name: string
+  image: string
+  quantity: number
+  product_size_id: number | null
+  size_name: string
+  original_price: string
+  discounted_price: string
+  total_price: string
+}
 
+interface Product {
+  id: number
+  slug?: string
+  name: string
+  original_price: string
+  discounted_price: string
+  product_code: string
+  imageUrl: string | null
+  rating: number
+  description: string
+  quantity: number
+  variant: string
+  size?: string
+  images?: string[]
+  sizes?: { size: string; quantity: number; product_size_id: number }[]
+  category?: { id: number; category_name: string }
+}
+
+const CartPage: React.FC = () => {
   const navigate = useNavigate()
-
-  const isLoggedIn = !!localStorage.getItem('user')
-
-  const increaseQuantity = (id: number) => {
-    setCart(cart.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item)))
-  }
-
-  const decreaseQuantity = (id: number) => {
-    setCart(cart.map((item) => (item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item)))
-  }
-
-  const toggleSelect = (id: number) => {
-    setCart(cart.map((item) => (item.id === id ? { ...item, selected: !item.selected } : item)))
-  }
-
-  const removeItem = (id: number) => {
-    setCart(cart.filter((item) => item.id !== id))
-    toast.success(t('item_removed'), { position: 'top-right' })
-  }
-
-  const totalOriginalPrice = cart.reduce((acc, item) => (item.selected ? acc + item.price * item.quantity : acc), 0)
-  const totalDiscountPrice = cart.reduce((acc, item) => (item.selected ? acc + item.discount * item.quantity : acc), 0)
-  const totalSavings = totalOriginalPrice - totalDiscountPrice
+  const { t } = useTranslation()
+  const { cartCount, updateCartCount } = useCart()
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const [totalCartPrice, setTotalCartPrice] = useState<number>(0)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedItems, setSelectedItems] = useState<number[]>([])
+  const [selectAll, setSelectAll] = useState<boolean>(false)
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
+  const [itemToRemove, setItemToRemove] = useState<CartItem | null>(null)
+  const [removeAction, setRemoveAction] = useState<'update' | 'delete' | null>(null)
 
   useEffect(() => {
-    toast.dismiss()
-    if (discountCode === 'thicho') {
-      setDiscountAmount(0.2 * totalDiscountPrice)
-      setDiscountValid(true)
-      toast.success(t('discount_applied'), { position: 'top-right' })
-    } else if (discountCode) {
-      setDiscountAmount(0)
-      setDiscountValid(false)
-      toast.error(t('discount_invalid_message'), { position: 'top-right' })
-    } else {
-      setDiscountAmount(0)
-      setDiscountValid(true)
+    fetchCart()
+  }, [])
+
+  const fetchCart = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get('http://localhost:8000/api/carts/list', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+
+      console.log('API response:', response.data)
+
+      setCartItems(response.data.items)
+      setTotalCartPrice(response.data.total_cart_price)
+      const totalItems = response.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      updateCartCount(totalItems)
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        toast.error(t('please_login_to_view_cart'), { autoClose: 2000 })
+        navigate('/login')
+      } else {
+        setError(error.response?.data?.message || t('error_fetching_cart'))
+      }
+    } finally {
+      setLoading(false)
     }
-  }, [discountCode, totalDiscountPrice, t]) 
-
-  const handlePayment = () => {
-    const finalAmount = totalDiscountPrice - discountAmount
-    toast.success(t('payment_success', { amount: finalAmount.toLocaleString() }), { position: 'top-right' })
   }
 
-  if (!isLoggedIn) {
-    return (
-      <div className='max-w-5xl mx-auto p-4 bg-white shadow-md rounded-lg mt-6 text-center'>
-        <Toaster />
-        <p className='text-gray-500 mb-4 text-red-500'>{t('not_logged_in')}</p>
-        <Link
-          to='/login'
-          className='inline-block bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition'
-        >
-          {t('login_now')}
-        </Link>
-      </div>
-    )
+  const handleUpdateQuantity = async (item: CartItem, action: 'increase' | 'decrease') => {
+    try {
+      if (action === 'decrease' && item.quantity === 1) {
+        toast.info(t('confirm_remove_item'), {
+          position: 'top-center',
+          autoClose: 2000
+        })
+
+        setItemToRemove(item)
+        setRemoveAction('update')
+        setShowConfirmModal(true)
+        return
+      }
+
+      const response = await axios.put(
+        'http://localhost:8000/api/carts/update',
+        {
+          product_id: item.product_id,
+          product_size_id: item.product_size_id,
+          action
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+
+      if (action === 'decrease' && response.data.quantity === undefined) {
+        setCartItems(cartItems.filter((cartItem) => cartItem.id !== item.id))
+        setSelectedItems(selectedItems.filter((id) => id !== item.id))
+      } else {
+        setCartItems(
+          cartItems.map((cartItem) =>
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: response.data.quantity, total_price: response.data.total_price }
+              : cartItem
+          )
+        )
+      }
+
+      const updatedCart = await axios.get('http://localhost:8000/api/carts/list', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+
+      setCartItems(updatedCart.data.items)
+      setTotalCartPrice(updatedCart.data.total_cart_price)
+      const totalItems = updatedCart.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      updateCartCount(totalItems)
+
+      toast.success(response.data.message, { autoClose: 1000 })
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t('error_updating_cart'), { autoClose: 2000 })
+    }
   }
 
-  return (
-    <div className='max-w-5xl mx-auto p-4 bg-white shadow-md rounded-lg mt-6'>
-      <Toaster />
-      <h2 className='text-2xl font-semibold mb-4 text-center'>{t('your_cart')}</h2>
+  const handleRemoveItem = async (cartItemId: number) => {
+    try {
+      const item = cartItems.find((item) => item.id === cartItemId)
+      if (!item) return
 
-      {cart.length === 0 ? (
-        <p className='text-gray-500 text-center'>{t('cart_empty')}</p>
-      ) : (
-        <div className='space-y-4'>
-          {cart.map((item) => (
-            <div
-              key={item.id}
-              className='flex flex-col md:flex-row items-center justify-between bg-gray-100 p-3 rounded-lg'
-            >
-              <div className='flex items-center w-full md:w-auto'>
-                <input
-                  type='checkbox'
-                  checked={item.selected}
-                  onChange={() => toggleSelect(item.id)}
-                  className='mr-3 transform scale-150 transition-all duration-200 ease-in-out hover:scale-160'
-                />
-                <img src={item.image} alt={item.name} className='w-20 h-20 object-cover rounded-lg' />
-                <div className='ml-3'>
-                  <h3 className='text-sm md:text-lg font-medium'>{item.name}</h3>
-                  <div className='flex items-center space-x-2 text-xs md:text-sm'>
-                    <span className='text-gray-500 line-through'>{item.price.toLocaleString()}đ</span>
-                    <span className='text-red-500 font-semibold'>{item.discount.toLocaleString()}đ</span>
-                  </div>
-                </div>
+      toast.info(t('confirm_remove_item'), {
+        position: 'top-center',
+        autoClose: 2000
+      })
+
+      setItemToRemove(item)
+      setRemoveAction('delete')
+      setShowConfirmModal(true)
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t('error_removing_item'), { autoClose: 2000 })
+    }
+  }
+
+  const confirmRemove = async () => {
+    if (!itemToRemove || !removeAction) return
+
+    try {
+      if (removeAction === 'update') {
+        const response = await axios.put(
+          'http://localhost:8000/api/carts/update',
+          {
+            product_id: itemToRemove.product_id,
+            product_size_id: itemToRemove.product_size_id,
+            action: 'decrease'
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        )
+
+        if (response.data.quantity === undefined) {
+          setCartItems(cartItems.filter((cartItem) => cartItem.id !== itemToRemove.id))
+          setSelectedItems(selectedItems.filter((id) => id !== itemToRemove.id))
+        }
+      } else if (removeAction === 'delete') {
+        const response = await axios.delete(`http://localhost:8000/api/carts/remove/${itemToRemove.id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+
+        setCartItems(cartItems.filter((item) => item.id !== itemToRemove.id))
+        setSelectedItems(selectedItems.filter((id) => id !== itemToRemove.id))
+
+        toast.success(response.data.message, { autoClose: 1000 })
+      }
+
+      const updatedCart = await axios.get('http://localhost:8000/api/carts/list', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+
+      setCartItems(updatedCart.data.items)
+      setTotalCartPrice(updatedCart.data.total_cart_price)
+      const totalItems = updatedCart.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      updateCartCount(totalItems)
+
+      toast.success(t('item_removed'), { autoClose: 1000 })
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t('error_removing_item'), { autoClose: 2000 })
+    } finally {
+      setShowConfirmModal(false)
+      setItemToRemove(null)
+      setRemoveAction(null)
+    }
+  }
+
+  const cancelRemove = () => {
+    setShowConfirmModal(false)
+    setItemToRemove(null)
+    setRemoveAction(null)
+  }
+
+  const handleSelectItem = (itemId: number) => {
+    if (selectedItems.includes(itemId)) {
+      setSelectedItems(selectedItems.filter((id) => id !== itemId))
+      setSelectAll(false)
+    } else {
+      setSelectedItems([...selectedItems, itemId])
+      if (selectedItems.length + 1 === cartItems.length) {
+        setSelectAll(true)
+      }
+    }
+  }
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedItems([])
+      setSelectAll(false)
+    } else {
+      setSelectedItems(cartItems.map((item) => item.id))
+      setSelectAll(true)
+    }
+  }
+
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) {
+      toast.error(t('please_select_at_least_one_item'), { autoClose: 2000 })
+      return
+    }
+
+    const selectedCartItems = cartItems.filter((item) => selectedItems.includes(item.id))
+
+    // Chuyển đổi CartItem sang Product
+    const products: Product[] = selectedCartItems.map((item) => ({
+      id: item.product_id,
+      name: item.product_name,
+      original_price: item.original_price,
+      discounted_price: item.discounted_price,
+      product_code: `PROD-${item.product_id}`, // Giả lập product_code
+      imageUrl: item.image,
+      rating: 0, // Giả lập rating
+      description: '', // Giả lập description
+      quantity: item.quantity, // Sử dụng quantity của từng sản phẩm
+      variant: item.size_name,
+      size: item.size_name,
+      images: [item.image], // Giả lập images
+      sizes: item.product_size_id
+        ? [{ size: item.size_name, quantity: item.quantity, product_size_id: item.product_size_id }]
+        : undefined,
+      category: undefined // Giả lập category
+    }))
+
+    navigate('/checkout', { state: { products } })
+  }
+
+  const calculateSelectedTotal = () => {
+    return cartItems
+      .filter((item) => selectedItems.includes(item.id))
+      .reduce((sum, item) => sum + Number(item.total_price), 0)
+  }
+
+  const SkeletonLoading = () => (
+    <div className='container mx-auto px-4 py-8 animate-pulse'>
+      <div className='bg-white shadow-lg rounded-lg p-6'>
+        <div className='h-8 bg-gray-300 rounded w-1/4 mb-6'></div>
+        {Array(3)
+          .fill(0)
+          .map((_, index) => (
+            <div key={index} className='flex items-center border-b py-4'>
+              <div className='w-24 h-24 bg-gray-300 rounded-md mr-4'></div>
+              <div className='flex-1'>
+                <div className='h-6 bg-gray-300 rounded w-3/4 mb-2'></div>
+                <div className='h-4 bg-gray-300 rounded w-1/4 mb-2'></div>
+                <div className='h-4 bg-gray-300 rounded w-1/3'></div>
               </div>
-
-              <div className='flex w-full justify-between md:w-auto md:space-x-4 mt-3 md:mt-0'>
-                <div className='flex items-center space-x-2'>
-                  <button onClick={() => decreaseQuantity(item.id)} className='p-1 bg-gray-300 rounded-md'>
-                    <FaMinus className='text-gray-600 text-xs md:text-sm' />
-                  </button>
-                  <span className='px-3 py-1 bg-gray-200 rounded-md text-xs md:text-sm'>{item.quantity}</span>
-                  <button onClick={() => increaseQuantity(item.id)} className='p-1 bg-gray-300 rounded-md'>
-                    <FaPlus className='text-gray-600 text-xs md:text-sm' />
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className='p-2 text-red-500 hover:text-red-600 text-sm md:text-lg'
-                >
-                  <FaTrash />
-                </button>
-              </div>
+              <div className='w-32 h-10 bg-gray-300 rounded-md'></div>
             </div>
           ))}
+        <div className='mt-6 flex justify-between'>
+          <div className='h-6 bg-gray-300 rounded w-1/4'></div>
+          <div className='h-10 bg-gray-300 rounded-md w-32'></div>
+        </div>
+      </div>
+    </div>
+  )
 
-          <div className='mt-6 p-5 bg-gray-200 rounded-lg text-sm md:text-lg'>
-            <div className='flex justify-between font-medium'>
-              <span>{t('total_price')}:</span>
-              <span className='text-gray-700'>{totalOriginalPrice.toLocaleString()}đ</span>
-            </div>
-            <div className='flex justify-between font-medium text-green-600'>
-              <span>{t('savings')}:</span>
-              <span>-{totalSavings.toLocaleString()}đ</span>
-            </div>
-            <div className='flex justify-between text-base md:text-xl font-semibold mt-2'>
-              <span>{t('subtotal')}:</span>
-              <span className='text-red-500'>{totalDiscountPrice.toLocaleString()}đ</span>
-            </div>
+  if (loading) return <SkeletonLoading />
+  if (error) return <p className='text-lg text-center text-red-600'>{error}</p>
 
-           
-            <div className='mt-4'>
-              <input
-                type='text'
-                placeholder={t('discount_code_placeholder')}
-                value={discountCode}
-                onChange={(e) => setDiscountCode(e.target.value)}
-                className={`w-full p-3 border ${discountValid ? 'border-gray-300' : 'border-red-500'} rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
-              />
-              {!discountValid && <p className='text-red-500 text-sm mt-2'>{t('discount_invalid')}</p>}
-            </div>
+  return (
+    <div className='container mx-auto px-4 py-8'>
+      <div className='bg-white shadow-md rounded-lg'>
+        {cartItems.length === 0 ? (
+          <div className='text-center py-12'>
+            <p className='text-lg text-gray-600 mb-4'>{t('cart_is_empty')}</p>
+            <button
+              onClick={() => navigate('/')}
+              className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition'
+            >
+              {t('continue_shopping')}
+            </button>
+          </div>
+        ) : (
+          <div className='flex flex-col p-5'>
+            {/* Danh sách sản phẩm */}
+            <div className='mb-6'>
+              <div className='flex items-center mb-4'>
+                <input type='checkbox' checked={selectAll} onChange={handleSelectAll} className='w-4 h-4 mr-2' />
+                <span className='text-sm font-medium text-gray-700'>
+                  {t('select_all')} ({cartItems.length})
+                </span>
+              </div>
 
-          
-            <div className='flex justify-between text-lg font-semibold mt-2'>
-              <span>{t('discount')}:</span>
-              <span className='text-green-600'>- {discountAmount.toLocaleString()}đ</span>
-            </div>
-            <div className='flex justify-between text-xl font-semibold mt-2'>
-              <span>{t('final_total')}:</span>
-              <span className='text-red-500'>{(totalDiscountPrice - discountAmount).toLocaleString()}đ</span>
+              <div className='hidden md:grid grid-cols-5 gap-4 text-sm font-medium text-gray-500 border-b pb-2 mb-4'>
+                <div>{t('product')}</div>
+                <div className='text-center'>{t('unit_price')}</div>
+                <div className='text-center'>{t('quantity')}</div>
+                <div className='text-center'>{t('total_price')}</div>
+                <div className='text-center'>{t('action')}</div>
+              </div>
+
+              {cartItems.map((item) => (
+                <div key={item.id} className='grid grid-cols-1 md:grid-cols-5 gap-4 items-center py-4 border-b'>
+                  <div className='flex items-center'>
+                    <input
+                      type='checkbox'
+                      checked={selectedItems.includes(item.id)}
+                      onChange={() => handleSelectItem(item.id)}
+                      className='w-4 h-4 mr-2'
+                    />
+                    <img src={item.image} alt={item.product_name} className='w-16 h-16 object-cover rounded-md mr-4' />
+                    <div>
+                      <h2 className='text-sm font-medium text-gray-800'>{item.product_name}</h2>
+                      <p className='text-xs text-gray-500'>
+                        {t('size')}: {item.size_name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className='text-sm text-center'>
+                    {item.original_price && Number(item.original_price) > Number(item.discounted_price) ? (
+                      <>
+                        <p className='line-through text-gray-500'>
+                          đ{Number(item.original_price).toLocaleString('vi-VN')}
+                        </p>
+                        <p className='text-black'>đ{Number(item.discounted_price).toLocaleString('vi-VN')}</p>
+                      </>
+                    ) : (
+                      <p className='text-black'>đ{Number(item.discounted_price).toLocaleString('vi-VN')}</p>
+                    )}
+                  </div>
+                  <div className='flex items-center justify-center'>
+                    <button
+                      onClick={() => handleUpdateQuantity(item, 'decrease')}
+                      className='w-8 h-8 border border-gray-300 rounded-l-md text-gray-700 hover:bg-gray-100 flex items-center justify-center'
+                    >
+                      -
+                    </button>
+                    <span className='w-10 h-8 border-t border-b border-gray-300 text-gray-800 flex items-center justify-center'>
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => handleUpdateQuantity(item, 'increase')}
+                      className='w-8 h-8 border border-gray-300 rounded-r-md text-gray-700 hover:bg-gray-100 flex items-center justify-center'
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className='text-sm font-medium text-black text-center'>
+                    đ{Number(item.total_price).toLocaleString('vi-VN')}
+                  </div>
+                  <div className='text-center'>
+                    <button
+                      onClick={() => handleRemoveItem(item.id)}
+                      className='text-red-600 hover:text-red-800 text-sm'
+                    >
+                      {t('remove')}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <button
-              onClick={handlePayment}
-              className='w-full mt-4 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition'
+              onClick={handleCheckout}
+              className={`w-full py-2 rounded-md text-white text-sm font-medium ${
+                selectedItems.length > 0 ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-300 cursor-not-allowed'
+              } transition`}
+              disabled={selectedItems.length === 0}
             >
-              {t('checkout')}
+              {t('buy_now')} ({selectedItems.length})
             </button>
+          </div>
+        )}
+      </div>
+
+      {showConfirmModal && itemToRemove && (
+        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50'>
+          <div className='bg-white rounded-lg p-6 shadow-lg max-w-sm w-full'>
+            <h3 className='text-lg font-medium text-gray-800 mb-2'>{t('confirm_remove_item')}</h3>
+            <p className='text-sm text-gray-600 mb-4'>
+              {t('remove_item_message')} <span className='font-medium'>{itemToRemove.product_name}</span>?
+            </p>
+            <div className='flex justify-end gap-2'>
+              <button
+                onClick={cancelRemove}
+                className='px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition'
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={confirmRemove}
+                className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition'
+              >
+                {t('yes_remove')}
+              </button>
+            </div>
           </div>
         </div>
       )}

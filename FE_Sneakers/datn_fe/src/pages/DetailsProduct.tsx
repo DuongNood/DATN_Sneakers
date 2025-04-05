@@ -1,9 +1,11 @@
+// src/components/ProductDetail.tsx
 import React, { useState, useEffect } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { FaBox, FaTruck, FaExchangeAlt } from 'react-icons/fa'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
+import { useCart } from '../contexts/CartContext'
 
 interface Product {
   id: number
@@ -17,7 +19,7 @@ interface Product {
   description: string
   quantity?: number
   images: string[]
-  sizes: { size: string; quantity: number }[]
+  sizes: { size: string; quantity: number; product_size_id: number }[]
   category: { id: number; category_name: string }
 }
 
@@ -26,11 +28,13 @@ const ProductDetail: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { id } = (location.state as { id?: number }) || {}
-  const { t } = useTranslation() // Hook để sử dụng i18n
+  const { t } = useTranslation()
+  const { updateCartCount } = useCart()
 
   const [product, setProduct] = useState<Product | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null)
   const [selectedSizeQuantity, setSelectedSizeQuantity] = useState<number>(0)
   const [quantity, setQuantity] = useState<number>(1)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -40,13 +44,11 @@ const ProductDetail: React.FC = () => {
   const [suggestedLoading, setSuggestedLoading] = useState(false)
   const [suggestedError, setSuggestedError] = useState<string | null>(null)
 
-  // Hàm tạo slug từ name
-  const generateSlug = (name: string) => {
-    return name
+  const generateSlug = (name: string) =>
+    name
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-') // Thay thế ký tự không phải chữ/số bằng dấu gạch ngang
-      .replace(/(^-|-$)/g, '') // Xóa dấu gạch ngang ở đầu và cuối
-  }
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -63,7 +65,6 @@ const ProductDetail: React.FC = () => {
           throw new Error(t('http_error', { status: response.status }))
         }
         const data = await response.json()
-        console.log('Dữ liệu sản phẩm:', data)
 
         const productData = data.data
         if (!productData) {
@@ -87,7 +88,8 @@ const ProductDetail: React.FC = () => {
           sizes:
             productData.product_variant.map((variant: any) => ({
               size: variant.product_size.name,
-              quantity: variant.quantity
+              quantity: variant.quantity,
+              product_size_id: variant.product_size.id
             })) || [],
           category: {
             id: productData.category.id,
@@ -99,7 +101,6 @@ const ProductDetail: React.FC = () => {
         setSelectedImage(newProduct.imageUrl || (newProduct.images.length > 0 ? newProduct.images[0] : null))
         fetchSuggestedProducts(productData.category.id)
       } catch (error: any) {
-        console.error('Lỗi khi fetch sản phẩm:', error)
         setError(error.message || t('error_fetching_product'))
       } finally {
         setIsLoading(false)
@@ -118,7 +119,6 @@ const ProductDetail: React.FC = () => {
         throw new Error(t('http_error', { status: response.status }))
       }
       const data = await response.json()
-      console.log('Dữ liệu sản phẩm gợi ý từ API:', data)
 
       if (!data.data || !Array.isArray(data.data)) {
         throw new Error(t('invalid_suggested_products_data'))
@@ -142,7 +142,8 @@ const ProductDetail: React.FC = () => {
           sizes:
             item.product_variant?.map((variant: any) => ({
               size: variant.product_size.name,
-              quantity: variant.quantity
+              quantity: variant.quantity,
+              product_size_id: variant.product_size.id
             })) || [],
           category: {
             id: item.category.id,
@@ -150,10 +151,8 @@ const ProductDetail: React.FC = () => {
           }
         }))
 
-      console.log('Sản phẩm gợi ý đã xử lý:', suggested)
       setSuggestedProducts(suggested)
     } catch (error: any) {
-      console.error('Lỗi khi fetch sản phẩm gợi ý:', error)
       setSuggestedError(error.message || t('error_fetching_suggested_products'))
     } finally {
       setSuggestedLoading(false)
@@ -172,25 +171,56 @@ const ProductDetail: React.FC = () => {
   }
 
   const handleAddToCart = async () => {
-    if (!product || !selectedSize) {
+    if (!product || !selectedSize || !selectedSizeId) {
       toast.error(t('select_size_before_adding_to_cart'), { autoClose: 1000 })
       return
     }
+
     try {
-      const response = await axios.post('http://localhost:8000/api/carts/add', {
-        product_id: product.id,
-        quantity,
-        size: selectedSize
+      const response = await axios.post(
+        'http://localhost:8000/api/carts/add',
+        {
+          product_id: product.id,
+          quantity,
+          product_size_id: selectedSizeId
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+
+      toast.success(
+        t('added_to_cart', {
+          quantity,
+          name: response.data.product_name,
+          size: response.data.size
+        }),
+        { autoClose: 2000 }
+      )
+
+      // Cập nhật cartCount từ API sau khi thêm sản phẩm
+      const cartResponse = await axios.get('http://localhost:8000/api/carts/list', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
       })
-      alert(t('added_to_cart', { quantity, name: product.name, size: selectedSize }))
-    } catch (error) {
-      alert(t('error_adding_to_cart'))
+      const totalItems = cartResponse.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+      updateCartCount(totalItems)
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        toast.error(t('please_login_to_add_to_cart'), { autoClose: 2000 })
+        navigate('/login')
+      } else {
+        toast.error(error.response?.data?.message || t('error_adding_to_cart'), { autoClose: 2000 })
+      }
     }
   }
 
   const handleBuyNow = () => {
     if (!product || !selectedSize) {
-      alert(t('select_size_before_buying'))
+      toast.error(t('select_size_before_buying'), { autoClose: 1000 })
       return
     }
     navigate('/checkout', {
@@ -202,8 +232,9 @@ const ProductDetail: React.FC = () => {
     setSelectedImage(image)
   }
 
-  const handleSizeClick = (size: string, sizeQuantity: number) => {
+  const handleSizeClick = (size: string, sizeQuantity: number, productSizeId: number) => {
     setSelectedSize(size)
+    setSelectedSizeId(productSizeId)
     setSelectedSizeQuantity(sizeQuantity)
     setQuantity(1)
   }
@@ -222,7 +253,6 @@ const ProductDetail: React.FC = () => {
   const SkeletonLoading = () => (
     <div className='container mx-auto px-2 sm:px-10 md:px-20 py-10 sm:py-20 animate-pulse'>
       <div className='flex flex-col md:flex-row gap-6'>
-        {/* Phần hình ảnh */}
         <div className='md:w-1/2 flex flex-col items-center'>
           <div className='w-full max-w-xs sm:max-w-sm md:max-w-md h-[400px] bg-gray-300 rounded-lg'></div>
           <div className='flex gap-2 mt-4'>
@@ -233,8 +263,6 @@ const ProductDetail: React.FC = () => {
               ))}
           </div>
         </div>
-
-        {/* Phần thông tin sản phẩm */}
         <div className='md:w-1/2 px-[30px] md:px-0'>
           <div className='h-8 bg-gray-300 rounded w-3/4 mb-2'></div>
           <div className='h-4 bg-gray-300 rounded w-1/4 mb-2'></div>
@@ -242,7 +270,7 @@ const ProductDetail: React.FC = () => {
             <div className='h-4 bg-gray-300 rounded w-1/3 mb-2'></div>
             <div className='h-4 bg-gray-300 rounded w-1/3 mb-2'></div>
           </div>
-          <div className='flex items-center gap-2 mt-4'>
+          <div className='mt-4 flex items-center gap-2'>
             <div className='h-6 bg-gray-300 rounded w-1/4'></div>
             <div className='h-6 bg-gray-300 rounded w-1/4'></div>
             <div className='h-4 bg-gray-300 rounded w-1/6'></div>
@@ -313,7 +341,6 @@ const ProductDetail: React.FC = () => {
 
   return (
     <div className='container mx-auto px-2 sm:px-10 md:px-20 py-10 sm:py-20'>
-      {/* Phần chi tiết sản phẩm hiện tại */}
       <div className='flex flex-col md:flex-row gap-6'>
         <div className='md:w-1/2 flex flex-col items-center'>
           <div className='relative w-full h-[400px] max-w-xs sm:max-w-sm md:max-w-md overflow-hidden'>
@@ -378,19 +405,19 @@ const ProductDetail: React.FC = () => {
             <div className='flex gap-2 mt-2 flex-wrap'>
               {product.sizes.length > 0 ? (
                 product.sizes.map((sizeObj) => {
-                  const { size, quantity: sizeQuantity } = sizeObj
+                  const { size, quantity: sizeQuantity, product_size_id } = sizeObj
                   const isAvailable = sizeQuantity > 0
                   return (
                     <button
-                      key={size}
-                      onClick={() => isAvailable && handleSizeClick(size, sizeQuantity)}
+                      key={product_size_id}
+                      onClick={() => isAvailable && handleSizeClick(size, sizeQuantity, product_size_id)}
                       disabled={!isAvailable}
                       className={`w-10 h-10 rounded-full border flex items-center justify-center text-sm sm:text-base ${
                         selectedSize === size
                           ? 'border-blue-500 bg-blue-500 text-white'
                           : isAvailable
                             ? 'border-gray-300 hover:border-black hover:bg-gray-100'
-                            : 'border-gray-300 bg-gray-100 opacity-50 cursor-not-allowed'
+                            : 'border-gray-300 bg-gray-200 opacity-50 cursor-not-allowed'
                       } transition`}
                     >
                       {size}
@@ -458,7 +485,6 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Phần "Có thể bạn thích" */}
       <div className='mt-12'>
         <h2 className='text-xl sm:text-2xl font-bold mb-6'>{t('you_may_like')}</h2>
         {suggestedLoading ? (
@@ -482,10 +508,7 @@ const ProductDetail: React.FC = () => {
                 <div
                   key={suggestedProduct.id}
                   className='border rounded-lg p-4 hover:shadow-lg transition cursor-pointer relative'
-                  onClick={() => {
-                    console.log('Chuyển hướng đến sản phẩm:', suggestedProduct.id, 'Slug:', suggestedProduct.slug)
-                    navigate(`/${suggestedProduct.slug}`, { state: { id: suggestedProduct.id } })
-                  }}
+                  onClick={() => navigate(`/${suggestedProduct.slug}`, { state: { id: suggestedProduct.id } })}
                 >
                   {discountPercentage > 0 && (
                     <div className='absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded'>

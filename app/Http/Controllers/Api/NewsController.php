@@ -21,7 +21,7 @@ class NewsController extends Controller
             'status' => true,
             'message' => 'Hiển thị tin tức thành công',
             'data' => $news
-        ]);
+        ], 200);
     }
 
     /**
@@ -39,27 +39,28 @@ class NewsController extends Controller
             if ($request->hasFile('image')) {
                 $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
             }
-            News::query()->create($data);
-            // dd($data);
+
+            $news = News::create($data);
 
             return response()->json([
                 'status' => true,
                 'message' => 'Thêm mới tin tức thành công',
-                'data' => $data
+                'data' => $news
             ], 201);
-
         } catch (\Throwable $th) {
-            //throw $th;
-            if (!empty($data['image']) && Storage::exists($data['image'])) {
-                Storage::dick('public')->delete($data['image']);
+            if (!empty($data['image']) && Storage::disk('public')->exists($data['image'])) {
+                Storage::disk('public')->delete($data['image']);
             }
-            Log::error(
-                __CLASS__ . '@' . __FUNCTION__,
-                ['error' => $th->getMessage()]
-            );
+
+            Log::error(__CLASS__ . '@' . __FUNCTION__, [
+                'error' => $th->getMessage(),
+                'request_data' => $request->all()
+            ]);
+
             return response()->json([
                 'status' => false,
-                'message' => 'Lỗi hệ thống ' . $th 
+                'message' => 'Lỗi hệ thống, vui lòng thử lại sau',
+                'data' => null
             ], 500);
         }
     }
@@ -76,10 +77,13 @@ class NewsController extends Controller
                 'status' => true,
                 'message' => 'Hiển thị thành công tin tức có id=' . $id,
                 'data' => $news
-            ]);
+            ], 200);
         }
+
         return response()->json([
+            'status' => false,
             'message' => 'Không tìm thấy tin tức có id=' . $id,
+            'data' => null
         ], 404);
     }
 
@@ -95,29 +99,31 @@ class NewsController extends Controller
         ]);
 
         $news = News::find($id);
-        // dd($news);
         if (!$news) {
             return response()->json([
-                'message' => 'Không tồn tại tin tức có id=' . $id
+                'status' => false,
+                'message' => 'Không tồn tại tin tức có id=' . $id,
+                'data' => null
             ], 404);
         }
 
         try {
-
             if ($request->hasFile('image')) {
                 $data['image'] = Storage::disk('public')->put('news', $request->file('image'));
+            } else {
+                $data['image'] = $news->image; // Giữ ảnh cũ nếu không upload ảnh mới
             }
 
-            $curentImage = $news->image;
+            $currentImage = $news->image;
 
             $news->update($data);
-            // dd($data);
+
             if (
-                $request->hasFile('image')
-                && !empty($curentImage)
-                && Storage::disk('public')->exists($curentImage)
+                $request->hasFile('image') &&
+                !empty($currentImage) &&
+                Storage::disk('public')->exists($currentImage)
             ) {
-                Storage::disk('public')->delete($curentImage);
+                Storage::disk('public')->delete($currentImage);
             }
 
             return response()->json([
@@ -125,21 +131,21 @@ class NewsController extends Controller
                 'message' => 'Cập nhật tin tức thành công',
                 'data' => $news
             ], 200);
-
         } catch (\Throwable $th) {
-            //throw $th;
-            if (!empty($data['image']) 
-                && Storage::disk('public')->exists($data['image'])) 
-            {
+            if (!empty($data['image']) && Storage::disk('public')->exists($data['image'])) {
                 Storage::disk('public')->delete($data['image']);
             }
-            Log::error(
-                __CLASS__ . '@' . __FUNCTION__,
-                ['error' => $th->getMessage()]
-            );
+
+            Log::error(__CLASS__ . '@' . __FUNCTION__, [
+                'error' => $th->getMessage(),
+                'request_data' => $request->all(),
+                'news_id' => $id
+            ]);
+
             return response()->json([
                 'status' => false,
-                'message' => 'Lỗi hệ thống ' . $th 
+                'message' => 'Lỗi hệ thống, vui lòng thử lại sau',
+                'data' => null
             ], 500);
         }
     }
@@ -149,8 +155,38 @@ class NewsController extends Controller
      */
     public function destroy(string $id)
     {
-        News::destroy($id);
+        $news = News::find($id);
+        if (!$news) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Không tìm thấy tin tức có id=' . $id,
+                'data' => null
+            ], 404);
+        }
 
-        return response()->json([], 204);
+        try {
+            if ($news->image && Storage::disk('public')->exists($news->image)) {
+                Storage::disk('public')->delete($news->image);
+            }
+
+            $news->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Xóa tin tức thành công',
+                'data' => null
+            ], 204);
+        } catch (\Throwable $th) {
+            Log::error(__CLASS__ . '@' . __FUNCTION__, [
+                'error' => $th->getMessage(),
+                'news_id' => $id
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi hệ thống, vui lòng thử lại sau',
+                'data' => null
+            ], 500);
+        }
     }
 }

@@ -33,7 +33,7 @@ const ProductList = () => {
     const fetchProducts = async () => {
       setIsLoading(true)
       try {
-        const response = await fetch('http://localhost:8000/api/products/top-views')
+        const response = await fetch('http://localhost:8000/api/productbycategory/{id}')
         if (!response.ok) throw new Error('API không phản hồi')
         const data = await response.json()
         setProducts(Array.isArray(data) ? data : data.data || [])

@@ -5,13 +5,13 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class PromotionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-
     const PATH_VIEW = 'admin.promotions.';
 
     public function index(Request $request)
@@ -114,5 +114,49 @@ class PromotionController extends Controller
         return redirect()
             ->route(self::PATH_VIEW . 'index')
             ->with('success', 'Mã giảm giá đã được xóa.');
+    }
+
+    /**
+     * Kiểm tra mã giảm giá qua API
+     */
+    public function checkPromotion(Request $request)
+    {
+        try {
+            $request->validate([
+                'code' => 'required|string',
+            ]);
+
+            $code = strtoupper($request->input('code'));
+            $promotion = Promotion::where('promotion_name', $code)
+                ->where('status', 1)
+                ->where('start_date', '<=', Carbon::now())
+                ->where('end_date', '>=', Carbon::now())
+                ->first();
+
+            if (!$promotion) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Mã giảm giá không hợp lệ hoặc đã hết hạn.',
+                ], 404);
+            }
+
+            // Ánh xạ discount_type sang type mà frontend mong đợi
+            $type = $promotion->discount_type === Promotion::PHAN_TRAM ? 'percentage' : 'fixed';
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'code' => $promotion->promotion_name,
+                    'type' => $type,
+                    'value' => $promotion->discount_value,
+                    'max_discount_value' => $promotion->max_discount_value, // Thêm nếu cần
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không thể kiểm tra mã giảm giá: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

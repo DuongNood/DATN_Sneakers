@@ -1,11 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-
-use App\Models\Momo_transactions;
-use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -13,103 +9,181 @@ use Illuminate\Support\Str;
 
 class MomopaymentController extends Controller
 {
-
     public function createPayment(Request $request)
     {
-        $order = Order::find($request->id);
+        // Validate dữ liệu đầu vào
+        $validated = $request->validate([
+            'orderId' => 'required|string',
+            'amount' => 'required|numeric|min:1000',
+            'orderInfo' => 'required|string',
+            'redirectUrl' => 'required|url',
+            'ipnUrl' => 'required|url',
+            'requestId' => 'required|string',
+            'extraData' => 'nullable|string',
+        ]);
 
-        if (!$order) {
-            return response()->json([
-                'status' => false,
-                'message' => "Không tìm thấy đơn hàng có id=" . $request->id,
-            ], 404);
-        }
-        // dd($dt);
-
-        $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+        // Thông tin MoMo (lấy từ .env)
         $partnerCode = env('MOMO_PARTNER_CODE');
         $accessKey = env('MOMO_ACCESS_KEY');
         $secretKey = env('MOMO_SECRET_KEY');
+        $endpoint = env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create');
 
-        $orderId = time() . '_' . $order->id;
-        $orderInfo = "Thanh toán đơn hàng " . $order->order_code;
-        $amount = (int) $order->total_price;
-        $redirectUrl = route('momo.callback');
-        $ipnUrl = route('momo.callback');
-        $requestId = Str::uuid()->toString();
-        $extraData = "";
-        $requestType = "payWithATM";
+        // Dữ liệu để tạo chữ ký
+        $rawSignature = "accessKey=$accessKey&amount={$validated['amount']}&extraData={$validated['extraData']}&ipnUrl={$validated['ipnUrl']}&orderId={$validated['orderId']}&orderInfo={$validated['orderInfo']}&partnerCode=$partnerCode&redirectUrl={$validated['redirectUrl']}&requestId={$validated['requestId']}&requestType=captureWallet";
 
+        // Tạo chữ ký
+        $signature = hash_hmac('sha256', $rawSignature, $secretKey);
 
-        $rawHash = "accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType";
-        $signature = hash_hmac("sha256", $rawHash, $secretKey);
-
-        $data = [
-            "partnerCode" => $partnerCode,
-            "requestId" => $requestId,
-            "amount" => $amount,
-            "orderId" => $orderId,
-            "orderInfo" => $orderInfo,
-            "redirectUrl" => $redirectUrl,
-            "ipnUrl" => $ipnUrl,
-            "requestType" => $requestType,
-            "extraData" => $extraData,
-            "signature" => $signature,
-            // "responseTime" => $responseTime
+        // Dữ liệu gửi lên MoMo
+        $requestBody = [
+            'partnerCode' => $partnerCode,
+            'accessKey' => $accessKey,
+            'requestId' => $validated['requestId'],
+            'amount' => (string) $validated['amount'],
+            'orderId' => $validated['orderId'],
+            'orderInfo' => $validated['orderInfo'],
+            'redirectUrl' => $validated['redirectUrl'],
+            'ipnUrl' => $validated['ipnUrl'],
+            'extraData' => $validated['extraData'] ?? '',
+            'requestType' => 'captureWallet',
+            'signature' => $signature,
+            'lang' => 'vi',
         ];
 
-        $response = Http::post($endpoint, $data)->json();
+        // Debug yêu cầu gửi đi
+        Log::info('MoMo request', [
+            'rawSignature' => $rawSignature,
+            'signature' => $signature,
+            'requestBody' => $requestBody,
+        ]);
 
-        if (!isset($response['payUrl']) || $response['resultCode'] !== 0) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Thanh toán thất bại!',
-                'error' => $response
-            ], 400);
-        }
+        try {
+            // Gửi yêu cầu đến MoMo
+            $response = Http::post($endpoint, $requestBody);
+            $responseData = $response->json();
 
-        return response()->json(["payUrl" => $response['payUrl']]);
+            // Debug phản hồi từ MoMo
+            Log::info('MoMo response', ['response' => $responseData]);
 
-    }
-
-       public function callback(Request $request)
-    {
-        $data = $request->all(); // Lấy toàn bộ dữ liệu trả về từ MoMo
-        // dd($data);
-
-        Log::info('MoMo Callback Data:', $data); // Ghi log để kiểm tra dữ liệu
-
-        if (isset($data['partnerCode']) && isset($data['orderId'])) {
-
-            // Tìm order theo orderId
-            $order = Order::where('id', explode('_', $data['orderId'])[1])->first();
-
-            if ($order) {
-                // Cập nhật trạng thái thanh toán 
-                $order->update([
-                    'payment_status' => 'da_thanh_toan',
-                ]);
-
-                // Lưu giao dịch vào bảng momo_transactions
-                Momo_transactions::query()->create([
-                    'partnerCode' => $data['partnerCode'] ?? 'UNKNOWN',
-                    'amount' => $data['amount'],
-                    'requestId' => $data['requestId'],
-                    'orderId' => $data['orderId'],
-                    'orderInfo' => $data['orderInfo'],
-                    'signature' => $data['signature'],
-                    'orderType' => $data['orderType'],
-                    'transId' => $data['transId'],
-                    'payType' => $data['payType'],
-                    'responseTime' => $data['responseTime'],
-                ]);
+            if ($response->successful() && $responseData['resultCode'] === 0) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Payment link created successfully',
+                    'payUrl' => $responseData['payUrl'],
+                ], 200);
+            } else {
+                Log::error('MoMo create payment failed', ['response' => $responseData]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $responseData['message'] ?? 'Failed to create MoMo payment link',
+                ], 400);
             }
-
-
+        } catch (\Exception $e) {
+            Log::error('Error creating MoMo payment link', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create MoMo payment link: ' . $e->getMessage(),
+            ], 500);
         }
-        // return redirect('/orders')->with('message', 'Thanh toán hoàn tất!');
     }
 
+    public function momoCallback(Request $request)
+    {
+        $data = $request->validate([
+            'partnerCode' => 'required|string',
+            'orderId' => 'required|string',
+            'requestId' => 'required|string',
+            'amount' => 'required|numeric',
+            'orderInfo' => 'required|string',
+            'orderType' => 'required|string',
+            'transId' => 'required|string',
+            'resultCode' => 'required|integer',
+            'message' => 'required|string',
+            'payType' => 'required|string',
+            'responseTime' => 'required|string',
+            'extraData' => 'nullable|string',
+            'signature' => 'required|string',
+        ]);
+
+        $secretKey = env('MOMO_SECRET_KEY');
+        $rawSignature = "accessKey=" . env('MOMO_ACCESS_KEY') . "&amount={$data['amount']}&extraData={$data['extraData']}&message={$data['message']}&orderId={$data['orderId']}&orderInfo={$data['orderInfo']}&orderType={$data['orderType']}&partnerCode={$data['partnerCode']}&payType={$data['payType']}&requestId={$data['requestId']}&responseTime={$data['responseTime']}&resultCode={$data['resultCode']}&transId={$data['transId']}";
+        $signature = hash_hmac('sha256', $rawSignature, $secretKey);
+
+        Log::info('MoMo callback', [
+            'receivedData' => $data,
+            'rawSignature' => $rawSignature,
+            'signature' => $signature,
+        ]);
+
+        if ($signature !== $data['signature']) {
+            Log::error('Invalid MoMo callback signature', ['data' => $data]);
+            return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 400);
+        }
+
+        if ($data['resultCode'] === 0) {
+            \DB::table('momo_transactions')->updateOrInsert(
+                ['order_id' => $data['orderId']],
+                [
+                    'partner_code' => $data['partnerCode'],
+                    'request_id' => $data['requestId'],
+                    'amount' => $data['amount'],
+                    'order_info' => $data['orderInfo'],
+                    'order_type' => $data['orderType'],
+                    'trans_id' => $data['transId'],
+                    'result_code' => $data['resultCode'],
+                    'message' => $data['message'],
+                    'pay_type' => $data['payType'],
+                    'response_time' => $data['responseTime'],
+                    'extra_data' => $data['extraData'],
+                    'signature' => $data['signature'],
+                    'status' => 'success',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            \DB::table('orders')
+                ->where('order_id', $data['orderId'])
+                ->update(['status' => 'paid']);
+
+            $extraData = json_decode(base64_decode($data['extraData']), true);
+            $orderCode = $extraData['orderCode'] ?? $data['orderId'];
+            return redirect("http://localhost:3000/order-success?orderCode={$orderCode}&status=success");
+        } else {
+            \DB::table('momo_transactions')->updateOrInsert(
+                ['order_id' => $data['orderId']],
+                [
+                    'partner_code' => $data['partnerCode'],
+                    'request_id' => $data['requestId'],
+                    'amount' => $data['amount'],
+                    'order_info' => $data['orderInfo'],
+                    'order_type' => $data['orderType'],
+                    'trans_id' => $data['transId'],
+                    'result_code' => $data['resultCode'],
+                    'message' => $data['message'],
+                    'pay_type' => $data['payType'],
+                    'response_time' => $data['responseTime'],
+                    'extra_data' => $data['extraData'],
+                    'signature' => $data['signature'],
+                    'status' => 'failed',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            return redirect("http://localhost:3000/order-success?status=failed");
+        }
+    }
+
+    public function getTransactions(Request $request)
+    {
+        $transactions = \DB::table('momo_transactions')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $transactions,
+        ]);
+    }
 }
-
-

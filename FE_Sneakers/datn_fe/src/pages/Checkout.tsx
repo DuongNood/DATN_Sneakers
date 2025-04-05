@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
+import axios from 'axios'
 
-// Định nghĩa interface
+// Định nghĩa các interface
 interface Product {
   id: number
+  slug?: string
   name: string
   original_price: string
   discounted_price: string
@@ -12,339 +16,357 @@ interface Product {
   rating: number
   description: string
   quantity: number
-  variant: string
+  variant?: string
+  size?: string
+  images?: string[]
+  sizes?: { size: string; quantity: number; product_size_id: number }[]
+  category?: { id: number; category_name: string }
 }
 
 interface CheckoutState {
   products: Product[]
-  quantity: number
+}
+
+interface User {
+  name: string
+  email: string
+  phone: string
+  address: string
+}
+
+interface Coupon {
+  code: string
+  type: string
+  value: number
+  max_discount_value?: number
 }
 
 const Checkout: React.FC = () => {
-  // Nhận dữ liệu sản phẩm từ ProductDetail qua useLocation
+  const { t } = useTranslation()
   const location = useLocation()
-  const { products: initialProducts, quantity: initialQuantity } = (location.state as CheckoutState) || {
-    products: [],
-    quantity: 1
-  }
+  const navigate = useNavigate()
+  const { products: initialProducts } = (location.state as CheckoutState) || { products: [] }
 
-  // Dữ liệu giả lập (mock data) với 3 sản phẩm
-  const mockProducts: Product[] = [
-    {
-      id: 1,
-      name: 'Son kem TINT Bóng Hàn Quốc Ro mand Juicy Lasting Tint 5.5g',
-      original_price: '180000',
-      discounted_price: '149000',
-      product_code: 'SONKEM001',
-      imageUrl: 'https://via.placeholder.com/80',
-      rating: 4.5,
-      description: 'Son kem chất lượng cao',
-      quantity: 2,
-      variant: '#13 Eat Dotori'
-    },
-    {
-      id: 2,
-      name: 'Mặt nạ dưỡng da Innisfree My Real Squeeze Mask',
-      original_price: '30000',
-      discounted_price: '25000',
-      product_code: 'MATNA001',
-      imageUrl: 'https://via.placeholder.com/80',
-      rating: 4.0,
-      description: 'Mặt nạ dưỡng da tự nhiên',
-      quantity: 3,
-      variant: 'Aloe'
-    },
-    {
-      id: 3,
-      name: 'Sữa rửa mặt Cetaphil Gentle Skin Cleanser 500ml',
-      original_price: '350000',
-      discounted_price: '320000',
-      product_code: 'SRM001',
-      imageUrl: 'https://via.placeholder.com/80',
-      rating: 4.8,
-      description: 'Sữa rửa mặt dịu nhẹ',
-      quantity: 1,
-      variant: 'Không mùi'
+  const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [fullName, setFullName] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
+  const [phone, setPhone] = useState<string>('')
+  const [address, setAddress] = useState<string>('')
+  const [loadingUser, setLoadingUser] = useState<boolean>(true)
+  const [errorUser, setErrorUser] = useState<string | null>(null)
+  const [loadingOrder, setLoadingOrder] = useState<boolean>(false)
+  const [errors, setErrors] = useState<{
+    fullName?: string
+    email?: string
+    phone?: string
+    address?: string
+  }>({})
+  const [couponCode, setCouponCode] = useState<string>('')
+  const [couponDiscount, setCouponDiscount] = useState<number>(0)
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null)
+
+  useEffect(() => {
+    console.log('Initial Products in Checkout:', initialProducts)
+    setProducts(initialProducts)
+  }, [initialProducts])
+
+  const fetchUserData = async () => {
+    try {
+      setLoadingUser(true)
+      setErrorUser(null)
+
+      const token = localStorage.getItem('token')
+      if (!token) throw new Error(t('no_token'))
+
+      const response = await axios.get('http://localhost:8000/api/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json'
+        }
+      })
+
+      const user: User = response.data
+      setFullName(user.name || '')
+      setEmail(user.email || '')
+      setPhone(user.phone || '')
+      setAddress(user.address || '')
+    } catch (error: any) {
+      setErrorUser(error.message || t('fetch_user_error'))
+      toast.error(error.message || t('fetch_user_error'), { autoClose: 2000 })
+    } finally {
+      setLoadingUser(false)
     }
-  ]
-
-  // Sử dụng mock data nếu initialProducts rỗng
-  const [products, setProducts] = useState<Product[]>(
-    initialProducts.length > 0
-      ? initialProducts.map((product) => ({
-          ...product,
-          quantity: initialQuantity,
-          variant: product.variant || '#13 Eat Dotori'
-        }))
-      : mockProducts
-  )
-
-  // State cho checkbox chọn tất cả
-  const [selectAll, setSelectAll] = useState<boolean>(false)
-  // State cho danh sách sản phẩm được chọn
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([])
-
-  // Xử lý chọn từng sản phẩm
-  const handleSelectProduct = (productId: number) => {
-    setSelectedProducts((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
-    )
   }
 
-  // Xử lý chọn tất cả
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedProducts([])
-    } else {
-      setSelectedProducts(products.map((product) => product.id))
-    }
-    setSelectAll(!selectAll)
+  useEffect(() => {
+    fetchUserData()
+  }, [t])
+
+  const validateForm = (): boolean => {
+    const newErrors: { fullName?: string; email?: string; phone?: string; address?: string } = {}
+
+    if (!fullName.trim()) newErrors.fullName = t('full_name_required')
+    else if (fullName.trim().length < 2) newErrors.fullName = t('full_name_min_length')
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!email.trim()) newErrors.email = t('email_required')
+    else if (!emailRegex.test(email)) newErrors.email = t('email_invalid')
+
+    const phoneRegex = /^[0-9]{10,11}$/
+    if (!phone.trim()) newErrors.phone = t('phone_required')
+    else if (!phoneRegex.test(phone)) newErrors.phone = t('phone_invalid')
+
+    if (!address.trim()) newErrors.address = t('address_required')
+    else if (address.trim().length < 5) newErrors.address = t('address_min_length')
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
-  // Tính tổng tiền (chỉ tính các sản phẩm được chọn)
   const calculateSubtotal = (): number => {
-    return products.reduce(
-      (total, product) =>
-        selectedProducts.includes(product.id) ? total + Number(product.discounted_price) * product.quantity : total,
-      0
-    )
+    return products.reduce((total, product) => {
+      const price = Number(product.discounted_price) || 0
+      return total + price * product.quantity
+    }, 0)
   }
 
-  // Tính tổng số lượng sản phẩm được chọn
-  const totalSelectedItems = products.reduce(
-    (total, product) => (selectedProducts.includes(product.id) ? total + product.quantity : total),
-    0
-  )
+  const shippingFee: number = 30000
+  const total: number = Math.max(calculateSubtotal() + shippingFee - couponDiscount, 0)
 
-  const shippingFee: number = 0 // Phí vận chuyển (miễn phí)
-  const discount: number = selectedProducts.length > 0 ? 44700 : 0 // Giả lập giảm giá
-  const total: number = calculateSubtotal() + shippingFee - discount
-  const savings: number =
-    products.reduce(
-      (total, product) =>
-        selectedProducts.includes(product.id) ? total + Number(product.original_price) * product.quantity : total,
-      0
-    ) -
-    calculateSubtotal() +
-    discount // Tiết kiệm
-
-  // Xử lý tăng số lượng
-  const handleIncreaseQuantity = (productId: number) => {
-    setProducts((prev) =>
-      prev.map((product) => (product.id === productId ? { ...product, quantity: product.quantity + 1 } : product))
-    )
-  }
-
-  // Xử lý giảm số lượng
-  const handleDecreaseQuantity = (productId: number) => {
-    setProducts((prev) =>
-      prev.map((product) =>
-        product.id === productId && product.quantity > 1 ? { ...product, quantity: product.quantity - 1 } : product
-      )
-    )
-  }
-
-  // Xử lý xóa sản phẩm
-  const handleDeleteProduct = (productId: number) => {
-    setProducts((prev) => prev.filter((product) => product.id !== productId))
-    setSelectedProducts((prev) => prev.filter((id) => id !== productId))
-  }
-
-  // Xử lý đặt hàng
-  const handlePlaceOrder = () => {
-    if (selectedProducts.length === 0) {
-      alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng!')
+  const applyCoupon = async () => {
+    if (!couponCode) {
+      toast.error(t('please_enter_coupon'), { autoClose: 2000 })
       return
     }
-    alert('Đặt hàng thành công!')
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/promotions', { code: couponCode })
+      if (response.data.status === 'success') {
+        const coupon: Coupon = response.data.data
+        setAppliedCoupon(coupon)
+
+        let discount = 0
+        if (coupon.type === 'percentage') {
+          discount = calculateSubtotal() * (coupon.value / 100)
+          if (coupon.max_discount_value && discount > coupon.max_discount_value) discount = coupon.max_discount_value
+        } else if (coupon.type === 'fixed') {
+          discount = coupon.value
+          if (coupon.max_discount_value && discount > coupon.max_discount_value) discount = coupon.max_discount_value
+        }
+
+        setCouponDiscount(discount)
+        toast.success(t('coupon_applied', { discount: discount.toLocaleString('vi-VN') }), { autoClose: 2000 })
+      } else {
+        throw new Error(response.data.message || t('invalid_coupon'))
+      }
+    } catch (error: any) {
+      console.error('Error applying coupon:', error)
+      setCouponDiscount(0)
+      setAppliedCoupon(null)
+      toast.error(error.response?.data?.message || error.message || t('invalid_coupon'), { autoClose: 2000 })
+    }
+  }
+
+  const handlePlaceOrder = async () => {
+    if (!validateForm()) {
+      toast.error(t('please_fill_all_fields_correctly'), { autoClose: 2000 })
+      return
+    }
+
+    setLoadingOrder(true)
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) throw new Error(t('no_token'))
+
+      // Không gọi API ngay, chỉ truyền dữ liệu sang Payment
+      console.log('Data sent to Payment:', {
+        products,
+        shippingInfo: { fullName, email, phone, address },
+        total,
+        couponDiscount,
+        shippingFee
+      })
+
+      navigate('/payment', {
+        state: {
+          products,
+          shippingInfo: { fullName, email, phone, address },
+          total,
+          couponDiscount,
+          shippingFee
+        }
+      })
+    } catch (error: any) {
+      console.error('Error in handlePlaceOrder:', error)
+      toast.error(error.message || t('order_prepare_failed'), { autoClose: 2000 })
+    } finally {
+      setLoadingOrder(false)
+    }
+  }
+
+  if (loadingUser) {
+    return (
+      <div className='min-h-screen bg-gray-100 font-sans flex items-center justify-center'>
+        <p className='text-gray-600'>{t('loading')}</p>
+      </div>
+    )
+  }
+
+  if (errorUser) {
+    return (
+      <div className='min-h-screen bg-gray-100 font-sans flex items-center justify-center'>
+        <p className='text-red-500'>{errorUser}</p>
+      </div>
+    )
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className='min-h-screen bg-gray-100 font-sans flex items-center justify-center'>
+        <p className='text-gray-600'>{t('no_products_to_checkout')}</p>
+      </div>
+    )
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 font-sans'>
-      <div className='container mx-auto px-4 py-6 lg:py-10 lg:px-20'>
-        {/* Header */}
-        <div className='hidden lg:flex items-center bg-white p-4 rounded-lg shadow-sm border-b border-gray-200 text-gray-700'>
-          <div className='w-1/12'>
-            <input
-              type='checkbox'
-              checked={selectAll}
-              onChange={handleSelectAll}
-              className='h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500'
-            />
-          </div>
-          <div className='w-4/12 font-medium text-sm'>Sản Phẩm</div>
-          <div className='w-2/12 font-medium text-sm text-center'>Đơn Giá</div>
-          <div className='w-2/12 font-medium text-sm text-center'>Số Lượng</div>
-          <div className='w-2/12 font-medium text-sm text-center'>Số Tiền</div>
-          <div className='w-1/12 font-medium text-sm text-center'>Thao Tác</div>
-        </div>
-
-        {/* Danh sách sản phẩm */}
-        {products.length === 0 ? (
-          <div className='p-6 text-center text-gray-500 bg-white rounded-lg shadow-sm mt-4'>Giỏ hàng trống</div>
-        ) : (
-          products.map((product) => (
-            <div
-              key={product.id}
-              className='flex flex-col lg:flex-row items-start lg:items-center p-4 bg-white rounded-lg shadow-sm mt-4 border border-gray-100 hover:shadow-md transition-shadow'
-            >
-              {/* Checkbox */}
-              <div className='w-full lg:w-1/12 flex items-center mb-3 lg:mb-0'>
-                <input
-                  type='checkbox'
-                  checked={selectedProducts.includes(product.id)}
-                  onChange={() => handleSelectProduct(product.id)}
-                  className='h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500'
-                />
-              </div>
-
-              {/* Sản phẩm (Hình ảnh + Tên + Phân loại) */}
-              <div className='w-full lg:w-4/12 flex items-center mb-3 lg:mb-0'>
+    <div className='min-h-screen bg-gray-100 font-sans'>
+      <div className='container mx-auto px-4 py-6 lg:py-10 lg:px-8'>
+        <div className='flex flex-col lg:flex-row gap-6'>
+          {/* Order Summary */}
+          <div className='w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-sm'>
+            <h2 className='text-lg font-semibold text-gray-800 mb-4'>{t('order_summary')}</h2>
+            {products.map((product) => (
+              <div key={product.id} className='flex items-center mb-4'>
                 <img
                   src={product.imageUrl || 'https://via.placeholder.com/80'}
                   alt={product.name}
-                  className='w-16 h-16 lg:w-20 lg:h-20 object-cover rounded-lg mr-4 border border-gray-100'
+                  className='w-16 h-16 object-cover rounded-md mr-4'
                 />
-                <div>
-                  <p className='text-sm lg:text-base font-medium text-gray-900'>{product.name}</p>
-                  <p className='text-xs text-gray-500 mt-1'>Phân Loại Hàng: {product.variant}</p>
-                </div>
-              </div>
-
-              {/* Đơn giá */}
-              <div className='w-full lg:w-2/12 flex lg:justify-center mb-3 lg:mb-0'>
-                <div>
-                  <p className='text-sm text-gray-400 line-through lg:text-center'>
-                    ₫{Number(product.original_price).toLocaleString('vi-VN')}
-                  </p>
-                  <p className='text-sm lg:text-base font-medium text-gray-900 lg:text-center'>
-                    ₫{Number(product.discounted_price).toLocaleString('vi-VN')}
+                <div className='flex-1'>
+                  <p className='text-sm font-medium text-gray-800'>{product.name}</p>
+                  <p className='text-xs text-gray-500'>
+                    {t('size')}: {product.variant || product.size || 'N/A'}
                   </p>
                 </div>
-              </div>
-
-              {/* Số lượng */}
-              <div className='w-full lg:w-2/12 flex lg:justify-center mb-3 lg:mb-0'>
-                <div className='flex items-center border border-gray-200 rounded-lg overflow-hidden'>
-                  <button
-                    onClick={() => handleDecreaseQuantity(product.id)}
-                    className='px-3 py-1 text-gray-600 hover:bg-gray-100 transition'
-                  >
-                    -
-                  </button>
-                  <span className='px-4 py-1 text-sm text-gray-900 border-x border-gray-200'>{product.quantity}</span>
-                  <button
-                    onClick={() => handleIncreaseQuantity(product.id)}
-                    className='px-3 py-1 text-gray-600 hover:bg-gray-100 transition'
-                  >
-                    +
-                  </button>
+                <div className='text-right'>
+                  <p className='text-sm font-medium text-gray-800'>
+                    {product.quantity} x ₫{Number(product.discounted_price || 0).toLocaleString('vi-VN')}
+                  </p>
+                  <p className='text-xs text-gray-600'>
+                    {t('subtotal')}: ₫
+                    {(Number(product.discounted_price || 0) * product.quantity).toLocaleString('vi-VN')}
+                  </p>
                 </div>
               </div>
-
-              {/* Số tiền và Thao tác (nút Xóa) */}
-              <div className='w-full lg:w-3/12 flex flex-row justify-between lg:justify-center items-center mb-3 lg:mb-0'>
-                {/* Số tiền */}
-                <div className='text-orange-500 font-medium text-sm lg:text-base lg:text-center lg:w-2/3'>
-                  ₫{(Number(product.discounted_price) * product.quantity).toLocaleString('vi-VN')}
-                </div>
-                {/* Thao tác */}
-                <div className='lg:w-1/3 flex lg:justify-center'>
-                  <button
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className='text-orange-500 hover:text-orange-600 text-sm font-medium transition'
-                  >
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-
-        {/* Thông tin đơn hàng */}
-        <div className='mt-6 p-4 lg:p-6 bg-white rounded-lg shadow-sm border border-gray-100'>
-          {/* Địa điểm nhận hàng */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4'>
-            <div className='flex items-center mb-2 lg:mb-0'>
-              <span className='text-sm text-gray-600 font-medium'>Địa điểm nhận hàng:</span>
-              <span className='text-sm text-orange-500 ml-2 font-medium'>
-                {selectedProducts.length > 0 ? `Đã giảm ₫${discount.toLocaleString('vi-VN')}` : 'Chưa có giảm giá'}
-              </span>
-            </div>
-            <a href='#' className='text-sm text-blue-500 hover:underline font-medium'>
-              Xem thêm voucher
-            </a>
-          </div>
-
-          {/* Phí vận chuyển */}
-          <div className='flex items-center mb-4'>
-            <svg
-              className='w-5 h-5 text-gray-500 mr-2'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M20 7h-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM8 5h4v2H8V5zm-4 4h16v10H4V9z'
-              />
-            </svg>
-            <span className='text-sm text-gray-600 font-medium'>Giảm ₫500.000 phí vận chuyển đơn tối thiểu ₫0</span>
-          </div>
-
-          {/* Voucher */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4'>
-            <span className='text-sm text-gray-600 font-medium mb-2 lg:mb-0'>Shopee Voucher</span>
-            <button className='text-sm text-orange-500 border border-orange-500 px-3 py-1 rounded-lg hover:bg-orange-50 transition font-medium'>
-              Chọn hoặc nhập mã
-            </button>
-          </div>
-
-          {/* Shopee Xu */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4'>
-            <div className='flex items-center mb-2 lg:mb-0'>
+            ))}
+            <hr className='my-4' />
+            <div className='flex items-center mb-4'>
               <input
-                type='checkbox'
-                className='h-5 w-5 text-gray-500 mr-2 rounded border-gray-300 focus:ring-orange-500'
-                disabled
+                type='text'
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                placeholder={t('enter_coupon_code')}
+                className='flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
               />
-              <span className='text-sm text-gray-600 font-medium'>Shopee Xu</span>
-            </div>
-            <span className='text-sm text-gray-600 font-medium'>Bạn chưa có Shopee Xu</span>
-          </div>
-
-          {/* Tổng thanh toán */}
-          <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center border-t pt-4'>
-            <div className='flex flex-wrap items-center mb-4 lg:mb-0 gap-4'>
-              <div className='flex items-center'>
-                <input
-                  type='checkbox'
-                  checked={selectAll}
-                  onChange={handleSelectAll}
-                  className='h-5 w-5 text-orange-500 mr-2 rounded border-gray-300 focus:ring-orange-500'
-                />
-                <span className='text-sm text-gray-600 font-medium'>Chọn Tất Cả ({products.length})</span>
-              </div>
-              <button className='text-sm text-orange-500 hover:text-orange-600 font-medium transition'>Xóa</button>
-              <span className='text-sm text-gray-600 font-medium'>Lưu vào mục Đã thích...</span>
-            </div>
-            <div className='text-left lg:text-right w-full lg:w-auto'>
-              <p className='text-sm text-gray-600 font-medium'>
-                Tổng thanh toán ({totalSelectedItems} Sản phẩm):{' '}
-                <span className='text-xl text-orange-500 font-semibold'>₫{total.toLocaleString('vi-VN')}</span>
-              </p>
-              <p className='text-sm text-gray-600 font-medium'>Tiết kiệm: ₫{savings.toLocaleString('vi-VN')}</p>
               <button
-                onClick={handlePlaceOrder}
-                className='bg-orange-500 text-white px-6 py-2 rounded-lg mt-3 w-full lg:w-auto hover:bg-orange-600 transition font-medium shadow-sm'
+                onClick={applyCoupon}
+                className='ml-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition'
               >
-                Mua Hàng
+                {t('apply')}
               </button>
             </div>
+            <div className='space-y-2'>
+              <div className='flex justify-between text-sm text-gray-700'>
+                <span>{t('subtotal')}</span>
+                <span>₫{calculateSubtotal().toLocaleString('vi-VN')}</span>
+              </div>
+              <div className='flex justify-between text-sm text-gray-700'>
+                <span>{t('shipping_fee')}</span>
+                <span>₫{shippingFee.toLocaleString('vi-VN')}</span>
+              </div>
+              {couponDiscount > 0 && (
+                <div className='flex justify-between text-sm text-green-600'>
+                  <span>{t('discount')}</span>
+                  <span>-₫{couponDiscount.toLocaleString('vi-VN')}</span>
+                </div>
+              )}
+              <div className='flex justify-between text-lg font-semibold text-gray-800'>
+                <span>{t('total')}</span>
+                <span>₫{total.toLocaleString('vi-VN')}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Shipping Info */}
+          <div className='w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-sm'>
+            <h2 className='text-lg font-semibold text-gray-800 mb-4'>{t('shipping_info')}</h2>
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>{t('full_name')}</label>
+                <input
+                  type='text'
+                  value={fullName}
+                  onChange={(e) => {
+                    setFullName(e.target.value)
+                    setErrors((prev) => ({ ...prev, fullName: undefined }))
+                  }}
+                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                  placeholder={t('enter_full_name')}
+                />
+                {errors.fullName && <p className='text-red-500 text-xs mt-1'>{errors.fullName}</p>}
+              </div>
+              <div className='flex gap-4'>
+                <div className='w-1/2'>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>{t('email')}</label>
+                  <input
+                    type='email'
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setErrors((prev) => ({ ...prev, email: undefined }))
+                    }}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                    placeholder={t('enter_email')}
+                  />
+                  {errors.email && <p className='text-red-500 text-xs mt-1'>{errors.email}</p>}
+                </div>
+                <div className='w-1/2'>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>{t('phone')}</label>
+                  <input
+                    type='text'
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value)
+                      setErrors((prev) => ({ ...prev, phone: undefined }))
+                    }}
+                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                    placeholder={t('enter_phone')}
+                  />
+                  {errors.phone && <p className='text-red-500 text-xs mt-1'>{errors.phone}</p>}
+                </div>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>{t('address')}</label>
+                <input
+                  type='text'
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value)
+                    setErrors((prev) => ({ ...prev, address: undefined }))
+                  }}
+                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${errors.address ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                  placeholder={t('enter_address')}
+                />
+                {errors.address && <p className='text-red-500 text-xs mt-1'>{errors.address}</p>}
+              </div>
+            </div>
+            <button
+              onClick={handlePlaceOrder}
+              disabled={loadingOrder}
+              className={`w-full mt-6 py-2 rounded-md text-white transition ${loadingOrder ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+            >
+              {loadingOrder ? t('processing') : t('proceed_to_payment')}
+            </button>
           </div>
         </div>
       </div>
