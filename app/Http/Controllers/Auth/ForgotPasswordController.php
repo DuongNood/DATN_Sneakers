@@ -33,13 +33,13 @@ class ForgotPasswordController extends Controller
         $user->save();
 
         // Gửi email chứa mật khẩu tạm thời
-        Mail::send('emails.reset-password', ['user' => $user, 'temporaryPassword' => $temporaryPassword], function ($message) use ($user) {
+        Mail::send('admin.emails.reset-password', ['user' => $user, 'temporaryPassword' => $temporaryPassword], function ($message) use ($user) {
             $message->to($user->email);
             $message->subject('Khôi phục mật khẩu');
         });
 
         return response()->json([
-            'message' => 'Mật khẩu tạm thời đã được gửi đến email của bạn.'
+            'message' => 'Mật khẩu mới đã được gửi đến email của bạn.'
         ], 200);
     }
 }

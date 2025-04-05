@@ -27,9 +27,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Models\Promotion;
-
-
-
+use Illuminate\Support\Facades\Auth;
 
 Route::apiResource('banners', BannerController::class);
 
