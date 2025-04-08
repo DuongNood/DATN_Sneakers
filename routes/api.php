@@ -117,11 +117,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::post('/orders/{order}/request-cancellation', [OrderController::class, 'requestCancellation']);
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
+    
+    // MomoPayment routes with authentication
+    Route::post('/momo/payment', [MomopaymentController::class, 'createOrderWithMomo']);
+    // Route::post('/momo/ipn', [MomopaymentController::class, 'createPayment']);
+    Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
 });
-// MomoPayment 
-// tạo thanh toán momo
-Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);
-// xử lí phản hồi từ momo
+
+// Public Momo callback route (needs to be public for Momo to access)
 Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
-// lấy danh sách giao dịch 
-Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
@@ -23,7 +23,7 @@ interface ShippingInfo {
 }
 
 interface PaymentState {
-  products: Product[]
+  products: Product[] // Thay đổi thành mảng
   shippingInfo: ShippingInfo
   total: number
   couponDiscount: number
@@ -39,9 +39,24 @@ const Payment: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'momo' | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
-  console.log('Payment Data from Checkout:', { products, shippingInfo, total, couponDiscount, shippingFee })
-
   const handlePayment = async () => {
+    const amount = Math.floor(total + shippingFee - couponDiscount); // Đảm bảo amount là số nguyên
+
+    const orderId = `ORDER_${Date.now()}`;
+
+    const paymentData = {
+      order_id: orderId,
+      amount: amount,
+      order_info: `Thanh toán đơn hàng ${orderId}`,
+      redirect_url: "http://localhost:3000/momo-success", // Đảm bảo điều này chính xác
+      ipn_url: "http://localhost:8000/api/momo/callback", // Đảm bảo điều này chính xác
+      lang: "vi",
+      products,
+      shippingInfo,
+      couponDiscount,
+      shippingFee,
+    };
+
     if (!paymentMethod) {
       toast.error(t('please_select_payment_method'), { autoClose: 2000 })
       return
@@ -52,19 +67,84 @@ const Payment: React.FC = () => {
       const token = localStorage.getItem('token')
       if (!token) throw new Error(t('no_token'))
 
-      const orderPromises = products.map(async (product) => {
-        const selectedSizeObj = product.sizes?.find((s) => s.size === (product.variant || product.size))
-        if (!selectedSizeObj)
-          throw new Error(`Size ${product.variant || product.size} not found for product ${product.name}`)
+      if (paymentMethod === 'cod') {
+        // Xử lý thanh toán COD
+        const orderPromises = products.map(async (product) => {
+          const selectedSizeObj = product.sizes?.find((s) => s.size === (product.variant || product.size))
+          if (!selectedSizeObj)
+            throw new Error(`Kích thước ${product.variant || product.size} không tìm thấy cho sản phẩm ${product.name}`)
+
+          return axios.post(
+            `http://localhost:8000/api/orders/buy/${encodeURIComponent(product.name)}`,
+            paymentData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          )
+        })
+
+        await Promise.all(orderPromises)
+        navigate('/order-success')
+        toast.success(t('order_confirmed_successfully'), { autoClose: 2000 })
+      } else if (paymentMethod === 'momo') {
+        // Xử lý thanh toán MoMo
+        const orderPromises = products.map(async (product) => {
+          const selectedSizeObj = product.sizes?.find((s) => s.size === (product.variant || product.size))
+          if (!selectedSizeObj) {
+            throw new Error(`Kích thước ${product.variant || product.size} không tìm thấy cho sản phẩm ${product.name}`)
+          }
+
+          return axios.post(
+            `http://localhost:8000/api/orders/buy/${encodeURIComponent(product.name)}`,
+            paymentData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          )
+        })
+
+        const orderResults = await Promise.all(orderPromises)
+
+        const requestId = `REQ_${Date.now()}`
+
+        const pendingOrder = {
+          orderId,
+          orderResults: orderResults.map(result => result.data),
+          products,
+          shippingInfo,
+          total,
+          couponDiscount,
+          shippingFee
+        }
+        localStorage.setItem('pendingOrder', JSON.stringify(pendingOrder))
 
         const response = await axios.post(
-          `http://localhost:8000/api/orders/buy/${encodeURIComponent(product.name)}`,
+          'http://localhost:8000/api/momo/payment',
           {
-            shipping_info: shippingInfo,
-            quantity: product.quantity,
-            product_size_id: selectedSizeObj.product_size_id,
-            payment_method: paymentMethod,
-            status: paymentMethod === 'cod' ? 'confirmed' : 'pending'
+            orderId,
+            orderResults: orderResults.map(result => result.data),
+            products,
+            shippingInfo,
+            total,
+            couponDiscount,
+            shippingFee,
+            amount, // Sử dụng amount đã tính toán
+            orderInfo: `Thanh toán đơn hàng ${orderId}`,
+            requestId,
+            redirectUrl: `${window.location.origin}/momo-callback`,
+            ipnUrl: 'http://localhost:8000/api/momo/callback',
+            extraData: btoa(unescape(encodeURIComponent(JSON.stringify({
+              orderCode: orderId,
+              orderIds: orderResults.map(result => result.data.order_id)
+            })))),
+            lang: 'vi',
+            requestType: 'captureWallet'
           },
           {
             headers: {
@@ -73,26 +153,20 @@ const Payment: React.FC = () => {
             }
           }
         )
-        return response.data
-      })
 
-      await Promise.all(orderPromises)
-
-      if (paymentMethod === 'cod') {
-        navigate('/order-success')
-        toast.success(t('order_confirmed_successfully'), { autoClose: 2000 })
-      } else if (paymentMethod === 'momo') {
-        const firstOrder = (await Promise.all(orderPromises))[0]
-        const { paymentUrl } = firstOrder
-        if (paymentUrl) {
-          window.location.href = paymentUrl
-          // Giả định sau khi thanh toán Momo thành công, cần backend redirect về /order-success
+        if (response.data && response.data.payUrl) {
+          localStorage.setItem('currentMomoPayment', JSON.stringify({
+            orderId,
+            amount,
+            orderIds: orderResults.map(result => result.data.order_id)
+          }))
+          window.location.href = response.data.payUrl
         } else {
-          throw new Error('No payment URL provided for Momo')
+          throw new Error(response.data?.message || t('payment_failed'))
         }
       }
     } catch (error: any) {
-      console.error('Payment error:', error)
+      console.error('Lỗi thanh toán:', error)
       toast.error(error.response?.data?.message || t('payment_failed'), { autoClose: 2000 })
     } finally {
       setLoading(false)
@@ -111,7 +185,7 @@ const Payment: React.FC = () => {
     <div className='min-h-screen bg-gray-100 font-sans'>
       <div className='container mx-auto px-4 py-6 lg:py-10 lg:px-8'>
         <div className='flex flex-col lg:flex-row gap-6'>
-          {/* Order Summary */}
+          {/* Tóm tắt đơn hàng */}
           <div className='w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-sm'>
             <h2 className='text-lg font-semibold text-gray-800 mb-4'>{t('order_summary')}</h2>
             {products.map((product) => (
@@ -160,15 +234,14 @@ const Payment: React.FC = () => {
             </div>
           </div>
 
-          {/* Payment Method */}
+          {/* Phương thức thanh toán */}
           <div className='w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-sm'>
             <h2 className='text-lg font-semibold text-gray-800 mb-4'>{t('payment_method')}</h2>
             <div className='space-y-4'>
-              {/* COD Option */}
+              {/* Tùy chọn COD */}
               <div
-                className={`p-4 border rounded-md cursor-pointer transition-colors ${
-                  paymentMethod === 'cod' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                }`}
+                className={`p-4 border rounded-md cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                  }`}
                 onClick={() => setPaymentMethod('cod')}
               >
                 <div className='flex items-center'>
@@ -186,11 +259,10 @@ const Payment: React.FC = () => {
                 </div>
               </div>
 
-              {/* Momo Option */}
+              {/* Tùy chọn MoMo */}
               <div
-                className={`p-4 border rounded-md cursor-pointer transition-colors ${
-                  paymentMethod === 'momo' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                }`}
+                className={`p-4 border rounded-md cursor-pointer transition-colors ${paymentMethod === 'momo' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                  }`}
                 onClick={() => setPaymentMethod('momo')}
               >
                 <div className='flex items-center'>
@@ -212,9 +284,8 @@ const Payment: React.FC = () => {
             <button
               onClick={handlePayment}
               disabled={loading}
-              className={`w-full mt-6 py-2 rounded-md text-white transition ${
-                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-              }`}
+              className={`w-full mt-6 py-2 rounded-md text-white transition ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                }`}
             >
               {loading ? t('processing') : t('confirm_payment')}
             </button>

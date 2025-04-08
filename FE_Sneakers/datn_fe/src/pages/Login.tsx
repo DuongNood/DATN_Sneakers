@@ -6,7 +6,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import axios from 'axios'
 import { useTranslation } from 'react-i18next'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -20,7 +19,7 @@ const Login = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) 
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -32,26 +31,32 @@ const Login = () => {
   })
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    setIsLoading(true) 
+    setIsLoading(true)
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login', data)
+      const response = await axios.post('http://localhost:8000/api/login', data)
 
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
 
-      toast.success(t('login_success'), { autoClose: 1000 })
-      setTimeout(() => navigate('/'), 100)
+        toast.success(t('login_success'), { autoClose: 1000 })
+        setTimeout(() => navigate('/'), 1000)
+      } else {
+        throw new Error('Invalid response from server')
+      }
     } catch (error: any) {
+      console.error('Login error:', error)
       if (error.response && error.response.status === 401) {
         setError('password', {
           type: 'manual',
           message: t('login_failed')
         })
+        toast.error(t('login_failed'), { autoClose: 2000 })
       } else {
         toast.error(t('system_error'), { autoClose: 2000 })
       }
     } finally {
-      setIsLoading(false) 
+      setIsLoading(false)
     }
   }
 
@@ -106,7 +111,7 @@ const Login = () => {
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.3 }}
             type='submit'
-            disabled={isLoading} 
+            disabled={isLoading}
             className={`w-full bg-blue-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition flex items-center justify-center ${
               isLoading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
@@ -129,25 +134,6 @@ const Login = () => {
             {isLoading ? t('logging_in') : t('login_button')}
           </motion.button>
         </form>
-
-        <div className='mt-4 flex flex-col items-center space-y-3'>
-          <SignedOut>
-            <SignInButton>
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ duration: 0.3 }}
-                className='w-full bg-gray-200 text-gray-800 py-3 rounded-md font-semibold hover:bg-gray-300 transition'
-              >
-                {t('login_with_other')}
-              </motion.button>
-            </SignInButton>
-          </SignedOut>
-
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
-        </div>
 
         <p className='text-gray-600 mt-6 text-center text-sm flex justify-between'>
           <span>
