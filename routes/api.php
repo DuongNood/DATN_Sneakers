@@ -109,20 +109,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('carts/remove/{cart_item_id}', [CartController::class, 'removeFromCart']);
     Route::get('/orders/{id}', [OrderController::class, 'orderDetails']);
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
-   
-});
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/orders/from-cart', [OrderController::class, 'createOrderFromCart']);
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/{order}', [OrderController::class, 'show']);
-    Route::post('/orders/{order}/request-cancellation', [OrderController::class, 'requestCancellation']);
-    Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
-    
-    // MomoPayment routes with authentication
-    Route::post('/momo/payment', [MomopaymentController::class, 'createOrderWithMomo']);
-    // Route::post('/momo/ipn', [MomopaymentController::class, 'createPayment']);
-    Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
+    Route::get('/vnpay-return', action: [OrderController::class, 'vnpayCallback']);
+
 });
 
-// Public Momo callback route (needs to be public for Momo to access)
-Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
+
