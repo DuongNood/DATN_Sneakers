@@ -104,7 +104,7 @@
             <div class="variant-row row align-items-end mb-3">
                 <input type="hidden" value="{{ $product->id }}"  name="product_variants[${index}][product_id]">
                  <div class="col-md-2">
-                    <select class="form-select" name="product_variants[{{ $key }}][product_size_id]">
+                    <select class="form-select" name="product_variants[${index}][product_size_id]">
                         @foreach ($size as $item)
                             <option value="{{ $item->id }}">
                                 {{ $item->name }}

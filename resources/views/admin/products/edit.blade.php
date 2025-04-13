@@ -17,8 +17,7 @@
                         <form action="{{route('admin.products.update', $product->id)}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
-                            <div class="row">
-                                <div class="col-lg-6">
+                            <div class="row">                                
                                     <div class="mb-3">
                                         <label for="simpleinput" class="form-label">Product code</label>
                                         <input type="text" id="simpleinput" class="form-control" name="product_code" value="{{$product->product_code}}">
@@ -52,39 +51,120 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
-                                    <div class="mb-3">
-                                        <label for="example-password" class="form-label">Category</label>
-                                        <select class="form-select" aria-label="Default select example" name="category_id">
-                                            @foreach ($category as $item)
-                                                <option value="{{$item->id}}" {{ $item->id == $product->category_id ? 'selected' : '' }}>{{$item->category_name}}</option>
-                                            @endforeach                                                                                    
-                                        </select>
+                                    <div class="col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="example-password" class="form-label">Category</label>
+                                            <select class="form-select" aria-label="Default select example" name="category_id">
+                                                @foreach ($category as $item)
+                                                    <option value="{{$item->id}}" {{ $item->id == $product->category_id ? 'selected' : '' }}>{{$item->category_name}}</option>
+                                                @endforeach                                                                                    
+                                            </select>
+                                        </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="example-password" class="form-label">Is show home</label>
-                                        <select class="form-select" aria-label="Default select example" name="is_show_home">
-                                            <option value="1" {{ $product->is_show_home == 1 ? 'selected' : '' }}>Display</option>
-                                            <option value="0" {{ $product->is_show_home == 0 ? 'selected' : '' }}>Hide</option>
-                                        </select>
+                                    <div class="col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="example-password" class="form-label">Thương hiệu</label>
+                                            <select class="form-select @error('brand_id') is-invalid @enderror" name="brand_id">
+                                                @foreach ($listBrand as $item)
+                                                    <option value="{{ $item->id }}" {{ old('brand_id') == $item->id ? 'selected' : '' }}>
+                                                        {{ $item->brand_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('brand_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
 
-                                    <div class="mb-3">
+                                    <div class="col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="example-password" class="form-label">Giới tính</label>
+                                            <select class="form-select @error('gender_id') is-invalid @enderror" name="gender_id">
+                                                @foreach ($listGender as $item)
+                                                    <option value="{{ $item->id }}" {{ old('gender_id') == $item->id ? 'selected' : '' }}>
+                                                        {{ $item->gender_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('gender_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="mb-3">
+                                            <label for="example-password" class="form-label">Is show home</label>
+                                            <select class="form-select" aria-label="Default select example" name="is_show_home">
+                                                <option value="1">Display</option>
+                                                <option value="0">Hide</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {{-- <div class="mb-3">
                                         <label for="example-password" class="form-label">Status</label>
                                         <select class="form-select" aria-label="Default select example" name="status">
                                             <option value="1" {{ $product->status == 1 ? 'selected' : '' }}>active</option>
                                             <option value="0" {{ $product->status == 0 ? 'selected' : '' }}>inactive</option>
                                         </select>
-                                    </div>
-                                </div>
+                                    </div> --}}
 
-                                <div class="col-lg-6">
+                                    <div id="variant-table" >                                            
+                                                <div class="variant-row row align-items-end mb-3">    
+                                                    @foreach ($listVariant as $key => $variant)                                                                                                                             
+                                                        <div class="col-md-1 mb-1">
+                                                            <label for="simpleinput" class="form-label">Size</label>
+                                                            <select class="form-select"
+                                                                name="product_variants[{{ $key }}][product_size_id]">
+                                                                @foreach ($size as $item)
+                                                                    <option value="{{ $item->id }}"
+                                                                        {{  old("product_variants.$key.product_size_id", $variant->product_size_id) 
+                                                                        == $item->id ? 'selected' : '' }}>
+                                                                        {{ $item->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-md-2 mb-1">
+                                                            <label for="simpleinput"
+                                                                class="form-label">Quantity</label>
+                                                            <input type="number" class="form-control"
+                                                                name="product_variants[{{ $key }}][quantity]"
+                                                                value="{{ old("product_variants.$key.quantity", $variant->quantity) }}"
+                                                                placeholder="Quantity" >
+                                                            @error("product_variants.$key.quantity")
+                                                                <p class="text-danger position-absolute">
+                                                                    {{ $message }}</p>
+                                                            @enderror
+                                                        </div>
+                                                        {{-- <div class="col-md-1">
+                                                            <button type="button"class="remove-row btn btn-danger">Xóa</button>
+                                                        </div> --}}
+                                                    @endforeach
+                                                </div>
+
+                                        </div>
+
+                                        <div class="col-lg-3">
+                                                <button type="button" id="add-variant" class="btn btn-success mb-2">➕
+                                                             Thêm Biến Thể</button>
+                                         </div>
+
+
                                     <div class="mb-3">
                                         <label for="mo_ta_ngan" class="form-label">Description</label> <br>
                                         <div id="quill-editor" style="height: 400px;">
                                         </div>
                                         <textarea name="description" id="editor_content" class="d-none">{{$product->description}}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="mo_ta_ngan" class="form-label">Hưỡng dẫn bảo quản giày</label> <br>
+                                        <div id="quill-editor1" style="height: 400px;">
+                                        </div>
+                                        <textarea name="care_instructions" id="editor_content1" class="d-none">{{$product->care_instructions}}</textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label for="image" class="form-label">Image</label>
@@ -116,7 +196,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
+
                             </div>
                             <div class="d-flex"><button type="submit" class="btn btn-primary">Update</button>
                         </form>
@@ -200,5 +280,60 @@
             var row = item.closest('tr');
             row.remove();
         }
+    </script>
+    <script>
+        $(document).ready(function () {
+            let index =
+                        {{ count(old('product_variants', [0 => []])) - 1 }}; // Lấy số lượng biến thể đã có từ old()
+
+            // Thêm biến thể mới
+            $("#add-variant").click(function () {
+                index++;
+                let newRow = `
+                        <div class="variant-row row align-items-end mb-3">
+                             <div class="col-md-2">
+                                <select class="form-select" name="product_variants[${index}][product_size_id]">
+                                    @foreach ($size as $item)
+                                        <option value="{{ $item->id }}">
+                                            {{ $item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>                         
+                            <div class="col-md-2">
+                                <input type="number" class="form-control" name="product_variants[${index}][quantity]" 
+                                       placeholder="Quantity">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="remove-row btn btn-danger">Xóa</button>
+                            </div>
+                        </div>
+                    `;
+                $("#variant-table").append(newRow);
+            });
+
+            // Xóa biến thể
+            $(document).on("click", ".remove-row", function () {
+                $(this).closest(".variant-row").remove();
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var quill = new Quill("#quill-editor1", {
+                theme: "snow",
+            })
+
+            // Hiển thị nội dung cũ 
+            var old_content = `{!! $product->care_instructions !!}`;
+            quill.root.innerHTML = old_content
+
+            // Cập nhật lại textarea ẩn khi nội dung của  quill-editor thay đổi
+            quill.on('text-change', function () {
+                var html = quill.root.innerHTML;
+                document.getElementById('editor_content1').value = html
+            })
+        })
+
     </script>
 @endsection

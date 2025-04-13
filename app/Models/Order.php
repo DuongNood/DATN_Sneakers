@@ -121,4 +121,8 @@ class Order extends Model
     {
         return $this->status === self::CHO_XAC_NHAN_HUY;
     }
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 }

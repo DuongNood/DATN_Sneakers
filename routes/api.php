@@ -1,33 +1,34 @@
 <?php
 
 
-use App\Http\Controllers\api\DetailController;
-use App\Http\Controllers\Api\MomopaymentController;
-use App\Http\Controllers\Api\SettingController;
+use App\Models\Promotion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\Api\BannerController;
-use App\Http\Controllers\admin\PromotionController;
-
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
+
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\api\DetailController;
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
-use App\Http\Controllers\CartController;
 
 use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\Api\StatisticsController;
 
+use App\Http\Controllers\admin\PromotionController;
+use App\Http\Controllers\Api\MomopaymentController;
+use App\Http\Controllers\api\ProductReviewController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Models\Promotion;
-use Illuminate\Support\Facades\Auth;
 
 Route::apiResource('banners', BannerController::class);
 
@@ -100,6 +101,10 @@ Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProduc
 Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
+Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::class, 'store']);
+Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);
+
+
 // mua hàng
 
 Route::middleware('auth:sanctum')->group(function () {
