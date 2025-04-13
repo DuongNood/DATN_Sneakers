@@ -102,7 +102,7 @@ Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
 Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::class, 'store']);
-Route::get('/products/{id}/reviews', [ProductReviewController::class, 'getReviewsByProduct']);
+Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);
 
 // mua hàng
 
