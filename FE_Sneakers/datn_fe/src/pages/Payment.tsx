@@ -39,7 +39,13 @@ const Payment: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'momo' | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
-  console.log('Payment Data from Checkout:', { products, shippingInfo, total, couponDiscount, shippingFee })
+  console.log('Payment Data from Checkout:', {
+    products,
+    shippingInfo,
+    total,
+    couponDiscount,
+    shippingFee
+  })
 
   const handlePayment = async () => {
     if (!paymentMethod) {
@@ -52,6 +58,7 @@ const Payment: React.FC = () => {
       const token = localStorage.getItem('token')
       if (!token) throw new Error(t('no_token'))
 
+      // Tạo đơn hàng
       const orderPromises = products.map(async (product) => {
         const selectedSizeObj = product.sizes?.find((s) => s.size === (product.variant || product.size))
         if (!selectedSizeObj)
@@ -82,18 +89,29 @@ const Payment: React.FC = () => {
         navigate('/order-success')
         toast.success(t('order_confirmed_successfully'), { autoClose: 2000 })
       } else if (paymentMethod === 'momo') {
-        const firstOrder = (await Promise.all(orderPromises))[0]
-        const { paymentUrl } = firstOrder
-        if (paymentUrl) {
-          window.location.href = paymentUrl
-          // Giả định sau khi thanh toán Momo thành công, cần backend redirect về /order-success
+        // Gọi API MoMo để lấy payUrl
+        const momoResponse = await axios.post(
+          'http://localhost:8000/api/momo/create',
+          { amount: total },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+
+        const { payUrl } = momoResponse.data
+        if (payUrl) {
+          window.location.href = payUrl // cái này nó sẽ chuyển hướng về url của MoMo nhá Thi tró
         } else {
-          throw new Error('No payment URL provided for Momo')
+          throw new Error('Lỗi, vui lòng nạp thêm tiền cho anh Hoàng Anh nhé')
         }
       }
     } catch (error: any) {
       console.error('Payment error:', error)
-      toast.error(error.response?.data?.message || t('payment_failed'), { autoClose: 2000 })
+      toast.error(error.response?.data?.message || t('payment_failed'), {
+        autoClose: 2000
+      })
     } finally {
       setLoading(false)
     }
@@ -111,7 +129,7 @@ const Payment: React.FC = () => {
     <div className='min-h-screen bg-gray-100 font-sans'>
       <div className='container mx-auto px-4 py-6 lg:py-10 lg:px-8'>
         <div className='flex flex-col lg:flex-row gap-6'>
-          {/* Order Summary */}
+        
           <div className='w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-sm'>
             <h2 className='text-lg font-semibold text-gray-800 mb-4'>{t('order_summary')}</h2>
             {products.map((product) => (
@@ -160,11 +178,11 @@ const Payment: React.FC = () => {
             </div>
           </div>
 
-          {/* Payment Method */}
+       
           <div className='w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-sm'>
             <h2 className='text-lg font-semibold text-gray-800 mb-4'>{t('payment_method')}</h2>
             <div className='space-y-4'>
-              {/* COD Option */}
+            
               <div
                 className={`p-4 border rounded-md cursor-pointer transition-colors ${
                   paymentMethod === 'cod' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
@@ -186,7 +204,7 @@ const Payment: React.FC = () => {
                 </div>
               </div>
 
-              {/* Momo Option */}
+             
               <div
                 className={`p-4 border rounded-md cursor-pointer transition-colors ${
                   paymentMethod === 'momo' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'

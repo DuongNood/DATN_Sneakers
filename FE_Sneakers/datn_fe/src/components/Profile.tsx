@@ -23,7 +23,7 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({ name: '', address: '', phone: '', image_user: null })
   const [errors, setErrors] = useState({ name: '', address: '', phone: '' })
 
-  const defaultImage = 'https://m.yodycdn.com/blog/anh-dai-dien-hai-yodyvn77.jpg'
+  const defaultImage = 'https://m.yodycdn.com/blog/meme-ech-xanh-yody-vn-55.jpg'
 
   const fetchUserData = async () => {
     try {
