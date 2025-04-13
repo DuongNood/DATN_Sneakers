@@ -27,7 +27,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const data = await response.json()
         setProducts(data.data || [])
       } catch (error) {
-        console.error('Lỗi khi fetch danh sách sản phẩm:', error)
+        // console.error('Lỗi khi fetch danh sách sản phẩm:', error)
       }
     }
 

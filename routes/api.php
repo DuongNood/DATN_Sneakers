@@ -100,6 +100,7 @@ Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProduc
 Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
+
 // mua hàng
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -111,13 +112,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
    
 });
+
+// đặt hàng,chi tiết đơn hàng
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/orders/from-cart', [OrderController::class, 'createOrderFromCart']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::post('/orders/{order}/request-cancellation', [OrderController::class, 'requestCancellation']);
-    Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
+    Route::post('/orders/create-from-cart', [OrderController::class, 'createOrderFromCart']);
+    Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
 });
+
 // MomoPayment 
 // tạo thanh toán momo
 Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);
