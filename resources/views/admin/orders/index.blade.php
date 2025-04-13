@@ -70,7 +70,8 @@
                             <tr>
                                 <th class="text-center small ">STT</th>
                                 <th class="text-center small">Mã Đơn Hàng</th>
-                                <th class="text-center small">Khách Hàng</th>
+                                <th class="text-center small">TT Người Đặt</th>
+                                <th class="text-center small">TT Người Nhận</th>
                                 <th class="text-center small">Giảm Giá</th>
                                 <th class="text-center small">Phí Ship</th>
                                 <th class="text-center small">Tổng Tiền</th>
@@ -86,6 +87,12 @@
                                 <tr class="align-middle">
                                     <td class="text-center small">{{ $order->id }}</td>
                                     <td>{{ $order->order_code }}</td>
+                                    <td>
+                                        <strong>{{ $order->user->name }}</strong><br>
+                                        <small class="text-muted">{{ $order->user->email }}</small><br>
+                                        <small class="text-muted">{{ $order->user->phone }}</small><br>
+                                        <small class="text-muted">{{ $order->user->address }}</small>
+                                    </td>
                                     <td>
                                         <strong>{{ $order->recipient_name }}</strong><br>
                                         <small class="text-muted">{{ $order->recipient_phone }}</small><br>
