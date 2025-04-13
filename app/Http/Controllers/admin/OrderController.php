@@ -5,11 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
-use App\Models\Product;
-use App\Models\ProductPromotion;
 use App\Models\ProductVariant;
-use App\Models\Promotion;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -82,10 +78,14 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
+            // Cập nhật thông tin người nhận
+            $order->recipient_name = $request->input('recipient_name');
+            $order->recipient_phone = $request->input('recipient_phone');
+            $order->recipient_address = $request->input('recipient_address');
+
             // Nếu trạng thái đơn hàng thay đổi hợp lệ thì cập nhật
             if ($request->status && $this->canUpdateShippingStatus($order->status, $request->status)) {
                 // Nếu chuyển sang trạng thái hủy đơn hàng, hoàn lại số lượng sản phẩm
-
                 if ($request->status === 'huy_don_hang') {
                     $this->restoreStock($order);
                 }
@@ -97,6 +97,13 @@ class OrderController extends Controller
                 $order->payment_status = $request->payment_status;
             }
 
+            // Xử lý thay đổi sản phẩm (cần thêm logic tùy theo yêu cầu của bạn)
+            // Ví dụ: thêm, sửa, xóa sản phẩm trong order_details
+            // ...
+
+            // Tính toán lại tổng tiền đơn hàng
+            $order->total_price = $this->calculateTotalPrice($order);
+
             $order->save();
             DB::commit();
 
@@ -105,6 +112,14 @@ class OrderController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi cập nhật đơn hàng!');
         }
+    }
+
+    private function calculateTotalPrice(Order $order)
+    {
+        $total = $order->orderDetails->sum(function ($detail) {
+            return $detail->price;
+        });
+        return $total - $order->promotion + $order->shipping_fee;
     }
 
     private function canUpdateShippingStatus($currentStatus, $newStatus)

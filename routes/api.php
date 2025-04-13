@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\MomoController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
-
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\api\DetailController;
@@ -102,8 +102,7 @@ Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
 Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::class, 'store']);
-Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);
-
+Route::get('/products/{id}/reviews', [ProductReviewController::class, 'getReviewsByProduct']);
 
 // mua hàng
 
@@ -116,18 +115,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
    
 });
+
+// đặt hàng,chi tiết đơn hàng
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/orders/from-cart', [OrderController::class, 'createOrderFromCart']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::post('/orders/{order}/request-cancellation', [OrderController::class, 'requestCancellation']);
-    Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
-    
-    // MomoPayment routes with authentication
-    Route::post('/momo/payment', [MomopaymentController::class, 'createOrderWithMomo']);
-    // Route::post('/momo/ipn', [MomopaymentController::class, 'createPayment']);
-    Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
+    Route::post('/orders/create-from-cart', [OrderController::class, 'createOrderFromCart']);
+    Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
 });
 
-// Public Momo callback route (needs to be public for Momo to access)
-Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
+// MomoPayment 
+
+Route::post('/momo/create', [MomoController::class, 'createPayment']);
+Route::post('/momo/callback', [MomoController::class, 'callback']);
+Route::post('/momo/ipn', [MomoController::class, 'ipn']);

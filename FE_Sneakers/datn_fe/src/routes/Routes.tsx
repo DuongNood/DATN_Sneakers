@@ -32,7 +32,9 @@ import NewsList from '../pages/New'
 import ProductCate from '../components/product_categories/ShoeCategories'
 import Payment from '../pages/Payment'
 import MomoCallback from '../pages/MomoCallback'
-import OrderSuccess from '../pages/OrderSuccess'
+import OrderSuccess from '../components/SuccesOrder'
+import OrdersPage from '../pages/OrdersPage'
+
 
 const RoutesConfig = () => {
   return (
@@ -65,8 +67,13 @@ const RoutesConfig = () => {
             </>
           }
         />
+<<<<<<< HEAD
         
         {/* Rest of your routes */}
+=======
+        <Route path='/' element={<ProductList />} />
+        <Route path='/*' element={<NotFound />} />
+>>>>>>> e4f88c52d01fffffd2d05609b191bce0809fd16d
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
@@ -78,6 +85,7 @@ const RoutesConfig = () => {
         <Route path='/category/:id' element={<ProductCate />} />
         <Route path='/news/:id' element={<NewsDetail />} />
         <Route path='/cart' element={<Cart />} />
+        <Route path='/orders' element={<OrdersPage />} />
         <Route path='/payment' element={<Payment />} />
         <Route path='/momo-callback' element={<MomoCallback />} />
         <Route path='/order-success' element={<OrderSuccess />} />

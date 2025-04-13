@@ -12,7 +12,6 @@ class Order extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-
         'user_id',
         'order_code',
         'recipient_name',
@@ -24,7 +23,8 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'status',
-        'cancellation_reason'
+        'cancellation_reason',
+        'previous_status',
     ];
 
     public function orderDetails()
@@ -35,6 +35,7 @@ class Order extends Model
     protected $casts = [
         'total_price' => 'decimal:2',
         'shipping_fee' => 'decimal:2',
+        'promotion' => 'decimal:2',
     ];
 
     // Trạng thái thanh toán
@@ -72,10 +73,6 @@ class Order extends Model
     }
 
     /**
-     * Quan hệ với bảng order_details
-     */
-
-    /**
      * Scope lọc đơn hàng theo trạng thái
      */
     public function scopeStatus($query, $status)
@@ -106,14 +103,9 @@ class Order extends Model
     {
         return self::ORDER_STATUS[$this->status] ?? 'Không xác định';
     }
-    public function productSize()
-    {
-        return $this->belongsTo(ProductSize::class, 'product_size_id');
-    }
 
     public function canBeCancelledByUser(): bool
     {
-        // Chỉ cho hủy khi đang chờ xử lý
         return in_array($this->status, [self::CHO_XAC_NHAN, self::DANG_CHUAN_BI]);
     }
 
@@ -121,8 +113,7 @@ class Order extends Model
     {
         return $this->status === self::CHO_XAC_NHAN_HUY;
     }
-    public function reviews()
-    {
-        return $this->hasMany(ProductReview::class);
-    }
+
+
 }
+

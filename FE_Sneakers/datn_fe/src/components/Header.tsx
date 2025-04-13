@@ -105,7 +105,7 @@ const Header = () => {
             <div className='relative group'>
               <div className='w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer'>
                 <img
-                  src={user?.image_user || 'https://m.yodycdn.com/blog/anh-dai-dien-hai-yodyvn77.jpg'}
+                  src={user?.image_user || 'https://m.yodycdn.com/blog/meme-ech-xanh-yody-vn-55.jpg'}
                   alt='Avatar'
                   className='w-full h-full rounded-full object-cover'
                 />
