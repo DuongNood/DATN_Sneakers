@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\admin\PromotionController;
-
+use App\Http\Controllers\MomoController;
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\UserController;
@@ -100,6 +100,7 @@ Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProduc
 Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
+
 // mua hàng
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -111,17 +112,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
    
 });
+
+// đặt hàng,chi tiết đơn hàng
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/orders/from-cart', [OrderController::class, 'createOrderFromCart']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::post('/orders/{order}/request-cancellation', [OrderController::class, 'requestCancellation']);
-    Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
+    Route::post('/orders/create-from-cart', [OrderController::class, 'createOrderFromCart']);
+    Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
 });
+
 // MomoPayment 
-// tạo thanh toán momo
-Route::post('/momo/payment', [MomopaymentController::class, 'createPayment']);
-// xử lí phản hồi từ momo
-Route::post('/momo/callback', [MomopaymentController::class, 'momoCallback']);
-// lấy danh sách giao dịch 
-Route::get('/momo/transactions', [MomopaymentController::class, 'getTransactions']);
+
+Route::post('/momo/create', [MomoController::class, 'createPayment']);
+Route::post('/momo/callback', [MomoController::class, 'callback']);
+Route::post('/momo/ipn', [MomoController::class, 'ipn']);
