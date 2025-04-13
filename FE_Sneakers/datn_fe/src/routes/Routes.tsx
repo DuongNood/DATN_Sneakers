@@ -32,7 +32,8 @@ import NewsList from '../pages/New'
 import ProductCate from '../components/product_categories/ShoeCategories'
 import Payment from '../pages/Payment'
 import MomoCallback from '../pages/MomoCallback'
-import OrderSuccess from '../pages/OrderSuccess'
+import OrderSuccess from '../components/SuccesOrder'
+import OrdersPage from '../pages/OrdersPage'
 
 const RoutesConfig = () => {
   return (
@@ -41,16 +42,6 @@ const RoutesConfig = () => {
       <Header />
       <ScrollToTop />
       <Routes>
-        {/* Test route to verify routing */}
-        <Route 
-          path="/test" 
-          element={
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-              <h1 className="text-2xl font-bold">Test Route Working!</h1>
-            </div>
-          } 
-        />
-
         <Route
           path='/'
           element={
@@ -65,8 +56,8 @@ const RoutesConfig = () => {
             </>
           }
         />
-        
-        {/* Rest of your routes */}
+        <Route path='/' element={<ProductList />} />
+        <Route path='/*' element={<NotFound />} />
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
@@ -78,23 +69,21 @@ const RoutesConfig = () => {
         <Route path='/category/:id' element={<ProductCate />} />
         <Route path='/news/:id' element={<NewsDetail />} />
         <Route path='/cart' element={<Cart />} />
+        <Route path='/orders' element={<OrdersPage />} />
         <Route path='/payment' element={<Payment />} />
+        <Route path='*' element={<NotFound />} />
+        <Route path='/' element={<SearchContainer />} />
         <Route path='/momo-callback' element={<MomoCallback />} />
+        <Route path='/search' element={<SearchResults />} />
         <Route path='/order-success' element={<OrderSuccess />} />
+        {/* rau dưa footer */}
         <Route path='/about' element={<AboutUs />} />
         <Route path='/privacy-policy' element={<WarrantyPolicy />} />
-        
-        {/* Protected routes */}
+        {/* Bảo vệ router */}
         <Route element={<ProtectedRoute />}>
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/change-password' element={<ChangePasswordPage />} />
         </Route>
-
-        {/* Search routes */}
-        <Route path='/search' element={<SearchResults />} />
-        
-        {/* 404 route */}
-        <Route path='*' element={<NotFound />} />
       </Routes>
 
       <Footer />

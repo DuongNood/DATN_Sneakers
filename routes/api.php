@@ -1,33 +1,34 @@
 <?php
 
 
-use App\Http\Controllers\api\DetailController;
-use App\Http\Controllers\Api\MomopaymentController;
-use App\Http\Controllers\Api\SettingController;
+use App\Models\Promotion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\MomoController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\Api\BannerController;
-use App\Http\Controllers\admin\PromotionController;
-
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\api\DetailController;
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
-use App\Http\Controllers\CartController;
 
 use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\Api\StatisticsController;
 
+use App\Http\Controllers\admin\PromotionController;
+use App\Http\Controllers\Api\MomopaymentController;
+use App\Http\Controllers\api\ProductReviewController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Models\Promotion;
-use Illuminate\Support\Facades\Auth;
 
 Route::apiResource('banners', BannerController::class);
 
@@ -100,6 +101,9 @@ Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProduc
 Route::get('/categories', [HomeController::class, 'getCategories']);
 Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
+Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::class, 'store']);
+Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);
+
 // mua hàng
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -109,8 +113,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('carts/remove/{cart_item_id}', [CartController::class, 'removeFromCart']);
     Route::get('/orders/{id}', [OrderController::class, 'orderDetails']);
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
-    Route::get('/vnpay-return', action: [OrderController::class, 'vnpayCallback']);
 
+   
 });
 
+// đặt hàng,chi tiết đơn hàng
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::post('/orders/{order}/request-cancellation', [OrderController::class, 'requestCancellation']);
+    Route::post('/orders/create-from-cart', [OrderController::class, 'createOrderFromCart']);
+    Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
+});
 
+// MomoPayment 
+
+Route::post('/momo/create', [MomoController::class, 'createPayment']);
+Route::post('/momo/callback', [MomoController::class, 'callback']);
+Route::post('/momo/ipn', [MomoController::class, 'ipn']);

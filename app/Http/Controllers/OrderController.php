@@ -431,7 +431,7 @@ public function vnpayCallback(Request $request)
         $ordersPaginator = Order::with([
             'user',
             'orderDetails.productVariant.product',
-            'orderDetails.productVariant.product_size'
+            'orderDetails.productVariant.productSize'
         ])
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
@@ -483,10 +483,17 @@ public function vnpayCallback(Request $request)
     public function requestCancellation(Request $request, Order $order): JsonResponse
     {
         $request->validate([
-            'cho_xac_nhan_huy' => ['required', 'string', 'min:10', 'max:500'],
+            'cancellation_reason' => ['required', 'string', 'min:10', 'max:500'],
         ]);
 
+        Gate::authorize('view', $order); // Kiểm tra quyền sở hữu
+
         if (!$order->canBeCancelledByUser()) {
+            Log::warning('Cancel order: Order cannot be cancelled', [
+                'order_id' => $order->id,
+                'status' => $order->status,
+                'user_id' => Auth::id(),
+            ]);
             return response()->json([
                 'message' => 'Đơn hàng không thể bị hủy ở giai đoạn này!',
                 'current_status' => $order->status
@@ -496,9 +503,10 @@ public function vnpayCallback(Request $request)
         try {
             DB::beginTransaction();
 
+            // Lưu trạng thái trước đó
             $order->previous_status = $order->status;
             $order->status = Order::CHO_XAC_NHAN_HUY;
-            $order->cho_xac_nhan_huy = $request->input('cho_xac_nhan_huy');
+            $order->cancellation_reason = $request->input('cancellation_reason');
             $order->save();
 
             DB::commit();
@@ -509,14 +517,25 @@ public function vnpayCallback(Request $request)
                 'orderDetails.productVariant.productSize'
             ]);
 
+            Log::info('Cancel order request submitted', [
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'reason' => $request->input('cancellation_reason'),
+            ]);
+
             return response()->json([
                 'message' => 'Yêu cầu hủy đã được gửi thành công.',
                 'order' => $this->formatOrderData($order)
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Yêu cầu hủy đơn hàng không thành công đối với đơn hàng ' . $order->order_code . ': ' . $e->getMessage());
-            return response()->json(['message' => 'Không thể gửi yêu cầu hủy!'], 500);
+            Log::error('Cancel order server error', [
+                'error' => $e->getMessage(),
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['message' => 'Lỗi server khi gửi yêu cầu hủy!', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -537,7 +556,7 @@ public function vnpayCallback(Request $request)
             'payment_method' => $order->payment_method,
             'payment_status' => $order->payment_status,
             'status' => $order->status,
-            'cho_xac_nhan_huy' => $order->cho_xac_nhan_huy,
+            'cancellation_reason' => $order->cancellation_reason,
             'previous_status' => $order->status === Order::CHO_XAC_NHAN_HUY ? $order->previous_status : null,
             'created_at' => $order->created_at ? $order->created_at->toISOString() : null,
             'updated_at' => $order->updated_at ? $order->updated_at->toISOString() : null,
@@ -547,7 +566,7 @@ public function vnpayCallback(Request $request)
                     'product_id' => $detail->productVariant->product_id,
                     'product_name' => $detail->productVariant->product->product_name,
                     'variant_id' => $detail->product_variant_id,
-                    'size' => $detail->productVariant->productSize->name,
+                    'size' => $detail->productVariant->productSize->name ?? 'N/A',
                     'quantity' => $detail->quantity,
                     'price' => (float) $detail->price,
                     'image_url' => $detail->productVariant->product->image
@@ -561,22 +580,7 @@ public function vnpayCallback(Request $request)
      */
     protected function getStatusText(?string $status): string
     {
-        switch ($status) {
-            case Order::CHO_XAC_NHAN:
-                return 'Chờ xác nhận';
-            case Order::DANG_CHUAN_BI:
-                return 'Đang chuẩn bị';
-            case Order::DANG_VAN_CHUYEN:
-                return 'Đang vận chuyển';
-            case Order::DA_GIAO_HANG:
-                return 'Đã giao hàng';
-            case Order::CHO_XAC_NHAN_HUY:
-                return 'Chờ xác nhận hủy';
-            case Order::HUY_DON_HANG:
-                return 'Hủy đơn hàng';
-            default:
-                return $status ?? 'Không xác định';
-        }
+        return Order::ORDER_STATUS[$status] ?? 'Không xác định';
     }
 
     
