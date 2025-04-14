@@ -10,25 +10,25 @@
             <div class="col-12">
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Chỉnh Sửa Danh Mục</h5>
+                        <h5 class="mb-0">Chỉnh Sửa Thương Hiệu</h5>
                         <div class="card">
 
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Create category</h5>
+                                <h5 class="card-title mb-0">Create brand</h5>
                             </div><!-- end card header -->
 
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <form action="{{route('admin.categories.update', $category->id)}}" method="POST">
+                                        <form action="{{route('admin.brands.update', $brand->id)}}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <div class="mb-3">
                                                 <label for="simpleinput" class="form-label">Category name</label>
-                                                <input type="text" id="simpleinput" class="form-control @error('category_name')
-                                                is-invalid @enderror" name="category_name"
-                                                    value="{{$category->category_name}}">
-                                                @error('category_name')
+                                                <input type="text" id="simpleinput" class="form-control @error('brand_name')
+                                                is-invalid @enderror" name="brand_name"
+                                                    value="{{$category->brand_name}}">
+                                                @error('brand_name')
                                                     <p>{{ $message }}</p>
                                                 @enderror
                                             </div>
@@ -37,14 +37,14 @@
                                                 <div class="col-sm-10 mb-3 d-flex gap-2">
                                                     <div class="form-check">
                                                         <input class="status" type="radio" name="status" id="gridRadios1"
-                                                            value="1" {{ $category->status == 1 ? 'checked' : '' }}>
+                                                            value="1" {{ $brand->status == 1 ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="gridRadios1">
                                                             Hiển Thị
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="status" type="radio" name="status" id="gridRadios2"
-                                                            value="0" {{ $category->status == 0 ? 'checked' : '' }}>
+                                                            value="0" {{ $brand->status == 0 ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="gridRadios2">
                                                             Ẩn
                                                         </label>
@@ -77,7 +77,7 @@
                                     </div>
                                 @endif
 
-                                <form action="{{ route('admin.categories.update', $category->id) }}" method="POST">
+                                <form action="{{ route('admin.brands.update', $category->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
 
@@ -114,7 +114,7 @@
                                     <button type="submit" class="btn btn-success">
                                         <i class="mdi mdi-check"></i> Cập nhật
                                     </button>
-                                    <a href="{{ route('admin.categories.index') }}" class="btn btn-light">
+                                    <a href="{{ route('admin.brands.index') }}" class="btn btn-light">
                                         <i class="mdi mdi-arrow-left"></i> Quay lại
                                     </a>
                                 </form>

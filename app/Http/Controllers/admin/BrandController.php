@@ -18,8 +18,8 @@ class BrandController extends Controller
     {
         //
         $title = "Danh sách thương hiệu";
-        $brands = Brand::latest('id')->paginate(10);    
-        return view(self::PATH_VIEW . __FUNCTION__, compact('brands','title'));
+        $brand = Brand::latest('id')->paginate(10);    
+        return view(self::PATH_VIEW . __FUNCTION__, compact('brand','title'));
 
     }
 
@@ -103,6 +103,6 @@ class BrandController extends Controller
         }
 
         $brand->delete();
-        return redirect()->route('admin.brands.index')->with('success', 'Xóa thương thành công!');
+        return redirect()->route('admin.brands.index')->with('success', 'Xóa thương hiệu thành công!');
     }
 }

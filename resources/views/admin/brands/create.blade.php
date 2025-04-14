@@ -36,18 +36,18 @@
                         <form action="{{ route('admin.brands.store') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="category_name" class="form-label fw-semibold">Tên Danh Mục</label>
-                                <input type="text" id="category_name" name="category_name"
-                                    class="form-control @error('category_name') is-invalid @enderror"
-                                    value="{{ old('category_name') }}" placeholder="Nhập tên danh mục">
+                                <label for="brand_name" class="form-label fw-semibold">Tên Danh Mục</label>
+                                <input type="text" id="brand_name" name="brand_name"
+                                    class="form-control @error('brand_name') is-invalid @enderror"
+                                    value="{{ old('brand_name') }}" placeholder="Nhập tên thương hiệu">
 
-                                @error('category_name')
+                                @error('brand_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Lưu danh mục
+                                <i class="bi bi-save"></i> Lưu thương hiệu
                             </button>
                         </form>
                     </div>

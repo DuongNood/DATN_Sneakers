@@ -3,8 +3,8 @@
 @section('content')
     <div class="container-xxl mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-semibold">Danh Sách Danh Mục</h4>
-            <a href="{{ route('admin.categories.create') }}" class="btn btn-success">
+            <h4 class="fw-semibold">Danh Sách Thương Hiệu</h4>
+            <a href="{{ route('admin.brands.create') }}" class="btn btn-success">
                 <i class="bi bi-plus-lg"></i> Thêm mới
             </a>
         </div>
@@ -24,28 +24,28 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>ID</th>
-                                <th>Tên Danh Mục</th>
+                                <th>Tên Thương Hiệu</th>
                                 <th>Trạng Thái</th>
                                 <th>Hành Động</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($category as $item)
+                            @foreach ($brand as $item)
                                 <tr>
                                     <td>{{ $item->id }}</td>
-                                    <td class="text-start">{{ $item->category_name }}</td>
+                                    <td class="text-start">{{ $item->brand_name }}</td>
                                     <td>
                                         <span class="badge {{ $item->status == 0 ? 'bg-danger' : 'bg-success' }}">
                                             {{ $item->status == 0 ? 'Inactive' : 'Active' }}
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.categories.edit', $item->id) }}"
+                                        <a href="{{ route('admin.brands.edit', $item->id) }}"
                                             class="btn btn-sm btn-outline-primary">
                                             <i class="mdi mdi-pencil"></i> Sửa
                                         </a>
 
-                                        <form action="{{ route('admin.categories.destroy', $item->id) }}" method="POST"
+                                        <form action="{{ route('admin.brands.destroy', $item->id) }}" method="POST"
                                             class="d-inline">
                                             @csrf
                                             @method('DELETE')
