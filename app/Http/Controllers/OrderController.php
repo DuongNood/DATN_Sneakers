@@ -184,7 +184,7 @@ class OrderController extends Controller
                     ->whereDate('start_date', '<=', now())
                     ->whereDate('end_date', '>=', now())
                     ->first();
-                    
+
                 if ($promotion) {
                     if ($promotion->discount_type === 'Giảm theo %') {
                         $promotionAmount = ($totalPriceBeforeDiscount * $promotion->discount_value) / 100;

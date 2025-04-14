@@ -25,10 +25,7 @@ class Product extends Model
         'is_show_home' => 'boolean',
     ];
 
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
-    }
+
     // 🔗 Liên kết với `ProductVariant`
 
     //  public function category()
