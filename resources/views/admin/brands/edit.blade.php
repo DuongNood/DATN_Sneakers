@@ -11,23 +11,23 @@
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Chỉnh Sửa Thương Hiệu</h5>
-                        <div class="card">
+                        <div class="card mt-3">
 
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Create brand</h5>
+                                <h5 class="card-title mb-0">Update brand</h5>
                             </div><!-- end card header -->
 
-                            <div class="card-body">
+                            {{-- <div class="card-body">
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <form action="{{route('admin.brands.update', $brand->id)}}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <div class="mb-3">
-                                                <label for="simpleinput" class="form-label">Category name</label>
+                                                <label for="simpleinput" class="form-label">Brand name</label>
                                                 <input type="text" id="simpleinput" class="form-control @error('brand_name')
                                                 is-invalid @enderror" name="brand_name"
-                                                    value="{{$category->brand_name}}">
+                                                    value="{{$brand->brand_name}}">
                                                 @error('brand_name')
                                                     <p>{{ $message }}</p>
                                                 @enderror
@@ -55,7 +55,7 @@
                                         </form>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="card-body">
                                 {{-- Hiển thị thông báo thành công --}}
@@ -77,18 +77,18 @@
                                     </div>
                                 @endif
 
-                                <form action="{{ route('admin.brands.update', $category->id) }}" method="POST">
+                                <form action="{{ route('admin.brands.update', $brand->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
 
                                     <div class="mb-3">
-                                        <label for="category_name" class="form-label fw-semibold">Tên Danh Mục</label>
-                                        <input type="text" id="category_name" name="category_name"
-                                            class="form-control @error('category_name') is-invalid @enderror"
-                                            value="{{ old('category_name', $category->category_name) }}"
+                                        <label for="brand_name" class="form-label fw-semibold">Tên Danh Mục</label>
+                                        <input type="text" id="brand_name" name="brand_name"
+                                            class="form-control @error('brand_name') is-invalid @enderror"
+                                            value="{{ old('brand_name', $brand->brand_name) }}"
                                             placeholder="Nhập tên danh mục">
 
-                                        @error('category_name')
+                                        @error('brand_name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -98,13 +98,13 @@
                                         <div class="d-flex gap-3">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="status" id="active"
-                                                    value="1" {{ old('status', $category->status) == 1 ? 'checked' : '' }}>
+                                                    value="1" {{ old('status', $brand->status) == 'active' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="active">Active</label>
                                             </div>
 
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="status" id="inactive"
-                                                    value="0" {{ old('status', $category->status) == 0 ? 'checked' : '' }}>
+                                                    value="0" {{ old('status', $brand->status) == 'inactive' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="inactive">Inactive</label>
                                             </div>
                                         </div>

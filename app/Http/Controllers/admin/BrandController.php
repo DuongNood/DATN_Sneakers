@@ -45,7 +45,7 @@ class BrandController extends Controller
             'description' => 'nullable',
         ]);
 
-        $params['status'] = isset($request->status) ? 1 : 0;
+        $params['status'] = isset($request->status) ? 'active' : 'inactive';
 
         Brand::create($params);
 
@@ -81,7 +81,7 @@ class BrandController extends Controller
 
         $params = $request->validate([
             'brand_name' => 'required|max:255|unique:brands,brand_name,' . $brand->id,
-            'status' => 'required|in:0,1'
+            'status' => 'required'
         ]);
 
         $brand->update($params);

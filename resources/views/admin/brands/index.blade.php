@@ -35,8 +35,8 @@
                                     <td>{{ $item->id }}</td>
                                     <td class="text-start">{{ $item->brand_name }}</td>
                                     <td>
-                                        <span class="badge {{ $item->status == 0 ? 'bg-danger' : 'bg-success' }}">
-                                            {{ $item->status == 0 ? 'Inactive' : 'Active' }}
+                                        <span class="badge {{ $item->status == 'inactive' ? 'bg-danger' : 'bg-success' }}">
+                                            {{ $item->status == 'inactive' ? 'Inactive' : 'Active' }}
                                         </span>
                                     </td>
                                     <td>

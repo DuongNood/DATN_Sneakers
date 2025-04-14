@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\BrandController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\AuthController;
 use App\Http\Controllers\admin\StatisticsController;
@@ -48,6 +49,10 @@ Route::prefix('admin')
 
         Route::middleware(['auth', 'permission:manage_users'])->group(function () {
             Route::resource('users', UserController::class);
+        });
+
+        Route::middleware(['auth', 'permission:manage_users'])->group(function () {
+            Route::resource('brands', BrandController::class);
         });
 
         Route::middleware(['auth', 'permission:manage_categories'])->group(function () {
