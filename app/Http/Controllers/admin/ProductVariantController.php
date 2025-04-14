@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\admin;
 
 use App\Models\Product;
+use App\Models\ProductSize;
 use Illuminate\Http\Request;
 use App\Models\ProductVariant;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Models\ProductSize;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 
@@ -43,53 +44,53 @@ class ProductVariantController extends Controller
 
 
     public function store(Request $request)
-    {
-        
+{
+    
+    DB::beginTransaction();
     try {
         $validatedData = $request->validate([
-            'product_variants'                  => 'required|array', 
-            'product_variants.*.product_size_id'=> 'required',
-            'product_variants.*.product_id'     => 'required|exists:products,id', 
-            'product_variants.*.quantity'       => 'required|integer|min:0', 
-            'product_variants.*.status'         => 'nullable|in:0,1'
-        ],[
-            //THÊM THÔNG BÁO LỖI TÙY CHỈNH
+            'product_variants'                   => 'required|array',
+            'product_variants.*.product_size_id' => 'required',
+            'product_variants.*.product_id'      => 'required|exists:products,id',
+            'product_variants.*.quantity'        => 'required|integer|min:0',
+            'product_variants.*.status'          => 'nullable|in:0,1',
+        ], [
             'product_variants.required' => 'Danh sách biến thể không được để trống!',
             'product_variants.array' => 'Dữ liệu biến thể không hợp lệ!',
             'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có một product_size_id!',
             'product_variants.*.product_id.required' => 'Mỗi biến thể phải có một product_id!',
             'product_variants.*.product_id.exists' => 'product_id không hợp lệ!',
-            'product_variants.*.price.required' => 'Giá sản phẩm là bắt buộc!',
-            'product_variants.*.price.min' => 'Giá không được nhỏ hơn 0!',
-            'product_variants.*.promotional_price.lte' => 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá gốc!',
             'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
             'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
             'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
         ]);
 
-        // Lưu vào database
         foreach ($validatedData['product_variants'] as $variant) {
             ProductVariant::create([
-                'product_size_id'=> $variant['product_size_id'],
-                'product_id'         => $variant['product_id'],               
-                'quantity'           => $variant['quantity'],
-                'status'             => $variant['status'] ?? 1,
+                'product_size_id' => $variant['product_size_id'],
+                'product_id'      => $variant['product_id'],
+                'quantity'        => $variant['quantity'],
+                'status'          => $variant['status'] ?? 1,
             ]);
         }
 
+        DB::commit();
         return redirect()->route('admin.product_variants.index')->with('success', 'Thêm biến thể thành công!');
     } catch (ValidationException $e) {
-        // Bắt lỗi validate của Laravel
+        DB::rollBack(); // 👈 rollback nếu validate fail
         return back()->withErrors($e->errors())->withInput();
     } catch (QueryException $e) {
-        // 💡 Bắt lỗi SQL trùng lặp SKU và tạo lỗi thủ công vào session
+        DB::rollBack(); // 👈 rollback nếu lỗi SQL
+
         if ($e->errorInfo[1] == 1062) {
             $errors = ['product_variants.*.product_size_id' => 'SKU đã tồn tại cho sản phẩm này!'];
             return back()->withErrors($errors)->withInput();
         }
 
-        // Nếu là lỗi khác, hiển thị thông báo lỗi chung
         return redirect()->route('admin.product_variants.index')->withErrors(['error' => 'Có lỗi xảy ra, vui lòng thử lại!'])->withInput();
+    } catch (\Exception $e) {
+        DB::rollBack(); // 👈 rollback nếu lỗi khác
+        return redirect()->route('admin.product_variants.index')->withErrors(['error' => 'Lỗi hệ thống: ' . $e->getMessage()])->withInput();
     }
 }
 

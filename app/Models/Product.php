@@ -12,7 +12,7 @@ class Product extends Model
    
     protected $fillable = [
         'product_code', 'product_name', 'image', 'description', 
-        'original_price', 'discounted_price', 'category_id', 
+        'original_price', 'discounted_price', 'category_id', 'brand_id','gender_id','care_instructions',
         'view', 'status', 'is_show_home'
     ];
 
@@ -49,6 +49,14 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
     // protected $fillable = ['name', 'price', 'stock'];
+    public function gender()
+    {
+        return $this->belongsTo(Gender::class);
+    }
+    public function brands()
+    {
+       return $this->belongsTo(Brand::class);
+    }
 
     public function orderDetails()
     {
@@ -67,4 +75,5 @@ class Product extends Model
     // {
     //     return $this->variants()->min('promotional_price') ?? $this->variants()->min('price');
     // }
+   
 }

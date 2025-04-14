@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Models\Brand;
+use App\Models\Banner;
+use App\Models\Gender;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductSize;
 use App\Models\ImageProduct;
 use Illuminate\Http\Request;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -65,13 +70,16 @@ class ProductController extends Controller
         //
         $title = "Product";
         $listCategories = Category::where('status', true)->get();
-        return view('admin.products.create', compact('title', 'listCategories'));
+        $listGender = Gender::where('status', true)->get();
+        $listBrand = Brand::where('status', 'active')->get();
+        $size= ProductSize::get();
+        return view('admin.products.create', compact('title', 'listCategories','listGender','listBrand','size'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProductRequest $request)
+    public function store(Request $request)
     {
         $params = $request->except('_token');
 
@@ -105,6 +113,31 @@ class ProductController extends Controller
                     }
                 }
             }
+            $validatedData = $request->validate([
+            'product_variants'                  => 'required|array', 
+            'product_variants.*.product_size_id'=> 'required',
+             
+            'product_variants.*.quantity'       => 'required|integer|min:0', 
+            'product_variants.*.status'         => 'nullable|in:0,1'
+        ],[
+            //THÊM THÔNG BÁO LỖI TÙY CHỈNH
+            'product_variants.required' => 'Danh sách biến thể không được để trống!',
+            'product_variants.array' => 'Dữ liệu biến thể không hợp lệ!',
+            'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có một product_size_id!',                   
+            'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
+            'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
+            'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
+        ]);
+
+        // Lưu vào database
+        foreach ($validatedData['product_variants'] as $variant) {
+            ProductVariant::create([
+                'product_size_id'=> $variant['product_size_id'],
+                'product_id'=> $productID,               
+                'quantity'=> $variant['quantity'],
+                'status' => $variant['status'] ?? 1,
+            ]);
+        }
 
             return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công!');
         } catch (QueryException $e) {
@@ -141,106 +174,157 @@ class ProductController extends Controller
         $title = "Cap nhat San pham";
         $product = Product::find($id);
         $category = Category::where('status', true)->get();
-        return view('admin.products.edit', compact('title', 'product', 'category'));
+        $listGender = Gender::where('status', true)->get();
+        $listBrand = Brand::where('status', 'active')->get();
+        $size= ProductSize::get();
+        $listVariant = ProductVariant::where('product_id', $id)->get();
+        return view('admin.products.edit', compact('title', 'product', 'category','listGender','size','listBrand','listVariant'));
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(ProductRequest $request, string $id)
-{
-    
-    try {
-        // Tìm sản phẩm theo ID
-        $product = Product::findOrFail($id);
-    } catch (ModelNotFoundException $e) {
-        return back()->with('error', 'Sản phẩm không tồn tại!');
-    }
-
-    $params = $request->except('_token', '_method');
-
-    if (!isset($params['is_show_home'])) {
-        $params['is_show_home'] = $product->is_show_home;
-    }
-
-    try {
-        DB::beginTransaction();
-
-        //Xử lý ảnh đại diện (upload lên Cloudinary)
-        if ($request->hasFile('image')) {
-            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-            if ($uploadedFileUrl) {
-                // Xóa ảnh cũ trên Cloudinary nếu tồn tại
-                if ($product->image) {
-                    try {
-                        Cloudinary::destroy($product->image);
-                    } catch (\Exception $e) {
-                        Log::error('Lỗi khi xóa ảnh trên Cloudinary: ' . $e->getMessage());
-                    }
-                }
-                $params['image'] = $uploadedFileUrl;
-            }
+    {
+        
+        try {
+            $product = Product::findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            return back()->with('error', 'Sản phẩm không tồn tại!');
         }
 
-        // Xử lý ảnh album (list_image)
-        $currentImages = $product->imageProduct()->pluck('id')->toArray();
+        $params = $request->except('_token', '_method');
 
-        // Kiểm tra nếu `list_image` không phải mảng thì gán thành mảng rỗng
-        $listImages = is_array($request->list_image) ? $request->list_image : [];
-
-        // ✅ Xóa ảnh không còn trong danh sách `list_image`
-        foreach ($currentImages as $imageId) {
-            if (!in_array($imageId, array_keys($listImages))) {
-                $hinhAnhSp = ImageProduct::where('product_id', $id)->where('id', $imageId)->first();
-                if ($hinhAnhSp) {
-                    try {
-                        Cloudinary::destroy($hinhAnhSp->image_product);
-                        $hinhAnhSp->delete();
-                    } catch (\Exception $e) {
-                        Log::error('Lỗi khi xóa ảnh cũ: ' . $e->getMessage());
-                    }
-                }
-            }
+        if (!isset($params['is_show_home'])) {
+            $params['is_show_home'] = $product->is_show_home;
         }
 
-        // ✅ Thêm hoặc cập nhật ảnh mới vào album
-        foreach ($listImages as $key => $image) {
-            if ($request->hasFile("list_image.$key")) {
-                $uploadedFileUrl = Cloudinary::upload($request->file("list_image.$key")->getRealPath())->getSecurePath();
+        try {
+            DB::beginTransaction();
+
+            // ✅ Xử lý ảnh đại diện
+            if ($request->hasFile('image')) {
+                $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
 
                 if ($uploadedFileUrl) {
-                    $hinhAnhSp = ImageProduct::where('product_id', $id)->where('id', $key)->first();
-                    if ($hinhAnhSp) {
-                        // Cập nhật ảnh cũ
+                    if ($product->image) {
                         try {
-                            Cloudinary::destroy($hinhAnhSp->image_product);
-                            $hinhAnhSp->update(['image_product' => $uploadedFileUrl]);
+                            $publicId = $this->getCloudinaryPublicId($product->image);
+                            Cloudinary::destroy($publicId);
                         } catch (\Exception $e) {
-                            Log::error('Lỗi khi cập nhật ảnh: ' . $e->getMessage());
+                            Log::error('Lỗi khi xóa ảnh đại diện trên Cloudinary: ' . $e->getMessage());
                         }
-                    } else {
-                        // Thêm ảnh mới
-                        $product->imageProduct()->create([
-                            'product_id' => $id,
-                            'image_product' => $uploadedFileUrl
-                        ]);
+                    }
+                    $params['image'] = $uploadedFileUrl;
+                }
+            }
+
+            // ✅ Xử lý ảnh album
+            $currentImages = $product->imageProduct()->pluck('id')->toArray();
+            $listImages = is_array($request->list_image) ? $request->list_image : [];
+
+            foreach ($currentImages as $imageId) {
+                if (!array_key_exists($imageId, $listImages)) {
+                    $img = ImageProduct::find($imageId);
+                    if ($img) {
+                        try {
+                            $publicId = $this->getCloudinaryPublicId($img->image_product);
+                            Cloudinary::destroy($publicId);
+                            $img->delete();
+                        } catch (\Exception $e) {
+                            Log::error('Lỗi khi xóa ảnh cũ: ' . $e->getMessage());
+                        }
                     }
                 }
             }
+
+            foreach ($listImages as $key => $image) {
+                if ($request->hasFile("list_image.$key")) {
+                    $uploadedFileUrl = Cloudinary::upload($request->file("list_image.$key")->getRealPath())->getSecurePath();
+
+                    if ($uploadedFileUrl) {
+                        $img = ImageProduct::where('product_id', $id)->where('id', $key)->first();
+
+                        if ($img) {
+                            try {
+                                $publicId = $this->getCloudinaryPublicId($img->image_product);
+                                Cloudinary::destroy($publicId);
+                                $img->update(['image_product' => $uploadedFileUrl]);
+                            } catch (\Exception $e) {
+                                Log::error('Lỗi khi cập nhật ảnh: ' . $e->getMessage());
+                            }
+                        } else {
+                            $product->imageProduct()->create([
+                                'product_id' => $id,
+                                'image_product' => $uploadedFileUrl
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // ✅ Cập nhật sản phẩm chính
+            $product->update($params);
+
+            // ✅ Validate biến thể
+            $validatedData = $request->validate([
+                'product_variants'                  => 'required|array',
+                'product_variants.*.product_size_id'=> 'required|exists:product_sizes,id',
+                'product_variants.*.quantity'       => 'required|integer|min:0',
+                'product_variants.*.status'         => 'nullable|in:0,1'
+            ],[
+                'product_variants.required' => 'Danh sách biến thể không được để trống!',
+                'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có product_size_id!',
+                'product_variants.*.product_size_id.exists' => 'Product size không hợp lệ!',
+                'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
+                'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
+                'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
+            ]);
+
+            // ✅ Xóa những biến thể không còn
+            $currentVariantIds = $product->variants()->pluck('product_size_id')->toArray();
+            $incomingVariantIds = collect($validatedData['product_variants'])->pluck('product_size_id')->toArray();
+            $variantIdsToDelete = array_diff($currentVariantIds, $incomingVariantIds);
+
+            if (!empty($variantIdsToDelete)) {
+                ProductVariant::where('product_id', $product->id)
+                    ->whereIn('product_size_id', $variantIdsToDelete)
+                    ->delete();
+            }
+
+            // ✅ Cập nhật hoặc thêm mới biến thể
+            foreach ($validatedData['product_variants'] as $variant) {
+                ProductVariant::updateOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'product_size_id' => $variant['product_size_id']
+                    ],
+                    [
+                        'quantity' => $variant['quantity'],
+                        'status' => $variant['status'] ?? 1
+                    ]
+                );
+            }
+
+            DB::commit();
+            return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
+            return back()->with('error', 'Cập nhật thất bại! Lỗi: ' . $e->getMessage());
         }
-
-        // ✅ Cập nhật thông tin sản phẩm
-        $product->update($params);
-
-        DB::commit();
-
-        return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
-        return back()->with('error', 'Cập nhật sản phẩm thất bại! Lỗi: ' . $e->getMessage());
     }
+
+/**
+ * Trích xuất public_id từ URL Cloudinary
+ */
+private function getCloudinaryPublicId($url)
+{
+    $parts = explode('/', parse_url($url, PHP_URL_PATH));
+    $filename = end($parts);
+    return pathinfo($filename, PATHINFO_FILENAME);
 }
+
 
 
 

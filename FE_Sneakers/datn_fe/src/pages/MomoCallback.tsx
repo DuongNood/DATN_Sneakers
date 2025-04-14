@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
@@ -8,76 +8,88 @@ const MomoCallback: React.FC = () => {
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
+  const [isProcessing, setIsProcessing] = useState(true)
 
   useEffect(() => {
     const handleCallback = async () => {
-      // Lấy query parameters từ URL
-      const query = new URLSearchParams(location.search)
-      const resultCode = query.get('resultCode')
-      const orderId = query.get('orderId')
+      try {
+        // Get query parameters from URL
+        const query = new URLSearchParams(location.search)
+        const resultCode = query.get('resultCode')
+        const orderId = query.get('orderId')
+        const orderCode = query.get('orderCode') || orderId
 
-      if (resultCode === '0') {
-        // Thanh toán thành công
-        try {
-          // Lấy thông tin đơn hàng từ localStorage
-          const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder') || '{}')
-          if (!pendingOrder.orderId || pendingOrder.orderId !== orderId) {
-            throw new Error('Invalid order data')
-          }
+        if (!orderId) {
+          throw new Error('Missing order information')
+        }
 
-          // Chuẩn bị dữ liệu để lưu đơn hàng
-          const orderData = {
-            user_id: 1, // Giả định user_id
-            products: pendingOrder.products.map((product: any) => ({
-              product_id: product.id,
-              quantity: product.quantity,
-              size: product.size,
-              price: product.discounted_price
-            })),
-            shipping_info: {
-              full_name: pendingOrder.shippingInfo.fullName,
-              email: pendingOrder.shippingInfo.email,
-              phone: pendingOrder.shippingInfo.phone,
-              address: pendingOrder.shippingInfo.address
-            },
-            total: pendingOrder.total,
-            coupon_discount: pendingOrder.couponDiscount,
-            shipping_fee: pendingOrder.shippingFee,
-            payment_method: 'momo',
-            status: 'paid' // Thanh toán thành công
-          }
+        // Get the pending order from localStorage
+        const pendingOrderStr = localStorage.getItem('pendingOrder')
+        if (!pendingOrderStr) {
+          throw new Error('No pending order found')
+        }
 
-          const token = localStorage.getItem('token')
-          if (!token) {
-            throw new Error(t('no_token'))
-          }
+        const pendingOrder = JSON.parse(pendingOrderStr)
+        const token = localStorage.getItem('token')
+        
+        if (!token) {
+          throw new Error(t('no_token'))
+        }
 
-          // Gửi dữ liệu lên API để lưu đơn hàng
-          const response = await axios.post('http://localhost:8000/api/orders', orderData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/json'
+        if (resultCode === '0') {
+          // Payment successful - create orders
+          const orderPromises = pendingOrder.products.map(async (product: any) => {
+            const selectedSizeObj = product.sizes?.find((s: any) => s.size === (product.variant || product.size))
+            if (!selectedSizeObj) {
+              throw new Error(`Size ${product.variant || product.size} not found for product ${product.name}`)
+            }
+
+            return axios.post(
+              `http://localhost:8000/api/orders/buy/${encodeURIComponent(product.name)}`,
+              {
+                shipping_info: pendingOrder.shippingInfo,
+                quantity: product.quantity,
+                product_size_id: selectedSizeObj.product_size_id,
+                payment_method: 'momo',
+                status: 'paid',
+                momo_order_id: orderId
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            )
+          })
+
+          await Promise.all(orderPromises)
+          toast.success(t('payment_successful'), { autoClose: 2000 })
+          localStorage.removeItem('pendingOrder')
+          navigate('/order-success', { 
+            state: { 
+              orderCode,
+              status: 'success',
+              message: t('payment_successful')
             }
           })
-
-          if (response.data.status === 'success') {
-            toast.success(t('order_placed_successfully_momo'), { autoClose: 2000 })
-            localStorage.removeItem('pendingOrder') // Xóa dữ liệu tạm
-            navigate('/') // Chuyển hướng về trang chủ
-          } else {
-            throw new Error(response.data.message || t('order_failed'))
-          }
-        } catch (error: any) {
-          console.error('Error saving order after MoMo payment:', error)
-          toast.error(error.response?.data?.message || error.message || t('order_failed'), {
-            autoClose: 2000
+        } else {
+          // Payment failed
+          toast.error(t('payment_failed'), { autoClose: 2000 })
+          navigate('/order-success', {
+            state: {
+              orderCode,
+              status: 'failed',
+              message: t('payment_failed')
+            }
           })
-          navigate('/payment', { state: JSON.parse(localStorage.getItem('pendingOrder') || '{}') })
         }
-      } else {
-        // Thanh toán thất bại
-        toast.error(t('momo_payment_failed'), { autoClose: 2000 })
-        navigate('/payment', { state: JSON.parse(localStorage.getItem('pendingOrder') || '{}') })
+      } catch (error: any) {
+        console.error('Error processing MoMo callback:', error)
+        toast.error(error.message || t('payment_processing_error'), { autoClose: 2000 })
+        navigate('/cart')
+      } finally {
+        setIsProcessing(false)
       }
     }
 
@@ -85,8 +97,15 @@ const MomoCallback: React.FC = () => {
   }, [location, navigate, t])
 
   return (
-    <div className='min-h-screen bg-gray-100 font-sans flex items-center justify-center'>
-      <p className='text-gray-600'>{t('processing_payment')}</p>
+    <div className='min-h-screen bg-gray-100 font-sans flex flex-col items-center justify-center'>
+      {isProcessing ? (
+        <>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4'></div>
+          <p className='text-gray-600'>{t('processing_payment')}</p>
+        </>
+      ) : (
+        <p className='text-gray-600'>{t('redirecting')}</p>
+      )}
     </div>
   )
 }
