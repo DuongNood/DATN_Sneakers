@@ -1,4 +1,3 @@
-// src/components/Header.tsx
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiShoppingCart, FiUser, FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
@@ -9,15 +8,25 @@ import axios from 'axios'
 import Search from './Search'
 import { useCart } from '../contexts/CartContext'
 
+interface User {
+  id: number
+  name: string
+  email?: string
+  phone?: string
+  address?: string
+  image_user?: string
+  role_id: number
+}
+
 const Header = () => {
   const { t, i18n } = useTranslation()
   const [search, setSearch] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileProductOpen, setMobileProductOpen] = useState(false)
-  const { cartCount, updateCartCount } = useCart() // Sử dụng context
+  const [user, setUser] = useState<User | null>(null)
+  const { cartCount, updateCartCount } = useCart()
   const navigate = useNavigate()
-  const isLoggedIn = !!localStorage.getItem('user')
-  const user = isLoggedIn ? JSON.parse(localStorage.getItem('user') || '{}') : null
+  const isLoggedIn = !!localStorage.getItem('token')
 
   // Hàm lấy số lượng giỏ hàng từ API
   const fetchCartCount = async () => {
@@ -41,14 +50,89 @@ const Header = () => {
     }
   }
 
-  // Gọi fetchCartCount khi component mount hoặc khi isLoggedIn thay đổi
+  // Hàm lấy thông tin người dùng từ API
+  const fetchUserInfo = async () => {
+    if (!isLoggedIn) {
+      setUser(null)
+      return
+    }
+
+    const token = localStorage.getItem('token')
+
+    try {
+      const response = await axios.get('http://localhost:8000/api/user', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      // Xử lý dữ liệu
+      let userData: any = response.data
+
+      // Kiểm tra cấu trúc
+      if (response.data.data) {
+        userData = response.data.data
+      } else if (response.data.user) {
+        userData = response.data.user
+      } else {
+      }
+
+      if (!userData) {
+        setUser(null)
+        return
+      }
+
+      // Tìm tên
+      const userName = userData.name || userData.full_name || userData.username || 'User'
+      if (userName === 'User') {
+        console.warn('[DEBUG] No name field found, falling back to "User"')
+      } else {
+        console.log('[DEBUG] Found name:', userName)
+      }
+
+      // Tìm role_id
+      const roleId = Number(userData.role_id) || 3
+      if (![1, 2, 3].includes(roleId)) {
+        console.warn('[DEBUG] Invalid role_id:', roleId, 'Defaulting to 3')
+      }
+
+      const processedUser: User = {
+        id: userData.id || 0,
+        name: userName,
+        email: userData.email || '',
+        phone: userData.phone || '',
+        address: userData.address || '',
+        image_user: userData.image_user || '',
+        role_id: roleId
+      }
+
+      setUser(processedUser)
+      localStorage.setItem('user', JSON.stringify(processedUser))
+    } catch (error: any) {
+      console.error('[DEBUG] Error fetching user info:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      })
+      setUser(null)
+      if (error.response?.status === 401) {
+        localStorage.clear()
+        toast.error(t('session_expired'), { autoClose: 1000 })
+        navigate('/login')
+      }
+    }
+  }
+
+  // Gọi API khi component mount hoặc isLoggedIn thay đổi
   useEffect(() => {
     fetchCartCount()
+    fetchUserInfo()
   }, [isLoggedIn])
 
   const handleLogout = () => {
     localStorage.clear()
-    updateCartCount(0) // Reset cartCount khi logout
+    updateCartCount(0)
+    setUser(null)
     toast.success(t('logout_success'), { autoClose: 1000 })
     navigate('/login')
     setMenuOpen(false)
@@ -111,13 +195,23 @@ const Header = () => {
                 />
               </div>
               <div className='absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-                <p className='px-4 py-2 bg-gray-300 text-blue-600 '>{t('greeting', {})}</p>
+                <p className='px-4 py-2 bg-gray-300 text-blue-600'>{t('greeting', { name: user?.name || 'User' })}</p>
                 <Link to='/profile' className='dropdown-link'>
                   {t('profile')}
                 </Link>
                 <Link to='/orders' className='dropdown-link'>
                   {t('orders')}
                 </Link>
+                {(user?.role_id === 1 || user?.role_id === 2) && (
+                  <a
+                    href='https://www.facebook.com'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='dropdown-link'
+                  >
+                    {t('admin_link')}
+                  </a>
+                )}
                 <button onClick={handleLogout} className='w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100'>
                   {t('logout')}
                 </button>
@@ -183,12 +277,24 @@ const Header = () => {
             </Link>
             {isLoggedIn && (
               <>
+                <p className='mobile-nav-link text-blue-600'>{t('greeting', { name: user?.name || 'User' })}</p>
                 <Link to='/profile' className='mobile-nav-link' onClick={handleLinkClick}>
                   {t('profile')}
                 </Link>
                 <Link to='/orders' className='mobile-nav-link' onClick={handleLinkClick}>
                   {t('orders')}
                 </Link>
+                {(user?.role_id === 1 || user?.role_id === 2) && (
+                  <a
+                    href='https://www.facebook.com'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='mobile-nav-link'
+                    onClick={handleLinkClick}
+                  >
+                    {t('admin_link')}
+                  </a>
+                )}
                 <button onClick={handleLogout} className='mobile-nav-link text-left'>
                   {t('logout')}
                 </button>
