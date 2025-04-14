@@ -254,10 +254,6 @@ class OrderController extends Controller
             ], 201);
         });
     }
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     /**
      * Hiển thị danh sách đơn hàng của user
      */
