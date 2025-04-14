@@ -168,7 +168,7 @@ class OrderController extends Controller
             }
 
             if ($productVariant->quantity < $request->quantity) {
-                return response()->json(['message' => 'Kho không đủ hàng!'], 400);
+                return response()->json(['message' => 'Kho không đủ hàng!'], 503);
             }
 
             $price = $product->discounted_price ?? $product->original_price;
@@ -254,7 +254,10 @@ class OrderController extends Controller
             ], 201);
         });
     }
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     /**
      * Hiển thị danh sách đơn hàng của user
      */

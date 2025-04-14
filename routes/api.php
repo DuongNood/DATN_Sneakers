@@ -29,6 +29,7 @@ use App\Http\Controllers\api\ProductReviewController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\FilterProductsController;
 
 Route::apiResource('banners', BannerController::class);
 
@@ -124,6 +125,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/create-from-cart', [OrderController::class, 'createOrderFromCart']);
     Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
 });
+//lọc spsp
+Route::get('/products/filter', [filterProductsController::class, 'filterProducts']);
 
 // MomoPayment 
 
