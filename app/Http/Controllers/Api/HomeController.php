@@ -6,6 +6,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\Category;
 
 class HomeController extends Controller
@@ -29,25 +30,25 @@ class HomeController extends Controller
             'data' => $products
         ]);
     }
-    public function getCategories(){
-        $categories = Category::where('status', true)->get();
+    public function getBrands(){
+        $brands = Brand::where('status', 'active')->get();
         return response()->json([
             'success' => true,
-            'data' => $categories
+            'data' => $brands
         ]);
     }
-    public function categoryByProduct($id)
+    public function brandsByProduct($id)
     {
 
          $products = Product::with([
-        'category',
+        'Brand',
         'productVariant' => function ($query) {
             $query->with('productSize'); // Lấy thông tin kích thước của sản phẩm
         },
         'imageProduct' // Lấy thông tin hình ảnh của sản phẩm
         ])
             ->where('status', true)
-            ->where('category_id', $id)
+            ->where('brand_id', $id)
             ->get();
 
         return response()->json([

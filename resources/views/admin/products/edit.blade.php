@@ -120,8 +120,8 @@
                                                                 name="product_variants[{{ $key }}][product_size_id]">
                                                                 @foreach ($size as $item)
                                                                     <option value="{{ $item->id }}"
-                                                                        {{  old("product_variants.$key.product_size_id", $variant->product_size_id) 
-                                                                        == $item->id ? 'selected' : '' }}>
+                                                                        {{  old("product_variants.$key.product_size_id", $variant->product_size_id)
+            == $item->id ? 'selected' : '' }}>
                                                                         {{ $item->name }}
                                                                     </option>
                                                                 @endforeach
@@ -185,7 +185,7 @@
                                                                 src="{{$image->image_product}}"
                                                                 alt="hinh anh" style="width:50px" class="me-3">
                                                             <input type="file" id="hinh_anh" name="list_image[{{$image->id}}]" class="form-control" onchange="previewImage(this,{{$index}})">
-                                                            <input type="hidden" name="list_image_ids[]" value="{{$image->id}}">
+                                                            <input type="hidden" name="list_image[{{$image->id}}]" value="{{$image->id}}">
                                                         </td>
                                                         <td class="">
                                                             <i class="mdi mdi-delete text-muted fs-18 rounded-2 border p-1" style="cursor: pointer"

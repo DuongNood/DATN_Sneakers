@@ -99,8 +99,8 @@ Route::get('/statistics/top-customers', [StatisticsController::class, 'topCustom
 Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
 Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
-Route::get('/categories', [HomeController::class, 'getCategories']);
-Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
+Route::get('/brands', [HomeController::class, 'getBrands']);
+Route::get('/productbybrand/{id}', [HomeController::class, 'brandsByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
 Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::class, 'store']);
 Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);

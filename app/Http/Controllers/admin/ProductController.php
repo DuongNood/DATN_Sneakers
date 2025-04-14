@@ -184,29 +184,31 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProductRequest $request, string $id)
-    {
-        
-        try {
-            $product = Product::findOrFail($id);
-        } catch (ModelNotFoundException $e) {
-            return back()->with('error', 'Sản phẩm không tồn tại!');
-        }
+   public function update(ProductRequest $request, string $id)
+{
 
-        $params = $request->except('_token', '_method');
+    try {
+        $product = Product::findOrFail($id);
+    } catch (ModelNotFoundException $e) {
+        return back()->with('error', 'Sản phẩm không tồn tại!');
+    }
 
-        if (!isset($params['is_show_home'])) {
-            $params['is_show_home'] = $product->is_show_home;
-        }
+    $params = $request->except('_token', '_method');
 
-        try {
-            DB::beginTransaction();
+    // Nếu không gửi checkbox thì giữ nguyên trạng thái hiện tại
+    $params['is_show_home'] = $request->has('is_show_home') ? $request->is_show_home : $product->is_show_home;
 
-            // ✅ Xử lý ảnh đại diện
-            if ($request->hasFile('image')) {
-                $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+    try {
+        DB::beginTransaction();
+
+        // ✅ Xử lý ảnh đại diện
+        if ($request->hasFile('image')) {
+            $imageFile = $request->file('image');
+            if ($imageFile->isValid()) {
+                $uploadedFileUrl = Cloudinary::upload($imageFile->getRealPath())->getSecurePath();
 
                 if ($uploadedFileUrl) {
+                    // Xóa ảnh cũ
                     if ($product->image) {
                         try {
                             $publicId = $this->getCloudinaryPublicId($product->image);
@@ -218,33 +220,36 @@ class ProductController extends Controller
                     $params['image'] = $uploadedFileUrl;
                 }
             }
+        }
 
-            // ✅ Xử lý ảnh album
-            $currentImages = $product->imageProduct()->pluck('id')->toArray();
-            $listImages = is_array($request->list_image) ? $request->list_image : [];
+        // ✅ Xử lý ảnh album
+        $currentImages = $product->imageProduct()->pluck('id')->toArray();
+        $listImages = $request->input('list_image', []);
 
-            foreach ($currentImages as $imageId) {
-                if (!array_key_exists($imageId, $listImages)) {
-                    $img = ImageProduct::find($imageId);
-                    if ($img) {
-                        try {
-                            $publicId = $this->getCloudinaryPublicId($img->image_product);
-                            Cloudinary::destroy($publicId);
-                            $img->delete();
-                        } catch (\Exception $e) {
-                            Log::error('Lỗi khi xóa ảnh cũ: ' . $e->getMessage());
-                        }
+        // Xóa ảnh không còn
+        foreach ($currentImages as $imageId) {
+            if (!array_key_exists($imageId, $listImages)) {
+                $img = ImageProduct::find($imageId);
+                if ($img) {
+                    try {
+                        $publicId = $this->getCloudinaryPublicId($img->image_product);
+                        Cloudinary::destroy($publicId);
+                        $img->delete();
+                    } catch (\Exception $e) {
+                        Log::error('Lỗi khi xóa ảnh cũ: ' . $e->getMessage());
                     }
                 }
             }
+        }
 
-            foreach ($listImages as $key => $image) {
-                if ($request->hasFile("list_image.$key")) {
-                    $uploadedFileUrl = Cloudinary::upload($request->file("list_image.$key")->getRealPath())->getSecurePath();
-
+        // Cập nhật hoặc thêm ảnh mới
+        foreach ($listImages as $key => $image) {
+            if ($request->hasFile("list_image.$key")) {
+                $imageFile = $request->file("list_image.$key");
+                if ($imageFile->isValid()) {
+                    $uploadedFileUrl = Cloudinary::upload($imageFile->getRealPath())->getSecurePath();
                     if ($uploadedFileUrl) {
                         $img = ImageProduct::where('product_id', $id)->where('id', $key)->first();
-
                         if ($img) {
                             try {
                                 $publicId = $this->getCloudinaryPublicId($img->image_product);
@@ -262,58 +267,60 @@ class ProductController extends Controller
                     }
                 }
             }
-
-            // ✅ Cập nhật sản phẩm chính
-            $product->update($params);
-
-            // ✅ Validate biến thể
-            $validatedData = $request->validate([
-                'product_variants'                  => 'required|array',
-                'product_variants.*.product_size_id'=> 'required|exists:product_sizes,id',
-                'product_variants.*.quantity'       => 'required|integer|min:0',
-                'product_variants.*.status'         => 'nullable|in:0,1'
-            ],[
-                'product_variants.required' => 'Danh sách biến thể không được để trống!',
-                'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có product_size_id!',
-                'product_variants.*.product_size_id.exists' => 'Product size không hợp lệ!',
-                'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
-                'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
-                'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
-            ]);
-
-            // ✅ Xóa những biến thể không còn
-            $currentVariantIds = $product->variants()->pluck('product_size_id')->toArray();
-            $incomingVariantIds = collect($validatedData['product_variants'])->pluck('product_size_id')->toArray();
-            $variantIdsToDelete = array_diff($currentVariantIds, $incomingVariantIds);
-
-            if (!empty($variantIdsToDelete)) {
-                ProductVariant::where('product_id', $product->id)
-                    ->whereIn('product_size_id', $variantIdsToDelete)
-                    ->delete();
-            }
-
-            // ✅ Cập nhật hoặc thêm mới biến thể
-            foreach ($validatedData['product_variants'] as $variant) {
-                ProductVariant::updateOrCreate(
-                    [
-                        'product_id' => $product->id,
-                        'product_size_id' => $variant['product_size_id']
-                    ],
-                    [
-                        'quantity' => $variant['quantity'],
-                        'status' => $variant['status'] ?? 1
-                    ]
-                );
-            }
-
-            DB::commit();
-            return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
-            return back()->with('error', 'Cập nhật thất bại! Lỗi: ' . $e->getMessage());
         }
+
+        // ✅ Cập nhật sản phẩm
+        $product->update($params);
+
+        // ✅ Validate biến thể
+        $validatedData = $request->validate([
+            'product_variants'                  => 'required|array',
+            'product_variants.*.product_size_id'=> 'required|exists:product_sizes,id',
+            'product_variants.*.quantity'       => 'required|integer|min:0',
+            'product_variants.*.status'         => 'nullable|in:0,1'
+        ],[
+            'product_variants.required' => 'Danh sách biến thể không được để trống!',
+            'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có product_size_id!',
+            'product_variants.*.product_size_id.exists' => 'Product size không hợp lệ!',
+            'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
+            'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
+            'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
+        ]);
+
+        // ✅ Xóa biến thể không còn
+        $currentVariantIds = $product->variants()->pluck('product_size_id')->toArray();
+        $incomingVariantIds = collect($validatedData['product_variants'])->pluck('product_size_id')->toArray();
+        $variantIdsToDelete = array_diff($currentVariantIds, $incomingVariantIds);
+
+        if (!empty($variantIdsToDelete)) {
+            ProductVariant::where('product_id', $product->id)
+                ->whereIn('product_size_id', $variantIdsToDelete)
+                ->delete();
+        }
+
+        // ✅ Thêm hoặc cập nhật biến thể
+        foreach ($validatedData['product_variants'] as $variant) {
+            ProductVariant::updateOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'product_size_id' => $variant['product_size_id']
+                ],
+                [
+                    'quantity' => $variant['quantity'],
+                    'status' => $variant['status'] ?? 1
+                ]
+            );
+        }
+
+        DB::commit();
+        return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
+        return back()->with('error', 'Cập nhật thất bại! Lỗi: ' . $e->getMessage());
     }
+}
+
 
 /**
  * Trích xuất public_id từ URL Cloudinary
