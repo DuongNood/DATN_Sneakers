@@ -155,7 +155,6 @@ const ProfilePage = () => {
         <div className='space-y-6'>
           <div className='flex flex-col items-center'>
             <div className='w-32 h-32 bg-gray-300 rounded-full mb-4'></div>
-            {/* <div className='h-10 w-40 bg-gray-300 rounded'></div> */}
           </div>
           {['name', 'email', 'address', 'phone'].map((field) => (
             <div key={field} className='space-y-2'>
