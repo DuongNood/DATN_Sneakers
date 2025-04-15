@@ -16,6 +16,7 @@ use App\Http\Controllers\admin\ReviewController;
 use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\SizeController;
 use App\Models\ProductReview;
+use App\Http\Controllers\admin\DashboardStatisticsController;
 use App\Models\User;
 
 /*
@@ -35,7 +36,10 @@ Route::prefix('admin')
             Route::get('/', function () {
                 return view('admin.index');
             })->name('index');
+
+            Route::get('/dashboard/daily-statistics', [DashboardStatisticsController::class, 'getDailyData'])->name('dashboard.daily_statistics');
         });
+
 
         Route::middleware(['auth', 'permission:manage_banners'])->group(function () {
             Route::resource('banners', BannerController::class);
