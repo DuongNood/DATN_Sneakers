@@ -12,8 +12,10 @@ use App\Http\Controllers\admin\BannerController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductVariantController;
 use App\Http\Controllers\admin\PromotionController;
+use App\Http\Controllers\admin\ReviewController;
 use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\SizeController;
+use App\Models\ProductReview;
 use App\Models\User;
 
 /*
@@ -136,4 +138,7 @@ Route::prefix('admin')
                     Route::put('update', [SettingController::class, 'update'])->name('update');
                 });
         });
+      
+            Route::get('review', [ReviewController::class,'index'])->name('review.index');
+       
     });
