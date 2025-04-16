@@ -89,15 +89,18 @@
 
                                         <div class="col-lg-3">
                                             <div class="mb-3">
-                                                <label for="example-password" class="form-label"><strong>Giới tính</strong></label>
-                                                <select class="form-select @error('gender_id') is-invalid @enderror" name="gender_id">
-                                                    @foreach ($listGender as $item)
-                                                        <option value="{{ $item->id }}" {{ old('gender_id') == $item->id ? 'selected' : '' }}>
-                                                            {{ $item->gender_name }}
-                                                        </option>
-                                                    @endforeach
+                                                <label for="example-password" class="form-label">Giới tính</label>
+                                                <select class="form-select @error('gender') is-invalid @enderror" name="gender">
+
+                                                    <option value="0" {{ old('gender') }}>
+                                                        Nữ
+                                                    </option>
+                                                    <option value="1" {{ old('gender') }}>
+                                                        Nam
+                                                    </option>
+
                                                 </select>
-                                                @error('gender_id')
+                                                @error('gender')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>

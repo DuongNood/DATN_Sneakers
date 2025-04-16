@@ -67,7 +67,7 @@
                                             <label for="example-password" class="form-label">Thương hiệu</label>
                                             <select class="form-select @error('brand_id') is-invalid @enderror" name="brand_id">
                                                 @foreach ($listBrand as $item)
-                                                    <option value="{{ $item->id }}" {{ old('brand_id') == $item->id ? 'selected' : '' }}>
+                                                    <option value="{{ $item->id }}" {{ old('brand_id') == $item->brand_id ? 'selected' : '' }}>
                                                         {{ $item->brand_name }}
                                                     </option>
                                                 @endforeach
@@ -81,14 +81,17 @@
                                     <div class="col-lg-3">
                                         <div class="mb-3">
                                             <label for="example-password" class="form-label">Giới tính</label>
-                                            <select class="form-select @error('gender_id') is-invalid @enderror" name="gender_id">
-                                                @foreach ($listGender as $item)
-                                                    <option value="{{ $item->id }}" {{ old('gender_id') == $item->id ? 'selected' : '' }}>
-                                                        {{ $item->gender_name }}
+                                            <select class="form-select @error('gender') is-invalid @enderror" name="gender">
+
+                                                    <option value="0" {{ old('gender') == $item->gender ? 'selected' : '' }}>
+                                                       Nữ
                                                     </option>
-                                                @endforeach
+                                                    <option value="1" {{ old('gender') == $item->gender ? 'selected' : '' }}>
+                                                        Nam
+                                                    </option>
+
                                             </select>
-                                            @error('gender_id')
+                                            @error('gender')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -121,7 +124,7 @@
                                                                 @foreach ($size as $item)
                                                                     <option value="{{ $item->id }}"
                                                                         {{  old("product_variants.$key.product_size_id", $variant->product_size_id)
-            == $item->id ? 'selected' : '' }}>
+                                                                            == $item->id ? 'selected' : '' }}>
                                                                         {{ $item->name }}
                                                                     </option>
                                                                 @endforeach

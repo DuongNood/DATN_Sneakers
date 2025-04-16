@@ -70,10 +70,9 @@ class ProductController extends Controller
         //
         $title = "Product";
         $listCategories = Category::where('status', true)->get();
-        $listGender = Gender::where('status', true)->get();
         $listBrand = Brand::where('status', 'active')->get();
         $size= ProductSize::get();
-        return view('admin.products.create', compact('title', 'listCategories','listGender','listBrand','size'));
+        return view('admin.products.create', compact('title', 'listCategories','listBrand','size'));
     }
 
     /**
@@ -174,11 +173,10 @@ class ProductController extends Controller
         $title = "Cap nhat San pham";
         $product = Product::find($id);
         $category = Category::where('status', true)->get();
-        $listGender = Gender::where('status', true)->get();
         $listBrand = Brand::where('status', 'active')->get();
         $size= ProductSize::get();
         $listVariant = ProductVariant::where('product_id', $id)->get();
-        return view('admin.products.edit', compact('title', 'product', 'category','listGender','size','listBrand','listVariant'));
+        return view('admin.products.edit', compact('title', 'product', 'category','size','listBrand','listVariant'));
     }
 
     /**
@@ -186,7 +184,7 @@ class ProductController extends Controller
      */
    public function update(ProductRequest $request, string $id)
 {
-
+    
     try {
         $product = Product::findOrFail($id);
     } catch (ModelNotFoundException $e) {
@@ -288,7 +286,7 @@ class ProductController extends Controller
         ]);
 
         // ✅ Xóa biến thể không còn
-        $currentVariantIds = $product->variants()->pluck('product_size_id')->toArray();
+        $currentVariantIds = ProductVariant::where('product_id', $product->id)->pluck('product_size_id')->toArray();
         $incomingVariantIds = collect($validatedData['product_variants'])->pluck('product_size_id')->toArray();
         $variantIdsToDelete = array_diff($currentVariantIds, $incomingVariantIds);
 
