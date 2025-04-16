@@ -63,8 +63,6 @@ const CartPage: React.FC = () => {
         }
       })
 
-      console.log('API response:', response.data)
-
       setCartItems(response.data.items)
       setTotalCartPrice(response.data.total_cart_price)
       const totalItems = response.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
@@ -88,7 +86,6 @@ const CartPage: React.FC = () => {
           position: 'top-center',
           autoClose: 2000
         })
-
         setItemToRemove(item)
         setRemoveAction('update')
         setShowConfirmModal(true)
@@ -249,25 +246,23 @@ const CartPage: React.FC = () => {
     }
 
     const selectedCartItems = cartItems.filter((item) => selectedItems.includes(item.id))
-
-    // Chuyển đổi CartItem sang Product
     const products: Product[] = selectedCartItems.map((item) => ({
       id: item.product_id,
       name: item.product_name,
       original_price: item.original_price,
       discounted_price: item.discounted_price,
-      product_code: `PROD-${item.product_id}`, // Giả lập product_code
+      product_code: `PROD-${item.product_id}`,
       imageUrl: item.image,
-      rating: 0, // Giả lập rating
-      description: '', // Giả lập description
-      quantity: item.quantity, // Sử dụng quantity của từng sản phẩm
+      rating: 0,
+      description: '',
+      quantity: item.quantity,
       variant: item.size_name,
       size: item.size_name,
-      images: [item.image], // Giả lập images
+      images: [item.image],
       sizes: item.product_size_id
         ? [{ size: item.size_name, quantity: item.quantity, product_size_id: item.product_size_id }]
         : undefined,
-      category: undefined // Giả lập category
+      category: undefined
     }))
 
     navigate('/checkout', { state: { products } })
@@ -280,156 +275,210 @@ const CartPage: React.FC = () => {
   }
 
   const SkeletonLoading = () => (
-    <div className='container mx-auto px-4 py-8 animate-pulse'>
-      <div className='bg-white shadow-lg rounded-lg p-6'>
-        <div className='h-8 bg-gray-300 rounded w-1/4 mb-6'></div>
+    <div className='container mx-auto px-11 py-11 animate-pulse'>
+      <div className='bg-white shadow-lg rounded-2xl p-6'>
+        <div className='h-8 bg-gray-200 rounded-lg w-1/4 mb-6'></div>
         {Array(3)
           .fill(0)
           .map((_, index) => (
             <div key={index} className='flex items-center border-b py-4'>
-              <div className='w-24 h-24 bg-gray-300 rounded-md mr-4'></div>
+              <div className='w-20 h-20 bg-gray-200 rounded-lg mr-4'></div>
               <div className='flex-1'>
-                <div className='h-6 bg-gray-300 rounded w-3/4 mb-2'></div>
-                <div className='h-4 bg-gray-300 rounded w-1/4 mb-2'></div>
-                <div className='h-4 bg-gray-300 rounded w-1/3'></div>
+                <div className='h-6 bg-gray-200 rounded-lg w-3/4 mb-2'></div>
+                <div className='h-4 bg-gray-200 rounded-lg w-1/4 mb-2'></div>
+                <div className='h-4 bg-gray-200 rounded-lg w-1/3'></div>
               </div>
-              <div className='w-32 h-10 bg-gray-300 rounded-md'></div>
+              <div className='w-32 h-10 bg-gray-200 rounded-lg'></div>
             </div>
           ))}
         <div className='mt-6 flex justify-between'>
-          <div className='h-6 bg-gray-300 rounded w-1/4'></div>
-          <div className='h-10 bg-gray-300 rounded-md w-32'></div>
+          <div className='h-6 bg-gray-200 rounded-lg w-1/4'></div>
+          <div className='h-10 bg-gray-200 rounded-lg w-32'></div>
         </div>
       </div>
     </div>
   )
 
   if (loading) return <SkeletonLoading />
-  if (error) return <p className='text-lg text-center text-red-600'>{error}</p>
+  if (error) return <p className='text-lg text-center text-red-600 font-semibold'>{error}</p>
 
   return (
-    <div className='container mx-auto px-4 py-8'>
-      <div className='bg-white shadow-md rounded-lg'>
+    <div className='container mx-auto px-8 py-12'>
+      <h1 className='text-2xl font-bold text-gray-800 mb-8'>{t('your_cart')}</h1>
+      <div className='bg-white shadow-xl rounded-2xl overflow-hidden'>
         {cartItems.length === 0 ? (
-          <div className='text-center py-12'>
-            <p className='text-lg text-gray-600 mb-4'>{t('cart_is_empty')}</p>
+          <div className='text-center py-16'>
+            <svg
+              className='w-24 h-24 mx-auto text-gray-400 mb-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='2'
+                d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z'
+              />
+            </svg>
+            <p className='text-lg text-gray-600 mb-6'>{t('cart_is_empty')}</p>
             <button
               onClick={() => navigate('/')}
-              className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition'
+              className='bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-3 rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md'
             >
               {t('continue_shopping')}
             </button>
           </div>
         ) : (
-          <div className='flex flex-col p-5'>
-            {/* Danh sách sản phẩm */}
-            <div className='mb-6'>
-              <div className='flex items-center mb-4'>
-                <input type='checkbox' checked={selectAll} onChange={handleSelectAll} className='w-4 h-4 mr-2' />
-                <span className='text-sm font-medium text-gray-700'>
-                  {t('select_all')} ({cartItems.length})
-                </span>
-              </div>
-
-              <div className='hidden md:grid grid-cols-5 gap-4 text-sm font-medium text-gray-500 border-b pb-2 mb-4'>
-                <div>{t('product')}</div>
-                <div className='text-center'>{t('unit_price')}</div>
-                <div className='text-center'>{t('quantity')}</div>
-                <div className='text-center'>{t('total_price')}</div>
-                <div className='text-center'>{t('action')}</div>
-              </div>
-
-              {cartItems.map((item) => (
-                <div key={item.id} className='grid grid-cols-1 md:grid-cols-5 gap-4 items-center py-4 border-b'>
-                  <div className='flex items-center'>
-                    <input
-                      type='checkbox'
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectItem(item.id)}
-                      className='w-4 h-4 mr-2'
-                    />
-                    <img src={item.image} alt={item.product_name} className='w-16 h-16 object-cover rounded-md mr-4' />
-                    <div>
-                      <h2 className='text-sm font-medium text-gray-800'>{item.product_name}</h2>
-                      <p className='text-xs text-gray-500'>
-                        {t('size')}: {item.size_name}
-                      </p>
-                    </div>
-                  </div>
-                  <div className='text-sm text-center'>
-                    {item.original_price && Number(item.original_price) > Number(item.discounted_price) ? (
-                      <>
-                        <p className='line-through text-gray-500'>
-                          đ{Number(item.original_price).toLocaleString('vi-VN')}
-                        </p>
-                        <p className='text-black'>đ{Number(item.discounted_price).toLocaleString('vi-VN')}</p>
-                      </>
-                    ) : (
-                      <p className='text-black'>đ{Number(item.discounted_price).toLocaleString('vi-VN')}</p>
-                    )}
-                  </div>
-                  <div className='flex items-center justify-center'>
-                    <button
-                      onClick={() => handleUpdateQuantity(item, 'decrease')}
-                      className='w-8 h-8 border border-gray-300 rounded-l-md text-gray-700 hover:bg-gray-100 flex items-center justify-center'
-                    >
-                      -
-                    </button>
-                    <span className='w-10 h-8 border-t border-b border-gray-300 text-gray-800 flex items-center justify-center'>
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => handleUpdateQuantity(item, 'increase')}
-                      className='w-8 h-8 border border-gray-300 rounded-r-md text-gray-700 hover:bg-gray-100 flex items-center justify-center'
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className='text-sm font-medium text-black text-center'>
-                    đ{Number(item.total_price).toLocaleString('vi-VN')}
-                  </div>
-                  <div className='text-center'>
-                    <button
-                      onClick={() => handleRemoveItem(item.id)}
-                      className='text-red-600 hover:text-red-800 text-sm'
-                    >
-                      {t('remove')}
-                    </button>
-                  </div>
-                </div>
-              ))}
+          <div className='p-6'>
+            {/* Select All */}
+            <div className='flex items-center mb-6'>
+              <input
+                type='checkbox'
+                checked={selectAll}
+                onChange={handleSelectAll}
+                className='w-5 h-5 text-blue-600 rounded focus:ring-blue-500'
+                aria-label={t('select_all')}
+              />
+              <span className='ml-3 text-sm font-medium text-gray-700'>
+                {t('select_all')} ({cartItems.length})
+              </span>
             </div>
 
-            <button
-              onClick={handleCheckout}
-              className={`w-full py-2 rounded-md text-white text-sm font-medium ${
-                selectedItems.length > 0 ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-300 cursor-not-allowed'
-              } transition`}
-              disabled={selectedItems.length === 0}
-            >
-              {t('buy_now')} ({selectedItems.length})
-            </button>
+            {/* Header for Desktop */}
+            <div className='hidden md:grid grid-cols-6 gap-4 text-sm font-semibold text-gray-600 border-b pb-3 mb-6'>
+              <div className='col-span-2'>{t('product')}</div>
+              <div className='text-center'>{t('unit_price')}</div>
+              <div className='text-center'>{t('quantity')}</div>
+              <div className='text-center'>{t('total_price')}</div>
+              <div className='text-center'>{t('action')}</div>
+            </div>
+
+            {/* Cart Items */}
+            {cartItems.map((item) => (
+              <div
+                key={item.id}
+                className='grid grid-cols-1 md:grid-cols-6 gap-4 items-center py-4 border-b hover:bg-gray-50 transition-all duration-200'
+              >
+                <div className='col-span-2 flex items-center'>
+                  <input
+                    type='checkbox'
+                    checked={selectedItems.includes(item.id)}
+                    onChange={() => handleSelectItem(item.id)}
+                    className='w-5 h-5 text-blue-600 rounded focus:ring-blue-500'
+                    aria-label={`${t('select')} ${item.product_name}`}
+                  />
+                  <img
+                    src={item.image}
+                    alt={item.product_name}
+                    className='w-20 h-20 object-cover rounded-lg ml-4 mr-4 shadow-sm'
+                  />
+                  <div>
+                    <h2 className='text-base font-semibold text-gray-800'>{item.product_name}</h2>
+                    <p className='text-sm text-gray-500'>
+                      {t('size')}: {item.size_name}
+                    </p>
+                  </div>
+                </div>
+                <div className='text-sm text-center'>
+                  {item.original_price && Number(item.original_price) > Number(item.discounted_price) ? (
+                    <>
+                      <p className='line-through text-gray-400'>
+                        đ{Number(item.original_price).toLocaleString('vi-VN')}
+                      </p>
+                      <p className='text-gray-800 font-medium'>
+                        đ{Number(item.discounted_price).toLocaleString('vi-VN')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className='text-gray-800 font-medium'>
+                      đ{Number(item.discounted_price).toLocaleString('vi-VN')}
+                    </p>
+                  )}
+                </div>
+                <div className='flex items-center justify-center'>
+                  <button
+                    onClick={() => handleUpdateQuantity(item, 'decrease')}
+                    className='w-10 h-10 border border-gray-300 rounded-l-lg text-gray-600 hover:bg-gray-100 transition-all duration-200 flex items-center justify-center'
+                    aria-label={t('decrease_quantity')}
+                  >
+                    -
+                  </button>
+                  <span className='w-12 h-10 border-t border-b border-gray-300 text-gray-800 flex items-center justify-center font-medium'>
+                    {item.quantity}
+                  </span>
+                  <button
+                    onClick={() => handleUpdateQuantity(item, 'increase')}
+                    className='w-10 h-10 border border-gray-300 rounded-r-lg text-gray-600 hover:bg-gray-100 transition-all duration-200 flex items-center justify-center'
+                    aria-label={t('increase_quantity')}
+                  >
+                    +
+                  </button>
+                </div>
+                <div className='text-sm font-semibold text-gray-800 text-center'>
+                  đ{Number(item.total_price).toLocaleString('vi-VN')}
+                </div>
+                <div className='text-center'>
+                  <button
+                    onClick={() => handleRemoveItem(item.id)}
+                    className='text-red-500 hover:text-red-600 text-sm font-medium transition-all duration-200'
+                    aria-label={`${t('remove')} ${item.product_name}`}
+                  >
+                    {t('remove')}
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Sticky Checkout Bar */}
+            <div className='sticky bottom-0 bg-white border-t pt-4 mt-6'>
+              <div className='flex justify-between items-center'>
+                <div>
+                  <p className='text-sm text-gray-600'>
+                    {t('selected_items')}: {selectedItems.length}
+                  </p>
+                  <p className='text-lg font-semibold text-gray-800'>
+                    {t('total')}: đ{calculateSelectedTotal().toLocaleString('vi-VN')}
+                  </p>
+                </div>
+                <button
+                  onClick={handleCheckout}
+                  className={`py-3 px-8 rounded-full text-white text-sm font-semibold transition-all duration-300 shadow-md ${
+                    selectedItems.length > 0
+                      ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                      : 'bg-gray-300 cursor-not-allowed'
+                  }`}
+                  disabled={selectedItems.length === 0}
+                  aria-label={t('proceed_to_checkout')}
+                >
+                  {t('buy_now')} ({selectedItems.length})
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
 
       {showConfirmModal && itemToRemove && (
-        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50'>
-          <div className='bg-white rounded-lg p-6 shadow-lg max-w-sm w-full'>
-            <h3 className='text-lg font-medium text-gray-800 mb-2'>{t('confirm_remove_item')}</h3>
-            <p className='text-sm text-gray-600 mb-4'>
+        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50'>
+          <div className='bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100'>
+            {/* <h3 className='text-xl font-semibold text-gray-800 mb-3'>{t('confirm_remove_item')}</h3> */}
+            <p className='text-sm text-gray-600 mb-6'>
               {t('remove_item_message')} <span className='font-medium'>{itemToRemove.product_name}</span>?
             </p>
-            <div className='flex justify-end gap-2'>
+            <div className='flex justify-end gap-3'>
               <button
                 onClick={cancelRemove}
-                className='px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition'
+                className='px-6 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-all duration-200'
+                aria-label={t('cancel')}
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={confirmRemove}
-                className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition'
+                className='px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-200'
+                aria-label={t('yes_remove')}
               >
                 {t('yes_remove')}
               </button>
