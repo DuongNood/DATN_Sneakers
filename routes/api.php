@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MomoController;
+use App\Http\Controllers\api\VnpaypaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
@@ -134,3 +135,8 @@ Route::get('/products/filter', [filterProductsController::class, 'filterProducts
 Route::post('/momo/create', [MomoController::class, 'createPayment']);
 Route::post('/momo/callback', [MomoController::class, 'callback']);
 Route::post('/momo/ipn', [MomoController::class, 'ipn']);
+
+// VnpayPayment
+Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
+
+
