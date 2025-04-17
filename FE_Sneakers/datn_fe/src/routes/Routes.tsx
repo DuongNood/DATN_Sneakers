@@ -57,7 +57,7 @@ const RoutesConfig = () => {
           }
         />
         <Route path='/' element={<ProductList />} />
-        <Route path='/*' element={<NotFound />} />
+       
         <Route path='/product-sale' element={<ProductSale />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
@@ -84,6 +84,7 @@ const RoutesConfig = () => {
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/change-password' element={<ChangePasswordPage />} />
         </Route>
+        
       </Routes>
 
       <Footer />
