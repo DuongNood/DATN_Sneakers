@@ -9,6 +9,7 @@ class MomoController extends Controller
 {
     public function createPayment(Request $request)
     {
+        // Cấu hình MoMo
         $config = [
             'partner_code' => env('MOMO_PARTNER_CODE', 'MOMOBKUN20180529'),
             'access_key' => env('MOMO_ACCESS_KEY', 'klm05TvNBzhg7h7j'),
@@ -18,15 +19,24 @@ class MomoController extends Controller
             'ipn_url' => env('MOMO_IPN_URL', 'https://datn-sneakers.loca.lt/api/momo/ipn'),
         ];
 
+        // Lấy dữ liệu từ request
+        $amount = $request->input('amount');
+        $paymentType = $request->input('paymentType'); // 'atm' hoặc 'card'
+        $orderIds = $request->input('extraData'); // Dữ liệu orderIds từ front-end
+
+        // Validate input
+        if (!$amount || !$paymentType || !in_array($paymentType, ['atm', 'card'])) {
+            return response()->json(['error' => 'Dữ liệu không hợp lệ'], 400);
+        }
+
+        // Xác định requestType dựa trên paymentType
+        $requestType = $paymentType === 'atm' ? 'payWithATM' : 'payWithCC';
+
+        // Tạo thông tin đơn hàng
         $orderId = time() . "";
         $orderInfo = "Thanh toán đơn hàng #$orderId";
-        $amount = $request->input('amount'); // Tổng tiền từ frontend
         $requestId = time() . "";
-        $extraData = base64_encode(json_encode([
-            'products' => $request->input('products', []),
-            'shipping_info' => $request->input('shipping_info', []),
-        ])); // Lưu thông tin đơn hàng vào extraData
-        $requestType = "payWithATM"; // Thẻ ATM, đổi thành "payWithCard" nếu dùng thẻ quốc tế
+        $extraData = $orderIds; // Sử dụng extraData từ front-end (đã base64 encoded)
 
         // Tạo raw signature
         $rawHash = "accessKey=" . $config['access_key'] .
@@ -84,7 +94,7 @@ class MomoController extends Controller
         if (isset($data['resultCode']) && $data['resultCode'] == 0) {
             // Thanh toán thành công, giải mã extraData
             $extraData = json_decode(base64_decode($data['extraData']), true);
-            // TODO: Tạo đơn hàng tại đây
+            // TODO: Cập nhật trạng thái đơn hàng dựa trên extraData['orderIds']
             return response()->json(['message' => 'Thanh toán thành công', 'data' => $data]);
         }
 
@@ -123,9 +133,9 @@ class MomoController extends Controller
         }
 
         if ($data['resultCode'] == 0) {
-            // Thanh toán thành công, giải mã extraData và tạo đơn hàng
+            // Thanh toán thành công, giải mã extraData và cập nhật đơn hàng
             $extraData = json_decode(base64_decode($data['extraData']), true);
-            // TODO: Tạo đơn hàng tại đây
+            // TODO: Cập nhật trạng thái đơn hàng dựa trên extraData['orderIds']
         }
 
         return response()->json([], 204);

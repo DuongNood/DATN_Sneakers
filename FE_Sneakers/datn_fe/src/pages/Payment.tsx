@@ -40,8 +40,6 @@ const Payment: React.FC = () => {
   const [momoPaymentType, setMomoPaymentType] = useState<'atm' | 'card' | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
-  console.log('Payment Data:', { products, shippingInfo, total, couponDiscount, shippingFee })
-
   const handlePayment = async () => {
     if (!paymentMethod) {
       toast.error(t('please_select_payment_method'), { autoClose: 2000 })
@@ -60,8 +58,9 @@ const Payment: React.FC = () => {
       // Tạo đơn hàng
       const orderPromises = products.map(async (product) => {
         const selectedSizeObj = product.sizes?.find((s) => s.size === (product.variant || product.size))
-        if (!selectedSizeObj)
+        if (!selectedSizeObj) {
           throw new Error(`Size ${product.variant || product.size} not found for product ${product.name}`)
+        }
 
         const orderId = `${Date.now()}_${product.id}`
         const response = await axios.post(
@@ -103,18 +102,16 @@ const Payment: React.FC = () => {
           }
         )
 
-        console.log('MoMo Response:', momoResponse.data)
         const { payUrl } = momoResponse.data
-        if (payUrl) {
-          console.log('Redirecting to:', payUrl)
-          window.location.href = payUrl
-        } else {
-          throw new Error(t('momo_payment_failed'))
+        if (!payUrl) {
+          throw new Error(t('momo_payment_failed_no_url'))
         }
+
+        window.location.href = payUrl
       }
     } catch (error: any) {
       console.error('Payment error:', error)
-      toast.error(error.response?.data?.message || t('payment_failed'), { autoClose: 2000 })
+      toast.error(error.message || t('payment_failed'), { autoClose: 2000 })
     } finally {
       setLoading(false)
     }
@@ -259,20 +256,11 @@ const Payment: React.FC = () => {
                   <p className='font-medium text-gray-900'>{t('momo_payment')}</p>
                   <p className='text-sm text-gray-500'>{t('momo_payment_description')}</p>
                 </div>
-                <svg
-                  className='w-6 h-6 text-gray-400'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
-                  />
-                </svg>
+                <img
+                  src='https://developers.momo.vn/v3/assets/images/logo-1-8a1f51b0e2f3c1e4b9f5e6c7d7e8f9a0.png'
+                  alt='MoMo'
+                  className='w-6 h-6'
+                />
               </div>
               {paymentMethod === 'momo' && (
                 <div className='ml-8 space-y-4'>
@@ -295,6 +283,11 @@ const Payment: React.FC = () => {
                       <p className='font-medium text-gray-900'>{t('atm_card')}</p>
                       <p className='text-sm text-gray-500'>{t('atm_card_description')}</p>
                     </div>
+                    <img
+                      src='https://developers.momo.vn/v3/assets/images/logo-1-8a1f51b0e2f3c1e4b9f5e6c7d7e8f9a0.png'
+                      alt='MoMo ATM'
+                      className='w-6 h-6'
+                    />
                   </div>
                   <div
                     className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${
@@ -314,6 +307,18 @@ const Payment: React.FC = () => {
                     <div className='flex-1'>
                       <p className='font-medium text-gray-900'>{t('international_card')}</p>
                       <p className='text-sm text-gray-500'>{t('international_card_description')}</p>
+                    </div>
+                    <div className='flex space-x-2'>
+                      <img
+                        src='https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg'
+                        alt='Visa'
+                        className='w-8 h-5'
+                      />
+                      <img
+                        src='https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg'
+                        alt='MasterCard'
+                        className='w-8 h-5'
+                      />
                     </div>
                   </div>
                 </div>
