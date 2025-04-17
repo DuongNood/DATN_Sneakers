@@ -19,7 +19,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, onCancel }) => {
     return null
   }
 
-  console.log('OrderItem rendered, order:', order.order_code)
+  // console.log('OrderItem rendered, order:', order.order_code)
   return (
     <div className='flex flex-col border border-gray-300 rounded-lg p-4 mb-4 bg-white shadow-sm'>
       <div className='flex items-center gap-4'>

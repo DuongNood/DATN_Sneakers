@@ -40,12 +40,12 @@ class OrderController extends Controller
         // Lấy giỏ hàng của user
         $cart = Cart::where('user_id', $user->id)->first();
         if (!$cart) {
-            return response()->json(['message' => 'Giỏ hàng trống!'], 400);
+            return response()->json(['message' => 'Giỏ hàng của bạn đang trống!'], 400);
         }
 
         $cartItems = CartItem::where('cart_id', $cart->id)->with('product')->get();
         if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'Không có sản phẩm trong giỏ hàng!'], 400);
+            return response()->json(['message' => 'Không có sản phẩm nào trong giỏ hàng!'], 400);
         }
 
         return DB::transaction(function () use ($request, $user, $cartItems, $shippingInfo, $couponCode) {
@@ -168,7 +168,7 @@ class OrderController extends Controller
             }
 
             if ($productVariant->quantity < $request->quantity) {
-                return response()->json(['message' => 'Kho không đủ hàng!'], 400);
+                return response()->json(['message' => 'Kho không đủ hàng!'], 503);
             }
 
             $price = $product->discounted_price ?? $product->original_price;
@@ -254,173 +254,6 @@ class OrderController extends Controller
             ], 201);
         });
     }
-
-
-    public function buyProductWithVNPAY(Request $request, $product_name)
-{
-    $request->validate([
-        'product_size_id' => 'required|integer',
-        'quantity' => 'required|integer|min:1',
-        'promotion_name' => 'nullable|string'
-    ]);
-
-    $user = Auth::user();
-
-    if (!$user->phone || !$user->address) {
-        return response()->json(['message' => 'Vui lòng cập nhật số điện thoại và địa chỉ trước khi mua hàng!'], 400);
-    }
-
-    $product = Product::firstWhere('product_name', $product_name);
-    if (!$product) {
-        return response()->json(['message' => 'Sản phẩm không tồn tại!'], 404);
-    }
-
-    return DB::transaction(function () use ($request, $product, $user) {
-        $productVariant = ProductVariant::where('product_id', $product->id)
-            ->where('product_size_id', $request->product_size_id)
-            ->lockForUpdate()
-            ->first();
-
-        if (!$productVariant) {
-            return response()->json(['message' => 'Không tìm thấy biến thể sản phẩm!'], 404);
-        }
-
-        if ($productVariant->quantity < $request->quantity) {
-            return response()->json(['message' => 'Kho không đủ hàng!'], 400);
-        }
-
-        $price = $product->discounted_price ?? $product->original_price;
-        $totalPriceBeforeDiscount = $price * $request->quantity;
-
-        $shippingFee = 30000;
-        $promotionAmount = 0;
-
-        if ($request->filled('promotion_name')) {
-            $promotion = DB::table('promotions')
-                ->where('promotion_name', $request->promotion_name)
-                ->where('status', 1)
-                ->whereDate('start_date', '<=', now())
-                ->whereDate('end_date', '>=', now())
-                ->first();
-
-            if ($promotion) {
-                if ($promotion->discount_type === 'Giảm theo %') {
-                    $promotionAmount = ($totalPriceBeforeDiscount * $promotion->discount_value) / 100;
-                    if (!empty($promotion->max_discount_value)) {
-                        $promotionAmount = min($promotionAmount, $promotion->max_discount_value);
-                    }
-                } elseif ($promotion->discount_type === 'Giảm số tiền') {
-                    $promotionAmount = min($promotion->discount_value, $totalPriceBeforeDiscount);
-                }
-            } else {
-                return response()->json(["message" => "Mã giảm giá không hợp lệ hoặc đã hết hạn!"], 400);
-            }
-        }
-
-        $finalTotalPrice = max(($totalPriceBeforeDiscount - $promotionAmount) + $shippingFee, 0);
-        $orderCode = 'ORD' . strtoupper(Str::random(10));
-
-        $order = Order::create([
-            'user_id' => $user->id,
-            'order_code' => $orderCode,
-            'recipient_name' => $user->name,
-            'recipient_phone' => $user->phone,
-            'recipient_address' => $user->address,
-            'total_price' => $finalTotalPrice,
-            'promotion' => $promotionAmount,
-            'shipping_fee' => $shippingFee,
-            'payment_method' => 'VNPAY',
-            'payment_status' => 'chua_thanh_toan',
-            'status' => 'cho_xac_nhan',
-        ]);
-
-        $productSize = ProductSize::find($request->product_size_id);
-
-        OrderDetail::create([
-            'order_id' => $order->id,
-            'product_variant_id' => $productVariant->id,
-            'quantity' => $request->quantity,
-            'price' => $price,
-        ]);
-
-        // Tạo URL thanh toán VNPAY
-        $vnp_Url = env('VNPAY_URL');
-        $vnp_Returnurl = env('VNPAY_RETURN_URL');
-        $vnp_TmnCode = env('VNPAY_TMN_CODE');
-        $vnp_HashSecret = env('VNPAY_HASH_SECRET');
-
-        $vnp_TxnRef = $orderCode;
-        $vnp_OrderInfo = "Thanh toan don hang $orderCode";
-        $vnp_OrderType = 'billpayment';
-        $vnp_Amount = $finalTotalPrice * 100; // VNPAY yêu cầu đơn vị là đồng * 100
-        $vnp_Locale = 'vn';
-        $vnp_BankCode = 'VNBANK';
-        $vnp_IpAddr = request()->ip();
-
-        $inputData = array(
-            "vnp_Version" => "2.1.0",
-            "vnp_TmnCode" => $vnp_TmnCode,
-            "vnp_Amount" => $vnp_Amount,
-            "vnp_Command" => "pay",
-            "vnp_CreateDate" => now()->format('YmdHis'),
-            "vnp_CurrCode" => "VND",
-            "vnp_IpAddr" => $vnp_IpAddr,
-            "vnp_Locale" => $vnp_Locale,
-            "vnp_OrderInfo" => $vnp_OrderInfo,
-            "vnp_OrderType" => $vnp_OrderType,
-            "vnp_ReturnUrl" => $vnp_Returnurl,
-            "vnp_TxnRef" => $vnp_TxnRef
-        );
-
-        ksort($inputData);
-        $hashdata = urldecode(http_build_query($inputData));
-        $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
-
-        $vnp_Url .= '?' . http_build_query($inputData) . '&vnp_SecureHash=' . $vnpSecureHash;
-
-        return response()->json([
-            'message' => 'Tạo đơn hàng thành công, chuyển đến VNPAY',
-            'redirect_url' => $vnp_Url
-        ]);
-    });
-}
-
-
-public function vnpayCallback(Request $request)
-{
-    $vnp_HashSecret = env('VNPAY_HASH_SECRET');
-
-    $vnp_SecureHash = $request->vnp_SecureHash;
-    $inputData = $request->except(['vnp_SecureHash', 'vnp_SecureHashType']);
-    ksort($inputData);
-    $hashData = urldecode(http_build_query($inputData));
-
-    $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-
-    if ($secureHash === $vnp_SecureHash) {
-        $orderCode = $request->vnp_TxnRef;
-        $order = Order::where('order_code', $orderCode)->first();
-
-        if ($order && $order->payment_status !== 'da_thanh_toan') {
-            $order->update(['payment_status' => 'da_thanh_toan']);
-
-            DB::table('momo_transactions')->insert([
-                'order_id' => $order->id,
-                'amount' => $request->vnp_Amount / 100,
-                'trans_id' => $request->vnp_TransactionNo,
-                'status' => 'success',
-                'payment_method' => 'VNPAY',
-                'response_data' => json_encode($request->all()),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        return response()->json(['message' => 'Thanh toán thành công!']);
-    }
-
-    return response()->json(['message' => 'Xác thực thất bại!'], 400);
-}
     /**
      * Hiển thị danh sách đơn hàng của user
      */
@@ -495,7 +328,7 @@ public function vnpayCallback(Request $request)
                 'user_id' => Auth::id(),
             ]);
             return response()->json([
-                'message' => 'Đơn hàng không thể bị hủy ở giai đoạn này!',
+                'message' => 'Đơn hàng không thể hủy tại thời điểm này!',
                 'current_status' => $order->status
             ], 400);
         }
@@ -535,7 +368,7 @@ public function vnpayCallback(Request $request)
                 'user_id' => Auth::id(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['message' => 'Lỗi server khi gửi yêu cầu hủy!', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Đã xảy ra lỗi server khi gửi yêu cầu hủy đơn hàng!', 'error' => $e->getMessage()], 500);
         }
     }
 

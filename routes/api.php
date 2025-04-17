@@ -29,6 +29,7 @@ use App\Http\Controllers\api\ProductReviewController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\FilterProductsController;
 
 Route::apiResource('banners', BannerController::class);
 
@@ -98,8 +99,8 @@ Route::get('/statistics/top-customers', [StatisticsController::class, 'topCustom
 Route::get('/home-products', [HomeController::class, 'getHomeProducts']);
 Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
 Route::get('/products-related/{id}', [DetailController::class, 'getRelatedProducts']);
-Route::get('/categories', [HomeController::class, 'getCategories']);
-Route::get('/productbycategory/{id}', [HomeController::class, 'categoryByProduct']);
+Route::get('/brands', [HomeController::class, 'getBrands']);
+Route::get('/productbybrand/{id}', [HomeController::class, 'brandsByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
 Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::class, 'store']);
 Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);
@@ -125,6 +126,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/create-from-cart', [OrderController::class, 'createOrderFromCart']);
     Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
 });
+//lọc sp
+Route::get('/products/filter', [filterProductsController::class, 'filterProducts']);
 
 // MomoPayment 
 

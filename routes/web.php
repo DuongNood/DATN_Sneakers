@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\BrandController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\AuthController;
 use App\Http\Controllers\admin\StatisticsController;
@@ -11,8 +12,11 @@ use App\Http\Controllers\admin\BannerController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ProductVariantController;
 use App\Http\Controllers\admin\PromotionController;
+use App\Http\Controllers\admin\ReviewController;
 use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\SizeController;
+use App\Models\ProductReview;
+use App\Http\Controllers\admin\DashboardStatisticsController;
 use App\Models\User;
 
 /*
@@ -32,7 +36,10 @@ Route::prefix('admin')
             Route::get('/', function () {
                 return view('admin.index');
             })->name('index');
+
+            Route::get('/dashboard/daily-statistics', [DashboardStatisticsController::class, 'getDailyData'])->name('dashboard.daily_statistics');
         });
+
 
         Route::middleware(['auth', 'permission:manage_banners'])->group(function () {
             Route::resource('banners', BannerController::class);
@@ -48,6 +55,10 @@ Route::prefix('admin')
 
         Route::middleware(['auth', 'permission:manage_users'])->group(function () {
             Route::resource('users', UserController::class);
+        });
+
+        Route::middleware(['auth', 'permission:manage_users'])->group(function () {
+            Route::resource('brands', BrandController::class);
         });
 
         Route::middleware(['auth', 'permission:manage_categories'])->group(function () {
@@ -131,4 +142,7 @@ Route::prefix('admin')
                     Route::put('update', [SettingController::class, 'update'])->name('update');
                 });
         });
+      
+            Route::get('review', [ReviewController::class,'index'])->name('review.index');
+       
     });

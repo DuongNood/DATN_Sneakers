@@ -73,6 +73,20 @@
                 </li>
 
                 <li>
+                    <a class='tp-link' href='{{ route('admin.brands.index') }}'>
+                        <i data-feather="clipboard"></i>
+                        <span> Quản lý thương hiệu </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class='tp-link' href='{{ route('admin.review.index') }}'>
+                        <i data-feather="clipboard"></i>
+                        <span> Quản lý đánh giá </span>
+                    </a>
+                </li>
+
+                <li>
                     <a class='tp-link' href='{{ route('admin.users.index') }}'>
                         <i data-feather="users"></i>
                         <span> Quản lý người dùng </span>

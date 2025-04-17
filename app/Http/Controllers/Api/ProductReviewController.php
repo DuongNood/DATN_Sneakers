@@ -17,7 +17,7 @@ class ProductReviewController extends Controller
             'product_variant_id' => 'required|exists:product_variants,id',
             'order_detail_id' => 'required|exists:order_details,id',
             'rating' => 'required|integer|min:1|max:5',
-            'content' => 'nullable|string',
+            'comment' => 'nullable|string',
         ]);
 
         $user = auth()->user();
@@ -50,7 +50,7 @@ class ProductReviewController extends Controller
             'product_variant_id' => $request->product_variant_id,
             'order_detail_id' => $request->order_detail_id,
             'rating' => $request->rating,
-            'content' => $request->content,
+            'comment' => $request->comment,
         ]);
 
         return response()->json(['message' => 'Đánh giá thành công.', 'review' => $review]);
@@ -66,7 +66,7 @@ class ProductReviewController extends Controller
 
     return response()->json([
         'product_id' => $productId,
-        'reviews' => $reviews,
+        'comment' => $reviews,
     ]);
 }
 
