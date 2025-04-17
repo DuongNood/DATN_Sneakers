@@ -204,12 +204,12 @@ const Header = () => {
                 </Link>
                 {(user?.role_id === 1 || user?.role_id === 2) && (
                   <a
-                    href='https://www.facebook.com'
+                    href='http://datn_sneakers.test/admin'
                     target='_blank'
                     rel='noopener noreferrer'
                     className='dropdown-link'
                   >
-                    {t('admin_link')}
+                    {t('Admin Dashboard')}
                   </a>
                 )}
                 <button onClick={handleLogout} className='w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100'>
@@ -286,13 +286,13 @@ const Header = () => {
                 </Link>
                 {(user?.role_id === 1 || user?.role_id === 2) && (
                   <a
-                    href='https://www.facebook.com'
+                    href='http://datn_sneakers.test/admin'
                     target='_blank'
                     rel='noopener noreferrer'
                     className='mobile-nav-link'
                     onClick={handleLinkClick}
                   >
-                    {t('admin_link')}
+                    {t('Admin Dashboard')}
                   </a>
                 )}
                 <button onClick={handleLogout} className='mobile-nav-link text-left'>

@@ -125,7 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/create-from-cart', [OrderController::class, 'createOrderFromCart']);
     Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
 });
-//lọc spsp
+//lọc sp
 Route::get('/products/filter', [filterProductsController::class, 'filterProducts']);
 
 // MomoPayment 

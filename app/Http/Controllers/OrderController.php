@@ -40,12 +40,12 @@ class OrderController extends Controller
         // Lấy giỏ hàng của user
         $cart = Cart::where('user_id', $user->id)->first();
         if (!$cart) {
-            return response()->json(['message' => 'Giỏ hàng trống!'], 400);
+            return response()->json(['message' => 'Giỏ hàng của bạn đang trống!'], 400);
         }
 
         $cartItems = CartItem::where('cart_id', $cart->id)->with('product')->get();
         if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'Không có sản phẩm trong giỏ hàng!'], 400);
+            return response()->json(['message' => 'Không có sản phẩm nào trong giỏ hàng!'], 400);
         }
 
         return DB::transaction(function () use ($request, $user, $cartItems, $shippingInfo, $couponCode) {
@@ -328,7 +328,7 @@ class OrderController extends Controller
                 'user_id' => Auth::id(),
             ]);
             return response()->json([
-                'message' => 'Đơn hàng không thể bị hủy ở giai đoạn này!',
+                'message' => 'Đơn hàng không thể hủy tại thời điểm này!',
                 'current_status' => $order->status
             ], 400);
         }
@@ -368,7 +368,7 @@ class OrderController extends Controller
                 'user_id' => Auth::id(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['message' => 'Lỗi server khi gửi yêu cầu hủy!', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Đã xảy ra lỗi server khi gửi yêu cầu hủy đơn hàng!', 'error' => $e->getMessage()], 500);
         }
     }
 
