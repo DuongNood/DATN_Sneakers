@@ -31,6 +31,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\FilterProductsController;
+use App\Http\Controllers\VnPayController;
 
 Route::apiResource('banners', BannerController::class);
 
@@ -137,6 +138,6 @@ Route::post('/momo/callback', [MomoController::class, 'callback']);
 Route::post('/momo/ipn', [MomoController::class, 'ipn']);
 
 // VnpayPayment
-Route::get('/vnpay-return', [OrderController::class, 'vnpayReturn']);
+Route::get('/vnpay-return', [VnPayController::class, 'vnpayReturn']);
 
 
