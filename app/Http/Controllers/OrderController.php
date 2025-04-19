@@ -124,13 +124,25 @@ class OrderController extends Controller
             }
 
             // Xóa giỏ hàng sau khi đặt hàng thành công
-            CartItem::where('cart_id', $cart->id)->delete();
+            Log::info('Deleting cart items for cart_id: ' . $cart->id);
+            $deletedItems = CartItem::where('cart_id', $cart->id)->delete();
+            Log::info('Deleted ' . $deletedItems . ' cart items');
+            
+            Log::info('Deleting cart: ' . $cart->id);
             $cart->delete();
+            Log::info('Cart deleted successfully');
 
             return response()->json([
                 'message' => 'Đặt hàng thành công!',
                 'order_id' => $order->id,
                 'order_code' => $orderCode,
+                'purchased_items' => $cartItems->map(function($item) {
+                    return [
+                        'product_id' => $item->product_id,
+                        'product_size_id' => $item->product_size_id,
+                        'quantity' => $item->quantity
+                    ];
+                })->toArray()
             ], 201);
         });
     }
@@ -227,6 +239,15 @@ class OrderController extends Controller
             ]);
 
             $productVariant->decrement('quantity', $request->quantity);
+
+            // Kiểm tra và xóa sản phẩm khỏi giỏ hàng nếu có
+            $cart = Cart::where('user_id', $user->id)->first();
+            if ($cart) {
+                CartItem::where('cart_id', $cart->id)
+                    ->where('product_id', $product->id)
+                    ->where('product_size_id', $request->product_size_id)
+                    ->delete();
+            }
 
             return response()->json([
                 'message' => 'Đặt hàng thành công!',
