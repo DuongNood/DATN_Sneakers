@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\MomoController;
+use App\Http\Controllers\api\VnpaypaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\api\HomeController;
 use App\Http\Controllers\Api\NewsController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\FilterProductsController;
+use App\Http\Controllers\VnPayController;
 
 Route::apiResource('banners', BannerController::class);
 
@@ -114,6 +116,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('carts/remove/{cart_item_id}', [CartController::class, 'removeFromCart']);
     Route::get('/orders/{id}', [OrderController::class, 'orderDetails']);
     Route::post('/orders/buy/{product_name}', [OrderController::class, 'buyProductByName']);
+
    
 });
 
@@ -133,5 +136,12 @@ Route::get('/products/filter', [filterProductsController::class, 'filterProducts
 
 
 Route::post('/momo/create', [MomoController::class, 'createPayment']);
+
+
+// VnpayPayment
+Route::get('/vnpay-return', [VnPayController::class, 'vnpayReturn']);
+
+
 Route::get('/momo/callback', [MomoController::class, 'callback']);
 Route::post('/momo/ipn', [MomoController::class, 'ipn']);
+
