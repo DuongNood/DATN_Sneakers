@@ -133,11 +133,15 @@ Route::get('/products/filter', [filterProductsController::class, 'filterProducts
 
 // MomoPayment 
 
+
+
 Route::post('/momo/create', [MomoController::class, 'createPayment']);
-Route::post('/momo/callback', [MomoController::class, 'callback']);
-Route::post('/momo/ipn', [MomoController::class, 'ipn']);
+
 
 // VnpayPayment
 Route::get('/vnpay-return', [VnPayController::class, 'vnpayReturn']);
 
+
+Route::get('/momo/callback', [MomoController::class, 'callback']);
+Route::post('/momo/ipn', [MomoController::class, 'ipn']);
 

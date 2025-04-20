@@ -36,20 +36,20 @@ const Payment: React.FC = () => {
   const navigate = useNavigate()
   const { products, shippingInfo, total, couponDiscount, shippingFee } = (location.state as PaymentState) || {}
 
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'momo' | 'vnpay'>(null)
-  const [loading, setLoading] = useState<boolean>(false)
 
-  console.log('Payment Data from Checkout:', {
-    products,
-    shippingInfo,
-    total,
-    couponDiscount,
-    shippingFee
-  })
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'momo' | 'vnpay'>(null)
+
+  const [momoPaymentType, setMomoPaymentType] = useState<'atm' | 'card' | null>(null)
+
+  const [loading, setLoading] = useState<boolean>(false)
 
   const handlePayment = async () => {
     if (!paymentMethod) {
       toast.error(t('please_select_payment_method'), { autoClose: 2000 })
+      return
+    }
+    if (paymentMethod === 'momo' && !momoPaymentType) {
+      toast.error(t('please_select_momo_payment_type'), { autoClose: 2000 })
       return
     }
 
@@ -61,9 +61,11 @@ const Payment: React.FC = () => {
       // Tạo đơn hàng
       const orderPromises = products.map(async (product) => {
         const selectedSizeObj = product.sizes?.find((s) => s.size === (product.variant || product.size))
-        if (!selectedSizeObj)
+        if (!selectedSizeObj) {
           throw new Error(`Size ${product.variant || product.size} not found for product ${product.name}`)
+        }
 
+        const orderId = `${Date.now()}_${product.id}`
         const response = await axios.post(
           `http://localhost:8000/api/orders/buy/${encodeURIComponent(product.name)}`,
           {
@@ -71,7 +73,8 @@ const Payment: React.FC = () => {
             quantity: product.quantity,
             product_size_id: selectedSizeObj.product_size_id,
             payment_method: paymentMethod,
-            status: paymentMethod === 'cod' ? 'confirmed' : 'pending'
+            status: paymentMethod === 'cod' ? 'cho_xac_nhan' : 'pending',
+            order_id: orderId
           },
           {
             headers: {
@@ -80,38 +83,38 @@ const Payment: React.FC = () => {
             }
           }
         )
-        return response.data
+        return { ...response.data, orderId }
       })
 
-      await Promise.all(orderPromises)
+      const orders = await Promise.all(orderPromises)
 
       if (paymentMethod === 'cod') {
-        navigate('/order-success')
+        navigate('/order-success?status=success')
         toast.success(t('order_confirmed_successfully'), { autoClose: 2000 })
       } else if (paymentMethod === 'momo') {
-        // Gọi API MoMo để lấy payUrl
+        const orderIds = orders.map((order) => order.orderId).join(',')
         const momoResponse = await axios.post(
           'http://localhost:8000/api/momo/create',
-          { amount: total },
           {
-            headers: {
-              'Content-Type': 'application/json'
-            }
+            amount: total,
+            extraData: btoa(JSON.stringify({ orderIds })),
+            paymentType: momoPaymentType
+          },
+          {
+            headers: { 'Content-Type': 'application/json' }
           }
         )
 
         const { payUrl } = momoResponse.data
-        if (payUrl) {
-          window.location.href = payUrl
-        } else {
-          throw new Error('Lỗi, vui lòng nạp thêm tiền cho anh Hoàng Anh nhé')
+        if (!payUrl) {
+          throw new Error(t('momo_payment_failed_no_url'))
         }
+
+        window.location.href = payUrl
       }
     } catch (error: any) {
       console.error('Payment error:', error)
-      toast.error(error.response?.data?.message || t('payment_failed'), {
-        autoClose: 2000
-      })
+      toast.error(error.message || t('payment_failed'), { autoClose: 2000 })
     } finally {
       setLoading(false)
     }
@@ -132,7 +135,6 @@ const Payment: React.FC = () => {
       <div className='max-w-7xl mx-auto'>
         <h1 className='text-4xl font-bold text-gray-900 mb-12 text-center tracking-tight'>{t('payment')}</h1>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-          {/* Tóm tắt đơn hàng và địa chỉ nhận hàng */}
           <div className='bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl'>
             <h2 className='text-2xl font-semibold text-gray-900 mb-6'>{t('order_summary')}</h2>
             {products.map((product) => (
@@ -181,13 +183,11 @@ const Payment: React.FC = () => {
                 <span>₫{total.toLocaleString('vi-VN')}</span>
               </div>
             </div>
-
-            {/* Địa chỉ nhận hàng */}
             <div className='mt-8 pt-6 border-t border-gray-200'>
               <h2 className='text-2xl font-semibold text-gray-900 mb-4'>{t('shipping_address')}</h2>
               <div className='bg-indigo-50 p-5 rounded-xl transition-all duration-200 hover:bg-indigo-100'>
-                <p className='text-base font-medium text-gray-900'> Họ và Tên: {shippingInfo.fullName}</p>
-                <p className='text-sm text-gray-600 mt-1'> Địa chỉ: {shippingInfo.address}</p>
+                <p className='text-base font-medium text-gray-900'>{shippingInfo.fullName}</p>
+                <p className='text-sm text-gray-600 mt-1'>{shippingInfo.address}</p>
                 <p className='text-sm text-gray-600 mt-1'>
                   {t('phone')}: {shippingInfo.phone}
                 </p>
@@ -197,24 +197,29 @@ const Payment: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Phương thức thanh toán */}
           <div className='bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl'>
             <h2 className='text-2xl font-semibold text-gray-900 mb-6'>{t('payment_method')}</h2>
             <div className='space-y-4'>
-              {/* Thanh toán COD */}
               <div
                 className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${paymentMethod === 'cod'
                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
                     : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                onClick={() => setPaymentMethod('cod')}
+
+                }`}
+                onClick={() => {
+                  setPaymentMethod('cod')
+                  setMomoPaymentType(null)
+                }}
+
               >
                 <input
                   type='radio'
                   name='paymentMethod'
                   checked={paymentMethod === 'cod'}
-                  onChange={() => setPaymentMethod('cod')}
+                  onChange={() => {
+                    setPaymentMethod('cod')
+                    setMomoPaymentType(null)
+                  }}
                   className='mr-3 h-5 w-5 text-indigo-600 focus:ring-indigo-400'
                 />
                 <div className='flex-1'>
@@ -236,8 +241,6 @@ const Payment: React.FC = () => {
                   />
                 </svg>
               </div>
-
-              {/* Thanh toán MoMo */}
               <div
                 className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${paymentMethod === 'momo'
                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
@@ -256,21 +259,13 @@ const Payment: React.FC = () => {
                   <p className='font-medium text-gray-900'>{t('momo_payment')}</p>
                   <p className='text-sm text-gray-500'>{t('momo_payment_description')}</p>
                 </div>
-                <svg
-                  className='w-6 h-6 text-gray-400'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
-                  />
-                </svg>
+                <img
+                  src='https://developers.momo.vn/v3/assets/images/logo-1-8a1f51b0e2f3c1e4b9f5e6c7d7e8f9a0.png'
+                  alt='MoMo'
+                  className='w-6 h-6'
+                />
               </div>
+
               <div
                 className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${paymentMethod === 'vnpay'
                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
@@ -304,8 +299,70 @@ const Payment: React.FC = () => {
                   />
                 </svg>
               </div>
-            </div>
 
+              {paymentMethod === 'momo' && (
+                <div className='ml-8 space-y-4'>
+                  <div
+                    className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${
+                      momoPaymentType === 'atm'
+                        ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setMomoPaymentType('atm')}
+                  >
+                    <input
+                      type='radio'
+                      name='momoPaymentType'
+                      checked={momoPaymentType === 'atm'}
+                      onChange={() => setMomoPaymentType('atm')}
+                      className='mr-3 h-5 w-5 text-indigo-600 focus:ring-indigo-400'
+                    />
+                    <div className='flex-1'>
+                      <p className='font-medium text-gray-900'>{t('atm_card')}</p>
+                      <p className='text-sm text-gray-500'>{t('atm_card_description')}</p>
+                    </div>
+                    <img
+                      src='https://developers.momo.vn/v3/assets/images/logo-1-8a1f51b0e2f3c1e4b9f5e6c7d7e8f9a0.png'
+                      alt='MoMo ATM'
+                      className='w-6 h-6'
+                    />
+                  </div>
+                  <div
+                    className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${
+                      momoPaymentType === 'card'
+                        ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setMomoPaymentType('card')}
+                  >
+                    <input
+                      type='radio'
+                      name='momoPaymentType'
+                      checked={momoPaymentType === 'card'}
+                      onChange={() => setMomoPaymentType('card')}
+                      className='mr-3 h-5 w-5 text-indigo-600 focus:ring-indigo-400'
+                    />
+                    <div className='flex-1'>
+                      <p className='font-medium text-gray-900'>{t('international_card')}</p>
+                      <p className='text-sm text-gray-500'>{t('international_card_description')}</p>
+                    </div>
+                    <div className='flex space-x-2'>
+                      <img
+                        src='https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg'
+                        alt='Visa'
+                        className='w-8 h-5'
+                      />
+                      <img
+                        src='https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg'
+                        alt='MasterCard'
+                        className='w-8 h-5'
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
             <button
               onClick={handlePayment}
               disabled={loading}
