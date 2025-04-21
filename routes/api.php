@@ -23,7 +23,7 @@ use App\Http\Controllers\Auth\ProductController;
 use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\Api\StatisticsController;
-
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\admin\PromotionController;
 use App\Http\Controllers\Api\MomopaymentController;
 use App\Http\Controllers\api\ProductReviewController;
@@ -144,4 +144,24 @@ Route::get('/vnpay-return', [VnPayController::class, 'vnpayReturn']);
 
 Route::get('/momo/callback', [MomoController::class, 'callback']);
 Route::post('/momo/ipn', [MomoController::class, 'ipn']);
+
+
+
+// realtime pusher
+Route::post('/login', function (Request $request) {
+    $credentials = $request->only('email', 'password');
+    if (Auth::attempt($credentials)) {
+        $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken;
+        return response()->json(['token' => $token, 'user' => $user]);
+    }
+    return response()->json(['error' => 'Unauthorized'], 401);
+});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user/conversation', [ChatController::class, 'getOrCreateConversation']);
+    Route::get('/conversations', [ChatController::class, 'getConversations']);
+    Route::post('/conversations', [ChatController::class, 'createConversation']);
+    Route::get('/conversations/{id}/messages', [ChatController::class, 'getMessages']);
+    Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
+});
 
