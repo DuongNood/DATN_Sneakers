@@ -339,10 +339,12 @@
   "no_token": "No token found. Please login again.",
   "fetch_user_error": "Unable to fetch user information.",
   "no_products_to_checkout": "No products to checkout.",
-
   "no_description": "No description available.",
-
   "no_images_to_display": "No images to display.",
-
-  "proceeding_to_checkout": "Proceeding to checkout..."
+  "proceeding_to_checkout": "Proceeding to checkout...",
+  "add_to_wishlist": "Add to Wishlist",
+  "remove_from_wishlist": "Remove from Wishlist",
+  "select_size_before_adding_to_wishlist": "Please select a size before adding to wishlist!",
+  "added_to_wishlist": "Added {{name}} (size {{size}}) to wishlist",
+  "removed_from_wishlist": "Removed {{name}} (size {{size}}) from wishlist"
 }

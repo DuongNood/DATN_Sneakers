@@ -35,6 +35,7 @@ import MomoCallback from '../pages/MomoCallback'
 import OrderSuccess from '../components/SuccesOrder'
 import OrdersPage from '../pages/OrdersPage'
 import ChatPopup from '../components/ChatPopup'
+import Wishlist from '../components/Wishlist'
 
 const RoutesConfig = () => {
   return (
@@ -69,6 +70,7 @@ const RoutesConfig = () => {
         <Route path='/category/:id' element={<ProductCate />} />
         <Route path='/news/:id' element={<NewsDetail />} />
         <Route path='/cart' element={<Cart />} />
+        <Route path='/wishlist' element={<Wishlist />} />
         <Route path='/orders' element={<OrdersPage />} />
         <Route path='/payment' element={<Payment />} />
         <Route path='*' element={<NotFound />} />

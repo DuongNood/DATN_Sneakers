@@ -1,13 +1,12 @@
-
 import React, { useState, useEffect } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { FaBox, FaTruck, FaExchangeAlt } from 'react-icons/fa'
+import { FiHeart, FiShoppingCart, FiDollarSign } from 'react-icons/fi'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { useCart } from '../contexts/CartContext'
 import CommentsSection from '../components/CommentsSection'
-
 
 interface Product {
   id: number
@@ -52,12 +51,21 @@ const ProductDetail: React.FC = () => {
   const [suggestedLoading, setSuggestedLoading] = useState(false)
   const [suggestedError, setSuggestedError] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
+  const [isFavorite, setIsFavorite] = useState(false)
 
   const generateSlug = (name: string) =>
     name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '')
+
+  const checkFavoriteStatus = (productId: number, sizeId: number | null) => {
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]')
+    return wishlist.some(
+      (item: { product_id: number; product_size_id: number | null }) =>
+        item.product_id === productId && item.product_size_id === sizeId
+    )
+  }
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -69,7 +77,6 @@ const ProductDetail: React.FC = () => {
 
       setIsLoading(true)
       try {
-        // Lấy thông tin sản phẩm
         const productResponse = await fetch(`http://localhost:8000/api/detail-product/${id}`)
         if (!productResponse.ok) {
           throw new Error(t('http_error', { status: productResponse.status }))
@@ -105,8 +112,8 @@ const ProductDetail: React.FC = () => {
         setProduct(newProduct)
         setSelectedImage(newProduct.imageUrl || (newProduct.images.length > 0 ? newProduct.images[0] : null))
         fetchSuggestedProducts(productData.data.category.id)
+        setIsFavorite(checkFavoriteStatus(newProduct.id, selectedSizeId))
 
-        // Lấy thông tin người dùng (nếu đã đăng nhập)
         const token = localStorage.getItem('token')
         if (token) {
           try {
@@ -127,6 +134,12 @@ const ProductDetail: React.FC = () => {
 
     fetchProduct()
   }, [id, t])
+
+  useEffect(() => {
+    if (product) {
+      setIsFavorite(checkFavoriteStatus(product.id, selectedSizeId))
+    }
+  }, [product, selectedSizeId])
 
   const fetchSuggestedProducts = async (categoryId: number) => {
     setSuggestedLoading(true)
@@ -243,6 +256,42 @@ const ProductDetail: React.FC = () => {
     navigate('/checkout', {
       state: { products: [{ ...product, quantity, variant: selectedSize }], quantity }
     })
+  }
+
+  const handleToggleFavorite = () => {
+    if (!product) return
+    if (!selectedSize || !selectedSizeId) {
+      toast.error(t('select_size_before_adding_to_wishlist'), { autoClose: 1000 })
+      return
+    }
+
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]')
+    const item = {
+      product_id: product.id,
+      product_name: product.name,
+      slug: product.slug || generateSlug(product.name),
+      image: product.imageUrl,
+      price: product.discounted_price,
+      product_size_id: selectedSizeId,
+      size_name: selectedSize
+    }
+
+    if (isFavorite) {
+      const updatedWishlist = wishlist.filter(
+        (i: { product_id: number; product_size_id: number | null }) =>
+          i.product_id !== item.product_id || i.product_size_id !== item.product_size_id
+      )
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist))
+      setIsFavorite(false)
+      toast.success(t('removed_from_wishlist', { name: product.name, size: selectedSize }), { autoClose: 1000 })
+    } else {
+      wishlist.push(item)
+      localStorage.setItem('wishlist', JSON.stringify(wishlist))
+      setIsFavorite(true)
+      toast.success(t('added_to_wishlist', { name: product.name, size: selectedSize }), { autoClose: 1000 })
+    }
+
+    window.dispatchEvent(new Event('storage'))
   }
 
   const handleImageClick = (image: string) => {
@@ -465,18 +514,29 @@ const ProductDetail: React.FC = () => {
             </p>
           </div>
 
-          <div className='mt-4 flex gap-2'>
+          <div className='mt-4 flex gap-4 flex-wrap'>
             <button
               onClick={handleAddToCart}
-              className='bg-yellow-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-yellow-600 transition text-sm sm:text-base'
+              className='bg-yellow-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-yellow-600 transition text-sm sm:text-base flex items-center gap-2'
             >
+              <FiShoppingCart />
               {t('add_to_cart')}
             </button>
             <button
               onClick={handleBuyNow}
-              className='bg-blue-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-blue-600 transition text-sm sm:text-base'
+              className='bg-blue-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-blue-600 transition text-sm sm:text-base flex items-center gap-2'
             >
+              <FiDollarSign />
               {t('buy_now')}
+            </button>
+            <button
+              onClick={handleToggleFavorite}
+              className={`px-4 sm:px-6 py-2 rounded-md transition text-sm sm:text-base flex items-center gap-2 ${
+                isFavorite ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-red-500 text-white hover:bg-red-600'
+              }`}
+            >
+              <FiHeart className={isFavorite ? 'fill-current' : ''} />
+              {isFavorite ? t('remove_from_wishlist') : t('add_to_wishlist')}
             </button>
           </div>
 
@@ -558,7 +618,6 @@ const ProductDetail: React.FC = () => {
         )}
       </div>
 
-      {/* Phần bình luận */}
       <CommentsSection productId={id} user={user} />
     </div>
   )
