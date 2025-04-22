@@ -142,12 +142,20 @@ const Header = () => {
     setMenuOpen(false)
     setMobileProductOpen(false)
   }
-
+  const text = 'PoleSneakers'
   return (
     <header className='bg-white shadow-md sticky top-0 z-50 p-2'>
       <div className='container mx-auto px-6 md:px-20 py-4 flex justify-between items-center'>
-        <Link to='/' className='text-xl font-bold text-gray-800 tracking-wide'>
-          HA Test Build
+        <Link to='/' className='flex space-x-0.5 text-2xl font-serif font-bold tracking-wider'>
+          {text.split('').map((char, index) => (
+            <span
+              key={index}
+              className='text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-gray-500 animate-blink'
+              style={{ animationDelay: `${index * 0.15}s` }}
+            >
+              {char}
+            </span>
+          ))}
         </Link>
 
         <nav className='hidden md:flex space-x-8'>
