@@ -1,4 +1,4 @@
-// src/components/ProductDetail.tsx
+
 import React, { useState, useEffect } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { FaBox, FaTruck, FaExchangeAlt } from 'react-icons/fa'
@@ -6,6 +6,8 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { useCart } from '../contexts/CartContext'
+import CommentsSection from '../components/CommentsSection'
+
 
 interface Product {
   id: number
@@ -21,6 +23,12 @@ interface Product {
   images: string[]
   sizes: { size: string; quantity: number; product_size_id: number }[]
   category: { id: number; category_name: string }
+}
+
+interface User {
+  id: number
+  name: string
+  role_id: number // 1 = Admin, 3 = User
 }
 
 const ProductDetail: React.FC = () => {
@@ -43,6 +51,7 @@ const ProductDetail: React.FC = () => {
   const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([])
   const [suggestedLoading, setSuggestedLoading] = useState(false)
   const [suggestedError, setSuggestedError] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   const generateSlug = (name: string) =>
     name
@@ -60,46 +69,55 @@ const ProductDetail: React.FC = () => {
 
       setIsLoading(true)
       try {
-        const response = await fetch(`http://localhost:8000/api/detail-product/${id}`)
-        if (!response.ok) {
-          throw new Error(t('http_error', { status: response.status }))
+        // Lấy thông tin sản phẩm
+        const productResponse = await fetch(`http://localhost:8000/api/detail-product/${id}`)
+        if (!productResponse.ok) {
+          throw new Error(t('http_error', { status: productResponse.status }))
         }
-        const data = await response.json()
-
-        const productData = data.data
-        if (!productData) {
-          throw new Error(t('no_product_data'))
-        }
+        const productData = await productResponse.json()
 
         const newProduct: Product = {
-          id: productData.id,
-          slug: productData.slug || generateSlug(productData.product_name),
-          name: productData.product_name,
-          original_price: productData.original_price.toString(),
-          discounted_price: productData.discounted_price.toString(),
-          imageUrl: productData.image || 'https://via.placeholder.com/500',
-          rating: productData.rating || 5,
-          description: productData.description || t('no_description'),
-          product_code: productData.product_code || 'SP123',
+          id: productData.data.id,
+          slug: productData.data.slug || generateSlug(productData.data.product_name),
+          name: productData.data.product_name,
+          original_price: productData.data.original_price.toString(),
+          discounted_price: productData.data.discounted_price.toString(),
+          imageUrl: productData.data.image || 'https://via.placeholder.com/500',
+          rating: productData.data.rating || 5,
+          description: productData.data.description || t('no_description'),
+          product_code: productData.data.product_code || 'SP123',
           quantity:
-            productData.quantity ||
-            productData.product_variant.reduce((sum: number, variant: any) => sum + variant.quantity, 0),
-          images: productData.image_product.map((img: any) => img.image_product) || [],
+            productData.data.quantity ||
+            productData.data.product_variant.reduce((sum: number, variant: any) => sum + variant.quantity, 0),
+          images: productData.data.image_product.map((img: any) => img.image_product) || [],
           sizes:
-            productData.product_variant.map((variant: any) => ({
+            productData.data.product_variant.map((variant: any) => ({
               size: variant.product_size.name,
               quantity: variant.quantity,
               product_size_id: variant.product_size.id
             })) || [],
           category: {
-            id: productData.category.id,
-            category_name: productData.category.category_name
+            id: productData.data.category.id,
+            category_name: productData.data.category.category_name
           }
         }
 
         setProduct(newProduct)
         setSelectedImage(newProduct.imageUrl || (newProduct.images.length > 0 ? newProduct.images[0] : null))
-        fetchSuggestedProducts(productData.category.id)
+        fetchSuggestedProducts(productData.data.category.id)
+
+        // Lấy thông tin người dùng (nếu đã đăng nhập)
+        const token = localStorage.getItem('token')
+        if (token) {
+          try {
+            const userResponse = await axios.get('http://localhost:8000/api/user', {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+            setUser(userResponse.data)
+          } catch (userError: any) {
+            console.error('Lỗi khi lấy thông tin người dùng:', userError)
+          }
+        }
       } catch (error: any) {
         setError(error.message || t('error_fetching_product'))
       } finally {
@@ -200,7 +218,6 @@ const ProductDetail: React.FC = () => {
         { autoClose: 2000 }
       )
 
-      // Cập nhật cartCount từ API sau khi thêm sản phẩm
       const cartResponse = await axios.get('http://localhost:8000/api/carts/list', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -540,6 +557,9 @@ const ProductDetail: React.FC = () => {
           <p className='text-gray-600'>{t('no_suggested_products')}</p>
         )}
       </div>
+
+      {/* Phần bình luận */}
+      <CommentsSection productId={id} user={user} />
     </div>
   )
 }

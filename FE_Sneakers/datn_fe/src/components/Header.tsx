@@ -146,8 +146,8 @@ const Header = () => {
   return (
     <header className='bg-white shadow-md sticky top-0 z-50 p-2'>
       <div className='container mx-auto px-6 md:px-20 py-4 flex justify-between items-center'>
-        <Link to='/' className='text-3xl font-bold text-gray-800 tracking-wide'>
-          Pole
+        <Link to='/' className='text-xl font-bold text-gray-800 tracking-wide'>
+          HA Test Build
         </Link>
 
         <nav className='hidden md:flex space-x-8'>

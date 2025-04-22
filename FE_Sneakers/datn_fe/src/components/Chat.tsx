@@ -36,6 +36,9 @@ const Chat: React.FC = () => {
       .then((response) => {
         setConversations(response.data)
       })
+      .catch((error) => {
+        console.error('Error fetching conversations:', error)
+      })
   }, [])
 
   useEffect(() => {
@@ -47,12 +50,18 @@ const Chat: React.FC = () => {
         .then((response) => {
           setMessages(response.data)
         })
+        .catch((error) => {
+          console.error('Error fetching messages:', error)
+        })
 
-      echo.channel(`conversation.${selectedConversation.id}`).listen('MessageSent', (e: { message: Message }) => {
+      const channel = echo.channel(`conversation.${selectedConversation.id}`)
+      channel.listen('MessageSent', (e: { message: Message }) => {
+        console.log('Pusher received:', e)
         setMessages((prev) => [...prev, e.message])
       })
 
       return () => {
+        channel.stopListening('MessageSent')
         echo.leave(`conversation.${selectedConversation.id}`)
       }
     }
@@ -65,18 +74,16 @@ const Chat: React.FC = () => {
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return
 
-    const response = await axios.post(
-      `http://localhost:8000/api/conversations/${selectedConversation.id}/messages`,
-      {
-        content: newMessage
-      },
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      }
-    )
-
-    setMessages([...messages, response.data])
-    setNewMessage('')
+    try {
+      await axios.post(
+        `http://localhost:8000/api/conversations/${selectedConversation.id}/messages`,
+        { content: newMessage },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      )
+      setNewMessage('')
+    } catch (error) {
+      console.error('Error sending message:', error)
+    }
   }
 
   return (
@@ -126,6 +133,7 @@ const Chat: React.FC = () => {
                   type='text'
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                   className='flex-1 border rounded-l-lg p-2'
                   placeholder='Type a message...'
                 />
