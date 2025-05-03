@@ -34,6 +34,8 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\FilterProductsController;
 use App\Http\Controllers\VnPayController;
 
+
+// api banner crud
 Route::apiResource('banners', BannerController::class);
 
 // Đăng ký tài khoản

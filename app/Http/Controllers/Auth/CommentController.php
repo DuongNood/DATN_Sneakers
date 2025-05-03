@@ -23,7 +23,7 @@ class CommentController extends Controller
             return response()->json($comments);
         } catch (\Exception $e) {
             Log::error('Error fetching comments: ' . $e->getMessage());
-            return response()->json(['message' => 'Lỗi khi lấy bình luận'], 500);
+            return response()->json(['message' => 'Lỗi, vui lòng thử lại'], 2000);
         }
     }
 

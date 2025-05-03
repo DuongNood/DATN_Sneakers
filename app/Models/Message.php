@@ -7,6 +7,7 @@ class Message extends Model
 {
     use HasFactory;
 
+    // realtime
     protected $fillable = ['conversation_id', 'sender_id', 'content'];
 
     public function sender()
