@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import axios from 'axios'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 
@@ -59,7 +59,41 @@ const Register = () => {
       setIsLoading(false)
     }
   }
+  useEffect(() => {
+    // Thay đổi tiêu đề trang để tối ưu SEO nhé
+    document.title = 'Đăng kí - Pole-Sneakers'
 
+    // Thay đổi meta description
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Đăng kí vào tài khoản của bạn để truy cập tất cả các tính năng.')
+    } else {
+      const newMeta = document.createElement('meta')
+      newMeta.name = 'description'
+      newMeta.content = 'đăng kí vào tài khoản của bạn để truy cập tất cả các tính năng.'
+      document.head.appendChild(newMeta)
+    }
+    const link = document.querySelector("link[rel='icon']")
+    if (link) {
+      link.setAttribute(
+        'href',
+        'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
+      )
+    } else {
+      const newLink = document.createElement('link')
+      newLink.rel = 'icon'
+      newLink.href = 'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
+      document.head.appendChild(newLink)
+    }
+
+    return () => {
+      document.title = 'Pole Sneakers'
+      const metaDescription = document.querySelector('meta[name="description"]')
+      if (metaDescription) {
+        metaDescription.setAttribute('content', 'Default description')
+      }
+    }
+  }, [])
   return (
     <div className='flex justify-center items-center min-h-screen bg-gray-100 px-4'>
       <motion.div

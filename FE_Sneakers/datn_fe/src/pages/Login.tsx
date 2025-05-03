@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
@@ -63,6 +63,41 @@ const Login = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
   }
+  useEffect(() => {
+    // Thay đổi tiêu đề trang để tối ưu SEO nhé
+    document.title = 'Đăng nhập - Pole-Sneakers'
+
+    // Thay đổi meta description
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Đăng nhập vào tài khoản của bạn để truy cập tất cả các tính năng.')
+    } else {
+      const newMeta = document.createElement('meta')
+      newMeta.name = 'description'
+      newMeta.content = 'đăng nhập vào tài khoản của bạn để truy cập tất cả các tính năng.'
+      document.head.appendChild(newMeta)
+    }
+    const link = document.querySelector("link[rel='icon']")
+    if (link) {
+      link.setAttribute(
+        'href',
+        'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
+      )
+    } else {
+      const newLink = document.createElement('link')
+      newLink.rel = 'icon'
+      newLink.href = 'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
+      document.head.appendChild(newLink)
+    }
+
+    return () => {
+      document.title = 'Pole Sneakers'
+      const metaDescription = document.querySelector('meta[name="description"]')
+      if (metaDescription) {
+        metaDescription.setAttribute('content', 'Default description')
+      }
+    }
+  }, [])
 
   return (
     <div className='flex justify-center items-center h-[500px] bg-gray-100 px-4'>
