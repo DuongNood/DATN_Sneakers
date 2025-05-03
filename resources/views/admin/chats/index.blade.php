@@ -2,66 +2,190 @@
 
 @section('content')
     <style>
+        /* Container chính */
+        .container-xxl {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         .chat-container {
             display: flex;
             flex-direction: column;
             height: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
+
+        /* Card chứa tin nhắn */
         .chat-container .card {
             display: flex !important;
             flex-direction: column !important;
             flex: 1 !important;
-            overflow: hidden !important;
+            border: none !important;
+            margin: 0 !important;
+            background: transparent !important;
         }
+
         .chat-container .card-body {
             flex: 1 !important;
             overflow-y: auto !important;
-            padding: 15px !important;
-            max-height: 50vh !important;
+            padding: 20px !important;
+            max-height: 60vh !important;
+            background: #f9fafb;
         }
+
+        /* Footer chứa form gửi tin nhắn */
         .chat-container .card-footer {
-            display: block !important;
-            padding: 15px !important;
-            background: #f8f9fa !important;
-            border-top: 1px solid #dee2e6 !important;
-            min-height: 60px !important;
+            padding: 15px 20px !important;
+            background: #ffffff !important;
+            border-top: 1px solid #e5e7eb !important;
+            min-height: 70px !important;
         }
+
+        /* Form gửi tin nhắn */
         .chat-container #message-form {
             display: flex !important;
             align-items: center !important;
             width: 100% !important;
         }
+
         .chat-container .input-group {
             display: flex !important;
             width: 100% !important;
             align-items: center !important;
         }
+
         .chat-container #message-input {
             flex: 1 !important;
             margin-right: 10px !important;
-            height: 40px !important;
-            display: block !important;
+            height: 45px !important;
+            border-radius: 8px !important;
+            border: 1px solid #d1d5db !important;
+            padding: 0 15px !important;
+            font-size: 14px !important;
+            transition: border-color 0.2s ease !important;
         }
+
+        .chat-container #message-input:focus {
+            outline: none !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+
         .chat-container #send-message {
-            display: inline-block !important;
-            height: 40px !important;
+            height: 45px !important;
             padding: 0 20px !important;
+            border-radius: 8px !important;
+            background: #3b82f6 !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-weight: 500 !important;
+            transition: background 0.2s ease !important;
         }
+
+        .chat-container #send-message:hover {
+            background: #2563eb !important;
+        }
+
+        /* Danh sách conversation */
+        .conversation-list {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            height: 60vh;
+            padding: 10px;
+        }
+
+        .conversation-item {
+            border-radius: 8px !important;
+            padding: 12px 15px !important;
+            margin-bottom: 5px !important;
+            transition: background 0.2s ease !important;
+        }
+
+        .conversation-item:hover {
+            background: #f1f5f9 !important;
+        }
+
         .conversation-item.active {
-            background-color: #e9ecef;
+            background: #e0f2fe !important;
         }
+
+        .conversation-item h6 {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            color: #1f2937 !important;
+        }
+
+        .conversation-item .message-preview {
+            font-size: 13px !important;
+            color: #6b7280 !important;
+        }
+
+        .conversation-item .badge {
+            font-size: 12px !important;
+            padding: 5px 10px !important;
+        }
+
+        /* Tin nhắn */
         .message-item {
             word-break: break-word;
+            margin-bottom: 15px !important;
+        }
+
+        .message-item .bg-light {
+            background: #e5e7eb !important;
+            border-radius: 10px !important;
+            padding: 10px 15px !important;
+            font-size: 14px !important;
+            color: #1f2937 !important;
+        }
+
+        .message-item.text-end .bg-light {
+            background: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+
+        .message-item small {
+            font-size: 12px !important;
+            color: #6b7280 !important;
+        }
+
+        /* Placeholder */
+        #chat-placeholder {
+            font-size: 14px !important;
+            color: #6b7280 !important;
+        }
+
+        /* Scrollbar */
+        .card-body::-webkit-scrollbar,
+        .conversation-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .card-body::-webkit-scrollbar-thumb,
+        .conversation-list::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        .card-body::-webkit-scrollbar-track,
+        .conversation-list::-webkit-scrollbar-track {
+            background: #f9fafb;
         }
     </style>
 
     <div class="container-xxl mt-4">
-        <h2 class="mb-4">Quản lý Chat</h2>
-        <div class="row" style="height: 70vh;">
+        <h2 class="mb-4" style="font-weight: 600; color: #1f2937;">Quản lý Chat</h2>
+        <div class="row" style="height: 75vh;">
             <!-- Danh sách conversation -->
-            <div class="col-md-4 border-end">
-                <h5>Danh sách Chat</h5>
-                <div class="list-group" id="conversation-list">
+            <div class="col-md-4">
+                <h5 style="font-weight: 600; color: #1f2937;">Danh sách Chat</h5>
+                <div class="conversation-list" id="conversation-list">
                     @forelse($conversations as $conv)
                         <a
                             href="#"
@@ -69,15 +193,15 @@
                             data-id="{{ $conv->id }}"
                             data-user-name="{{ $conv->user->name ?? 'Unknown' }}"
                         >
-                            <div class="d-flex w-100 justify-content-between">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
                                 <h6 class="mb-1">{{ $conv->user->name ?? 'Unknown' }}</h6>
                                 @if(is_null($conv->admin_id))
-                                    <span class="badge bg-danger rounded-pill">New</span>
+                                    <span class="badge bg-danger rounded-pill">Mới</span>
                                 @endif
                             </div>
                             <small class="message-preview">
                                 @if($conv->messages->count() > 0)
-                                    {{ Str::limit($conv->messages->last()->content, 30) }}
+                                    {{ Str::limit($conv->messages->last()->content, 50) }}
                                 @else
                                     Chưa có tin nhắn
                                 @endif
@@ -91,7 +215,7 @@
 
             <!-- Khu vực tin nhắn -->
             <div class="col-md-8 chat-container">
-                <h5>Tin nhắn</h5>
+                <h5 style="font-weight: 600; color: #1f2937; padding: 15px 20px 0;">Tin nhắn</h5>
                 <div class="card">
                     <div class="card-body" id="chat-messages">
                         <p class="text-muted text-center" id="chat-placeholder">Chọn một đoạn chat để xem tin nhắn.</p>
@@ -151,12 +275,13 @@
 
             // Pusher config
             Pusher.logToConsole = true;
+            const pusher = new Pusher('c1c Ưu tiên sử dụng Pusher để nhận thông báo tin nhắn mới
             const pusher = new Pusher('c1c7ff3f6141d637ab84', {
                 cluster: 'ap1',
                 forceTLS: true
             });
 
-            pusher.connection.bind('connected', () => console.log('Pusher connected'));
+            pusher.connection.bind('connected3102', () => console.log('Pusher connected'));
             pusher.connection.bind('error', (err) => console.error('Pusher error:', err));
 
             // Auth
@@ -250,7 +375,7 @@
                 if (convItem) {
                     const preview = convItem.querySelector('.message-preview');
                     if (preview) {
-                        preview.textContent = msg.content.length > 30 ? msg.content.slice(0, 30) + '...' : msg.content;
+                        preview.textContent = msg.content.length > 50 ? msg.content.slice(0, 50) + '...' : msg.content;
                     }
                 }
             };
@@ -364,9 +489,9 @@
                 convItem.setAttribute('data-id', conv.id);
                 convItem.setAttribute('data-user-name', conv.user?.name || 'Unknown');
                 convItem.innerHTML = `
-                    <div class="d-flex w-100 justify-content-between">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
                         <h6 class="mb-1">${conv.user?.name || 'Unknown'}</h6>
-                        <span class="badge bg-danger rounded-pill">New</span>
+                        <span class="badge bg-danger rounded-pill">Mới</span>
                     </div>
                     <small class="message-preview">Chưa có tin nhắn</small>
                 `;
