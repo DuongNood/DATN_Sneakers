@@ -18,6 +18,13 @@ interface User {
   role_id: number
 }
 
+interface Brand {
+  id: number
+  brand_name: string
+  description: string
+  status: string
+}
+
 const Header = () => {
   const { t, i18n } = useTranslation()
   const [search, setSearch] = useState('')
@@ -25,9 +32,47 @@ const Header = () => {
   const [mobileProductOpen, setMobileProductOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [wishlistCount, setWishlistCount] = useState(0)
+  const [brands, setBrands] = useState<Brand[]>([])
   const { cartCount, updateCartCount } = useCart()
   const navigate = useNavigate()
   const isLoggedIn = !!localStorage.getItem('token')
+
+  // Hàm lấy danh sách brands từ API
+  const fetchBrands = async () => {
+    try {
+      console.log('Fetching brands from:', 'http://localhost:8000/api/brands')
+      const response = await axios.get('http://localhost:8000/api/brands', {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      console.log('Raw response:', response)
+      console.log('Response data:', response.data)
+
+      if (response.data && response.data.success) {
+        const brandsData = response.data.data
+        console.log('Brands data:', brandsData)
+        if (Array.isArray(brandsData)) {
+          setBrands(brandsData)
+        } else {
+          console.error('Brands data is not an array:', brandsData)
+          setBrands([])
+        }
+      } else {
+        console.error('Invalid response format:', response.data)
+        setBrands([])
+      }
+    } catch (error: any) {
+      console.error('Error fetching brands:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        url: error.config?.url
+      })
+      setBrands([])
+    }
+  }
 
   // Hàm lấy số lượng giỏ hàng từ API
   const fetchCartCount = async () => {
@@ -131,6 +176,7 @@ const Header = () => {
     fetchCartCount()
     fetchUserInfo()
     updateWishlistCount()
+    fetchBrands()
 
     // Lắng nghe sự kiện storage để cập nhật wishlistCount khi localStorage thay đổi
     const handleStorageChange = () => {
@@ -155,7 +201,7 @@ const Header = () => {
     setMobileProductOpen(false)
   }
 
-  const text = 'PoleSneakers'
+  const text = 'Pole Sneakers'
 
   return (
     <header className='bg-white shadow-md sticky top-0 z-50 p-2'>
@@ -176,15 +222,22 @@ const Header = () => {
           <Link to='/' className='nav-link'>
             {t('home')}
           </Link>
-          <div className='relative group hidden md:block'>
+          <div className='relative group'>
             <button className='nav-link'>{t('products')}</button>
-            <div className='absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300'>
-              <Link to='/giay-nam' className='dropdown-link'>
-                {t('men_shoes')}
-              </Link>
-              <Link to='/giay-nu' className='dropdown-link'>
-                {t('women_shoes')}
-              </Link>
+            <div className='absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50'>
+              {brands && brands.length > 0 ? (
+                brands.map((brand) => (
+                  <Link
+                    key={brand.id}
+                    to={`/productbybrand/${brand.id}`}
+                    className='block px-4 py-2 text-gray-800 hover:bg-gray-100'
+                  >
+                    {brand.brand_name}
+                  </Link>
+                ))
+              ) : (
+                <div className='px-4 py-2 text-gray-500'>Loading...</div>
+              )}
             </div>
           </div>
           <Link to='/product-sale' className='nav-link'>
@@ -211,7 +264,7 @@ const Header = () => {
             <div className='relative group'>
               <div className='w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer'>
                 <img
-                  src={user?.image_user || 'https://m.yodycdn.com/blog/meme-ech-xanh-yody-vn-55.jpg'}
+                  src={user?.image_user || 'https://i.pinimg.com/474x/2a/f6/cd/2af6cde7dd1c03451c92bdd4deefedc6.jpg'}
                   alt='Avatar'
                   className='w-full h-full rounded-full object-cover'
                 />
@@ -288,12 +341,20 @@ const Header = () => {
               </button>
               {mobileProductOpen && (
                 <div className='pl-4 space-y-2'>
-                  <Link to='/giay-nam' className='dropdown-link' onClick={handleLinkClick}>
-                    {t('men_shoes')}
-                  </Link>
-                  <Link to='/giay-nu' className='dropdown-link' onClick={handleLinkClick}>
-                    {t('women_shoes')}
-                  </Link>
+                  {brands && brands.length > 0 ? (
+                    brands.map((brand) => (
+                      <Link
+                        key={brand.id}
+                        to={`/productbybrand/${brand.id}`}
+                        className='block px-4 py-2 text-gray-800 hover:bg-gray-100'
+                        onClick={handleLinkClick}
+                      >
+                        {brand.brand_name}
+                      </Link>
+                    ))
+                  ) : (
+                    <div className='px-4 py-2 text-gray-500'>Loading...</div>
+                  )}
                 </div>
               )}
             </div>

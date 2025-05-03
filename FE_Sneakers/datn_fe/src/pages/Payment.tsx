@@ -36,11 +36,8 @@ const Payment: React.FC = () => {
   const navigate = useNavigate()
   const { products, shippingInfo, total, couponDiscount, shippingFee } = (location.state as PaymentState) || {}
 
-
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'momo' | 'vnpay'>(null)
-
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'momo' | 'vnpay' | null>(null)
   const [momoPaymentType, setMomoPaymentType] = useState<'atm' | 'card' | null>(null)
-
   const [loading, setLoading] = useState<boolean>(false)
 
   const handlePayment = async () => {
@@ -56,7 +53,9 @@ const Payment: React.FC = () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('token')
-      if (!token) throw new Error(t('no_token'))
+      if (!token) {
+        throw new Error(t('no_token'))
+      }
 
       // Tạo đơn hàng
       const orderPromises = products.map(async (product) => {
@@ -66,6 +65,13 @@ const Payment: React.FC = () => {
         }
 
         const orderId = `${Date.now()}_${product.id}`
+        console.log('Creating order for product:', {
+          product_name: product.name,
+          order_id: orderId,
+          quantity: product.quantity,
+          product_size_id: selectedSizeObj.product_size_id
+        })
+
         const response = await axios.post(
           `http://localhost:8000/api/orders/buy/${encodeURIComponent(product.name)}`,
           {
@@ -83,6 +89,11 @@ const Payment: React.FC = () => {
             }
           }
         )
+        console.log('Order response:', {
+          order_id: response.data.order.order_id,
+          order_code: response.data.order.order_code,
+          response_data: response.data
+        })
         return { ...response.data, orderId }
       })
 
@@ -93,6 +104,7 @@ const Payment: React.FC = () => {
         toast.success(t('order_confirmed_successfully'), { autoClose: 2000 })
       } else if (paymentMethod === 'momo') {
         const orderIds = orders.map((order) => order.orderId).join(',')
+        console.log('Creating MoMo payment for orders:', orderIds)
         const momoResponse = await axios.post(
           'http://localhost:8000/api/momo/create',
           {
@@ -104,6 +116,7 @@ const Payment: React.FC = () => {
             headers: { 'Content-Type': 'application/json' }
           }
         )
+        console.log('MoMo response:', momoResponse.data)
 
         const { payUrl } = momoResponse.data
         if (!payUrl) {
@@ -111,9 +124,45 @@ const Payment: React.FC = () => {
         }
 
         window.location.href = payUrl
+      } else if (paymentMethod === 'vnpay') {
+        const vnpayPromises = orders.map(async (order) => {
+          const orderId = order.order.order_id
+          console.log('Calling VNPay API for order:', {
+            order_id: orderId,
+            order_code: order.order.order_code
+          })
+          try {
+            const vnpayResponse = await axios.get(`http://localhost:8000/api/vnpay/payment/${orderId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            })
+            console.log('VNPay response:', {
+              order_id: orderId,
+              payment_url: vnpayResponse.data.payment_url,
+              response_data: vnpayResponse.data
+            })
+            const { payment_url } = vnpayResponse.data
+            if (!payment_url) {
+              throw new Error(`VNPay payment failed: No payment_url for order ${orderId}`)
+            }
+            return payment_url
+          } catch (error: any) {
+            console.error('VNPay API error for order:', orderId, error.response?.data || error.message)
+            throw error
+          }
+        })
+
+        const paymentUrls = await Promise.all(vnpayPromises)
+        console.log('VNPay payment URLs:', paymentUrls)
+        if (paymentUrls.length === 0) {
+          throw new Error(t('vnpay_payment_failed_no_urls'))
+        }
+        window.location.href = paymentUrls[0]
       }
     } catch (error: any) {
-      console.error('Payment error:', error)
+      console.error('Payment error:', error.response?.data || error.message)
       toast.error(error.message || t('payment_failed'), { autoClose: 2000 })
     } finally {
       setLoading(false)
@@ -201,16 +250,15 @@ const Payment: React.FC = () => {
             <h2 className='text-2xl font-semibold text-gray-900 mb-6'>{t('payment_method')}</h2>
             <div className='space-y-4'>
               <div
-                className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${paymentMethod === 'cod'
+                className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${
+                  paymentMethod === 'cod'
                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
                     : 'border-gray-200 hover:bg-gray-50'
-
                 }`}
                 onClick={() => {
                   setPaymentMethod('cod')
                   setMomoPaymentType(null)
                 }}
-
               >
                 <input
                   type='radio'
@@ -242,10 +290,11 @@ const Payment: React.FC = () => {
                 </svg>
               </div>
               <div
-                className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${paymentMethod === 'momo'
+                className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${
+                  paymentMethod === 'momo'
                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
                     : 'border-gray-200 hover:bg-gray-50'
-                  }`}
+                }`}
                 onClick={() => setPaymentMethod('momo')}
               >
                 <input
@@ -265,41 +314,33 @@ const Payment: React.FC = () => {
                   className='w-6 h-6'
                 />
               </div>
-
               <div
-                className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${paymentMethod === 'vnpay'
+                className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${
+                  paymentMethod === 'vnpay'
                     ? 'border-indigo-500 bg-indigo-50 shadow-md'
                     : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                onClick={() => setPaymentMethod('vnpay')}
+                }`}
+                onClick={() => {
+                  setPaymentMethod('vnpay')
+                  setMomoPaymentType(null)
+                }}
               >
                 <input
                   type='radio'
                   name='paymentMethod'
                   checked={paymentMethod === 'vnpay'}
-                  onChange={() => setPaymentMethod('vnpay')}
+                  onChange={() => {
+                    setPaymentMethod('vnpay')
+                    setMomoPaymentType(null)
+                  }}
                   className='mr-3 h-5 w-5 text-indigo-600 focus:ring-indigo-400'
                 />
                 <div className='flex-1'>
                   <p className='font-medium text-gray-900'>{t('vnpay_payment')}</p>
                   <p className='text-sm text-gray-500'>{t('vnpay_payment_description')}</p>
                 </div>
-                <svg
-                  className='w-6 h-6 text-gray-400'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
-                  />
-                </svg>
+                <img src='https://vnpay.vn/assets/images/logo.png' alt='VNPay' className='w-6 h-6' />
               </div>
-
               {paymentMethod === 'momo' && (
                 <div className='ml-8 space-y-4'>
                   <div
@@ -361,13 +402,13 @@ const Payment: React.FC = () => {
                   </div>
                 </div>
               )}
-
             </div>
             <button
               onClick={handlePayment}
               disabled={loading}
-              className={`w-full mt-8 py-3 rounded-lg text-white font-semibold transition-all flex items-center justify-center bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 ${loading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+              className={`w-full mt-8 py-3 rounded-lg text-white font-semibold transition-all flex items-center justify-center bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 ${
+                loading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
             >
               {loading ? (
                 <>

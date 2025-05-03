@@ -129,7 +129,6 @@ const CartPage: React.FC = () => {
       setTotalCartPrice(updatedCart.data.total_cart_price)
       const totalItems = updatedCart.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
       updateCartCount(totalItems)
-
       toast.success(response.data.message, { autoClose: 1000 })
     } catch (error: any) {
       toast.error(error.response?.data?.message || t('error_updating_cart'), { autoClose: 2000 })
@@ -141,16 +140,16 @@ const CartPage: React.FC = () => {
       const item = cartItems.find((item) => item.id === cartItemId)
       if (!item) return
 
-      toast.info(t('confirm_remove_item'), {
-        position: 'top-center',
-        autoClose: 2000
-      })
+      // toast.info(t('confirm_remove_item'), {
+      //   position: 'top-center',
+      //   autoClose: 2000
+      // })
 
       setItemToRemove(item)
       setRemoveAction('delete')
       setShowConfirmModal(true)
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('error_removing_item'), { autoClose: 2000 })
+      toast.error(t('error_removing_item'), { autoClose: 2000 })
     }
   }
 
@@ -187,7 +186,7 @@ const CartPage: React.FC = () => {
         setCartItems(cartItems.filter((item) => item.id !== itemToRemove.id))
         setSelectedItems(selectedItems.filter((id) => id !== itemToRemove.id))
 
-        toast.success(response.data.message, { autoClose: 1000 })
+        // toast.success(response.data.message, { autoClose: 1000 })
       }
 
       const updatedCart = await axios.get('http://localhost:8000/api/carts/list', {
@@ -385,15 +384,15 @@ const CartPage: React.FC = () => {
                   {item.original_price && Number(item.original_price) > Number(item.discounted_price) ? (
                     <>
                       <p className='line-through text-gray-400'>
-                        đ{Number(item.original_price).toLocaleString('vi-VN')}
+                        {Number(item.original_price).toLocaleString('vi-VN')}đ
                       </p>
                       <p className='text-gray-800 font-medium'>
-                        đ{Number(item.discounted_price).toLocaleString('vi-VN')}
+                        {Number(item.discounted_price).toLocaleString('vi-VN')}đ
                       </p>
                     </>
                   ) : (
                     <p className='text-gray-800 font-medium'>
-                      đ{Number(item.discounted_price).toLocaleString('vi-VN')}
+                      {Number(item.discounted_price).toLocaleString('vi-VN')}đ
                     </p>
                   )}
                 </div>
@@ -417,7 +416,7 @@ const CartPage: React.FC = () => {
                   </button>
                 </div>
                 <div className='text-sm font-semibold text-gray-800 text-center'>
-                  đ{Number(item.total_price).toLocaleString('vi-VN')}
+                  {Number(item.total_price).toLocaleString('vi-VN')}đ
                 </div>
                 <div className='text-center'>
                   <button
@@ -439,7 +438,7 @@ const CartPage: React.FC = () => {
                     {t('selected_items')}: {selectedItems.length}
                   </p>
                   <p className='text-lg font-semibold text-gray-800'>
-                    {t('total')}: đ{calculateSelectedTotal().toLocaleString('vi-VN')}
+                    {t('total')}: {calculateSelectedTotal().toLocaleString('vi-VN')}đ
                   </p>
                 </div>
                 <button

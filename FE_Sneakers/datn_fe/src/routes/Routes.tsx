@@ -20,7 +20,6 @@ import ProtectedRoute from '../components/ProtectedRoute'
 import Navbar from '../components/TopHeader'
 import ProductDetail from '../pages/DetailsProduct'
 import ScrollToTop from '../components/ScrollToTop'
-import SearchContainer from '../components/Search'
 import SearchResults from '../components/SearchResults'
 import BackToTop from '../components/BackToTop'
 import AboutUs from '../components/Footer_Components/About'
@@ -34,8 +33,12 @@ import Payment from '../pages/Payment'
 import MomoCallback from '../pages/MomoCallback'
 import OrderSuccess from '../components/SuccesOrder'
 import OrdersPage from '../pages/OrdersPage'
-import ChatPopup from '../components/ChatPopup'
+
 import Wishlist from '../components/Wishlist'
+import CouponPopup from '../components/CouponPopup'
+import ReturnPolicy from '../components/Footer_Components/ReturnPolicy'
+import FAQ from '../components/Footer_Components/FAQ'
+import HowToBuy from '../components/Footer_Components/HowToBuy'
 
 const RoutesConfig = () => {
   return (
@@ -54,8 +57,8 @@ const RoutesConfig = () => {
               <ProductList />
               <TitleWithEffect1 />
               <ProductHot />
+              <CouponPopup />
               <PurchaseNotification />
-              <ChatPopup />
             </>
           }
         />
@@ -75,6 +78,9 @@ const RoutesConfig = () => {
         <Route path='/payment' element={<Payment />} />
         <Route path='*' element={<NotFound />} />
         <Route path='/search' element={<SearchResults />} />
+        <Route path='/return-policy' element={<ReturnPolicy />} />
+        <Route path='/faq' element={<FAQ />} />
+        <Route path='/how-to-buy' element={<HowToBuy />} />
         <Route path='/momo-callback' element={<MomoCallback />} />
         <Route path='/order-success' element={<OrderSuccess />} />
         <Route path='/about' element={<AboutUs />} />

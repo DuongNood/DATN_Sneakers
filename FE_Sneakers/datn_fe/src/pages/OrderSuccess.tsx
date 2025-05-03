@@ -3,13 +3,13 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { useCart } from '../contexts/CartContext'
-import axios from 'axios'
+
 
 interface OrderSuccessState {
   orderCode: string
   status: 'success' | 'failed'
   message: string
-  purchased_items?: any[]
+  purchased_items?: any[]z
 }
 
 const OrderSuccess: React.FC = () => {

@@ -171,6 +171,32 @@ const Checkout: React.FC = () => {
     }
   }
 
+  const updateUserInfo = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) throw new Error(t('no_token'))
+
+      await axios.put(
+        'http://localhost:8000/api/user',
+        {
+          name: fullName,
+          email: email,
+          phone: phone,
+          address: address
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json'
+          }
+        }
+      )
+    } catch (error: any) {
+      console.error('Error updating user info:', error)
+      // We don't throw error here because we still want to proceed with the order
+    }
+  }
+
   const handlePlaceOrder = async () => {
     if (!validateForm()) {
       toast.error(t('please_fill_all_fields_correctly'), { autoClose: 2000 })
@@ -181,6 +207,9 @@ const Checkout: React.FC = () => {
     try {
       const token = localStorage.getItem('token')
       if (!token) throw new Error(t('no_token'))
+
+      // Update user information before proceeding
+      await updateUserInfo()
 
       console.log('Data sent to Payment:', {
         products,
