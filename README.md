@@ -14,3 +14,17 @@ No Name Number Card Expdate CVC OTP Test Case
 2 NGUYEN VAN A 4111 1111 1111 1111 05/25 111 No OTP Card Successful
 
 Ứng dụng sẽ yêu cầu nhập mã OTP. Mã này sẽ được đặt mặc định là 0000 hoặc 000000 trên App MoMo test.
+
+// THANH TOÁN VNPAY
+Tài liệu hướng dẫn tích hợp: https://sandbox.vnpayment.vn/apis/docs/thanh-toan-pay/pay.html
+
+Code demo tích hợp: https://sandbox.vnpayment.vn/apis/vnpay-demo/code-demo-tích-hợp
+
+// THÔNG TIN THẺ
+Ngân hàng : NCB
+Số thẻ : 9704198526191432198
+Tên chủ thẻ : NGUYEN VAN A
+Ngày phát hành : 07/15
+Mật khẩu OTP : 123456
+
+
