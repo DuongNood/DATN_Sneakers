@@ -6,7 +6,7 @@ import { CartProvider } from './contexts/CartContext'
 import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
-  console.log('App component rendered')
+  // console.log('App component rendered')
   return (
     <CartProvider>
       <ProductProvider>
