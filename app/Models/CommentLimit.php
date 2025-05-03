@@ -9,6 +9,7 @@ class CommentLimit extends Model
     protected $fillable = ['user_id', 'date', 'comment_count'];
 
     protected $casts = [
+        // ngày tháng bình luận
         'date' => 'date',
     ];
 }
