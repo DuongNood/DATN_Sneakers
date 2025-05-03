@@ -31,11 +31,13 @@ class OrderController extends Controller
             'shipping_info.phone' => 'required|regex:/^[0-9]{10,11}$/',
             'shipping_info.address' => 'required|string|min:5',
             'coupon_code' => 'nullable|string',
+            'payment_method' => ['required', Rule::in(['cod', 'momo', 'vnpay'])],
         ]);
 
         $user = Auth::user();
         $shippingInfo = $request->input('shipping_info');
         $couponCode = $request->input('coupon_code');
+        $paymentMethod = $request->input('payment_method');
 
         // Lấy giỏ hàng của user
         $cart = Cart::where('user_id', $user->id)->first();
@@ -48,7 +50,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Không có sản phẩm nào trong giỏ hàng!'], 400);
         }
 
-        return DB::transaction(function () use ($request, $user, $cartItems, $shippingInfo, $couponCode) {
+        return DB::transaction(function () use ($request, $user, $cartItems, $shippingInfo, $couponCode, $paymentMethod, $cart) {
             // Tính tổng tiền trước giảm giá
             $totalPriceBeforeDiscount = $cartItems->sum(function ($item) {
                 return ($item->discounted_price ?? $item->original_price) * $item->quantity;
@@ -97,7 +99,7 @@ class OrderController extends Controller
                 'total_price' => $finalTotalPrice,
                 'promotion' => $promotionAmount,
                 'shipping_fee' => $shippingFee,
-                'payment_method' => 'COD',
+                'payment_method' => $paymentMethod,
                 'payment_status' => 'chua_thanh_toan',
                 'status' => 'cho_xac_nhan',
             ]);
@@ -120,29 +122,23 @@ class OrderController extends Controller
                     'price' => $item->discounted_price ?? $item->original_price,
                 ]);
 
-                $productVariant->decrement('quantity', $item->quantity);
+                // Chỉ giảm tồn kho nếu không dùng VNPay
+                if ($paymentMethod !== 'vnpay') {
+                    $productVariant->decrement('quantity', $item->quantity);
+                }
             }
 
-            // Xóa giỏ hàng sau khi đặt hàng thành công
-            Log::info('Deleting cart items for cart_id: ' . $cart->id);
-            $deletedItems = CartItem::where('cart_id', $cart->id)->delete();
-            Log::info('Deleted ' . $deletedItems . ' cart items');
-            
-            Log::info('Deleting cart: ' . $cart->id);
-            $cart->delete();
-            Log::info('Cart deleted successfully');
+            // Xóa giỏ hàng nếu không dùng VNPay
+            if ($paymentMethod !== 'vnpay') {
+                CartItem::where('cart_id', $cart->id)->delete();
+                $cart->delete();
+            }
 
             return response()->json([
                 'message' => 'Đặt hàng thành công!',
                 'order_id' => $order->id,
                 'order_code' => $orderCode,
-                'purchased_items' => $cartItems->map(function($item) {
-                    return [
-                        'product_id' => $item->product_id,
-                        'product_size_id' => $item->product_size_id,
-                        'quantity' => $item->quantity
-                    ];
-                })->toArray()
+                'payment_method' => $paymentMethod,
             ], 201);
         });
     }
@@ -155,7 +151,8 @@ class OrderController extends Controller
         $request->validate([
             'product_size_id' => 'required|integer',
             'quantity' => 'required|integer|min:1',
-            'promotion_name' => 'nullable|string'
+            'promotion_name' => 'nullable|string',
+            'payment_method' => ['required', Rule::in(['cod', 'momo', 'vnpay'])],
         ]);
 
         $user = Auth::user();
@@ -224,10 +221,12 @@ class OrderController extends Controller
                 'total_price' => $finalTotalPrice,
                 'promotion' => $promotionAmount,
                 'shipping_fee' => $shippingFee,
-                'payment_method' => 'VNPAY',
+                'payment_method' => $request->payment_method,
                 'payment_status' => 'chua_thanh_toan',
                 'status' => 'cho_xac_nhan',
             ]);
+
+            $productSize = ProductSize::find($request->product_size_id);
 
             OrderDetail::create([
                 'order_id' => $order->id,
@@ -236,123 +235,37 @@ class OrderController extends Controller
                 'price' => $price,
             ]);
 
-            $productVariant->decrement('quantity', $request->quantity);
-
-
-            // Kiểm tra và xóa sản phẩm khỏi giỏ hàng nếu có
-            $cart = Cart::where('user_id', $user->id)->first();
-            if ($cart) {
-                CartItem::where('cart_id', $cart->id)
-                    ->where('product_id', $product->id)
-                    ->where('product_size_id', $request->product_size_id)
-                    ->delete();
+            // Chỉ giảm tồn kho nếu không dùng VNPay
+            if ($request->payment_method !== 'vnpay') {
+                $productVariant->decrement('quantity', $request->quantity);
             }
 
-            // Tạo URL thanh toán VNPAY
-            $vnpUrl = $this->createVNPayPaymentUrl($order);
-
             return response()->json([
-                'message' => 'Tạo đơn hàng thành công, chuyển đến VNPAY!',
-                'redirect_url' => $vnpUrl,
+                'message' => 'Đặt hàng thành công!',
+                'order' => [
+                    'order_id' => $order->id,
+                    'order_code' => $order->order_code,
+                    'recipient_name' => $order->recipient_name,
+                    'recipient_phone' => $order->recipient_phone,
+                    'recipient_address' => $order->recipient_address,
+                    'total_price' => $order->total_price,
+                    'promotion' => $order->promotion,
+                    'shipping_fee' => $order->shipping_fee,
+                    'payment_method' => $order->payment_method,
+                    'payment_status' => $order->payment_status,
+                    'status' => $order->status,
+                    'products' => [
+                        'product_name' => $product->product_name,
+                        'product_code' => $product->product_code,
+                        'image' => $product->image,
+                        'size' => optional($productSize)->name ?? 'N/A',
+                        'quantity' => $request->quantity,
+                        'unit_price' => $price,
+                        'total_price' => $totalPriceBeforeDiscount
+                    ]
+                ],
             ], 201);
         });
-    }
-
-    private function createVNPayPaymentUrl($order)
-{
-    // Thiết lập múi giờ
-    date_default_timezone_set('Asia/Ho_Chi_Minh');
-
-    // Cấu hình VNPay từ .env
-    $vnp_Url = env('VNPAY_URL', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html');
-    $vnp_Returnurl = env('VNPAY_RETURN_URL', 'https://38c7-2405-4802-21a-ab90-cd32-49af-4dbb-f211.ngrok-free.app');
-    $vnp_TmnCode = env('VNPAY_TMN_CODE', 'M5599FDJ');
-    $vnp_HashSecret = env('VNPAY_HASH_SECRET', 'RE3CGAO0B0DH570H1PIXLX9ZHQA7MI3P');
-
-    // Dữ liệu đơn hàng
-    $vnp_TxnRef = $order->order_code;
-    $vnp_OrderInfo = "Thanh toan don hang #" . $vnp_TxnRef; // Có thể mã hóa nếu cần
-    $vnp_OrderType = "billpayment";
-    $vnp_Amount = $order->total_price * 100; // VNPay yêu cầu số tiền * 100
-    $vnp_Locale = "vn";
-    $vnp_BankCode = ""; // Để trống nếu không chọn ngân hàng cụ thể
-    $vnp_IpAddr = request()->ip();
-
-    // Tạo mảng dữ liệu đầu vào
-    $inputData = [
-        "vnp_Version" => "2.1.0",
-        "vnp_TmnCode" => $vnp_TmnCode,
-        "vnp_Amount" => $vnp_Amount,
-        "vnp_Command" => "pay",
-        "vnp_CreateDate" => date('YmdHis'),
-        "vnp_CurrCode" => "VND",
-        "vnp_IpAddr" => $vnp_IpAddr,
-        "vnp_Locale" => $vnp_Locale,
-        "vnp_OrderInfo" => $vnp_OrderInfo,
-        "vnp_OrderType" => $vnp_OrderType,
-        "vnp_ReturnUrl" => $vnp_Returnurl,
-        "vnp_TxnRef" => $vnp_TxnRef,
-    ];
-
-    // Thêm vnp_BankCode nếu có
-    if (!empty($vnp_BankCode)) {
-        $inputData["vnp_BankCode"] = $vnp_BankCode;
-    }
-
-    // Sắp xếp mảng theo thứ tự bảng chữ cái
-    ksort($inputData);
-
-    // Tạo chuỗi hashData và query
-    $hashData = "";
-    $query = "";
-    $i = 0;
-    foreach ($inputData as $key => $value) {
-        // Tạo hashData (đã mã hóa URL để đảm bảo đúng định dạng)
-        if ($i == 1) {
-            $hashData .= '&' . urlencode($key) . "=" . urlencode($value);
-        } else {
-            $hashData .= urlencode($key) . "=" . urlencode($value);
-            $i = 1;
-        }
-        // Tạo query cho URL
-        $query .= urlencode($key) . "=" . urlencode($value) . '&';
-    }
-    $query = rtrim($query, '&');
-
-    // Tạo chữ ký vnp_SecureHash
-    $vnpSecureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-
-    // Tạo URL thanh toán
-    $vnp_Url .= '?' . $query . '&vnp_SecureHash=' . $vnpSecureHash;
-    return $vnp_Url;
-}
-
-    
-
-    public function vnpayReturn(Request $request)
-    {
-        $vnp_ResponseCode = $request->input('vnp_ResponseCode');
-        $vnp_TxnRef = $request->input('vnp_TxnRef');
-
-        $order = Order::where('order_code', $vnp_TxnRef)->first();
-
-        if (!$order) {
-            return response()->json(['message' => 'Không tìm thấy đơn hàng!'], 404);
-        }
-
-        if ($vnp_ResponseCode === '00') {
-            $order->update([
-                'payment_status' => 'da_thanh_toan',
-                'status' => 'dang_chuan_bi'
-            ]);
-            return response()->json(['message' => 'Thanh toán thành công!']);
-        } else {
-            $order->update([
-                'payment_status' => 'that_bai',
-                'status' => 'huy'
-            ]);
-            return response()->json(['message' => 'Thanh toán thất bại!']);
-        }
     }
 
     /**
@@ -516,6 +429,4 @@ class OrderController extends Controller
     {
         return Order::ORDER_STATUS[$status] ?? 'Không xác định';
     }
-
-    
 }

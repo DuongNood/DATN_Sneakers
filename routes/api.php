@@ -19,8 +19,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProductController;
-
+use App\Http\Controllers\Auth\CommentController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ReplyController;
 
 use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\ChatController;
@@ -90,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user', [UserController::class, 'update']);
 });
 Route::get('settings', [SettingController::class, 'index']);
+
 // Promotion
 Route::post('/promotions', [PromotionController::class, 'checkPromotion']);
 
@@ -108,7 +110,6 @@ Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::cla
 Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);
 
 // mua hàng
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('carts/add', [CartController::class, 'addToCart']);
     Route::get('carts/list', [CartController::class, 'getCart']);
@@ -129,39 +130,37 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/buy/{product_name}', [OrderController::class, 'buyProductByName']);
 });
 //lọc sp
-Route::get('/products/filter', [filterProductsController::class, 'filterProducts']);
+Route::get('/products/search', [FilterProductsController::class, 'search']);
+
 
 // MomoPayment 
-
-
-
 Route::post('/momo/create', [MomoController::class, 'createPayment']);
-
-
-// VnpayPayment
-Route::get('/vnpay-return', [VnPayController::class, 'vnpayReturn']);
-
-
 Route::get('/momo/callback', [MomoController::class, 'callback']);
 Route::post('/momo/ipn', [MomoController::class, 'ipn']);
 
 
 
 // realtime pusher
-Route::post('/login', function (Request $request) {
-    $credentials = $request->only('email', 'password');
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json(['token' => $token, 'user' => $user]);
-    }
-    return response()->json(['error' => 'Unauthorized'], 401);
-});
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user/conversation', [ChatController::class, 'getOrCreateConversation']);
     Route::get('/conversations', [ChatController::class, 'getConversations']);
-    Route::post('/conversations', [ChatController::class, 'createConversation']);
-    Route::get('/conversations/{id}/messages', [ChatController::class, 'getMessages']);
-    Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
+    Route::post('/conversations/get-or-create', [ChatController::class, 'getOrCreateConversation']);
+    Route::get('/conversations/{conversationId}/messages', [ChatController::class, 'getMessages']);
+    Route::post('/conversations/{conversationId}/messages', [ChatController::class, 'sendMessage']);
+    Route::post('/conversations/{conversation}/assign', [ChatController::class, 'assignConversation']);
+});
+//  bình luận sản phẩm
+Route::get('/detail-product/{id}', [DetailController::class, 'getProductDetail']);
+Route::get('/detail-product/{id}/comments', [CommentController::class, 'index']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/comments', [CommentController::class, 'store']);
+    Route::delete('/comments/{id}', [CommentController::class, 'apiDestroy']);
+    Route::post('/replies', [ReplyController::class, 'store']); // Thêm route này
 });
 
+// vnpay
+Route::prefix('vnpay')->group(function () {
+    Route::get('/payment/{orderId}', [VnpayController::class, 'createPaymentUrl'])->name('vnpay.payment');
+    Route::get('/return', [VnpayController::class, 'handleReturn'])->name('vnpay.return');
+    Route::post('/ipn', [VnpayController::class, 'handleIpn'])->name('vnpay.ipn');
+    
+});

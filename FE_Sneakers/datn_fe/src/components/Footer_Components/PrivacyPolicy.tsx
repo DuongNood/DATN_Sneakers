@@ -2,35 +2,35 @@ import { motion } from 'framer-motion'
 
 export default function PrivacyPolicy() {
   return (
-    <div className='min-h-screen bg-gradient-to-r from-gray-100 to-gray-200 flex justify-center items-center p-6'>
+    <div className='min-h-screen bg-gradient-to-r from-blue-50 to-indigo-50 flex justify-center items-center p-4 sm:p-6'>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className='bg-white shadow-2xl rounded-3xl p-10 max-w-3xl w-full border border-gray-300'
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        className='bg-white shadow-2xl rounded-3xl p-8 sm:p-10 max-w-4xl w-full border border-gray-200'
       >
         <motion.h1
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-          className='text-4xl font-extrabold text-gray-900 mb-6 text-center'
+          transition={{ delay: 0.2, duration: 0.8, ease: 'easeOut' }}
+          className='text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6 text-center'
         >
           Chính Sách Bảo Mật
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className='text-gray-700 text-lg leading-relaxed text-center mb-8'
+          transition={{ delay: 0.4, duration: 0.8, ease: 'easeOut' }}
+          className='text-gray-700 text-lg sm:text-xl leading-relaxed text-center mb-8 max-w-3xl mx-auto'
         >
           Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn và đảm bảo quyền riêng tư khi sử dụng trang web bán giày
           sneaker của chúng tôi.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
+          transition={{ delay: 0.6, duration: 0.8, ease: 'easeOut' }}
           className='space-y-6'
         >
           {[
@@ -58,11 +58,11 @@ export default function PrivacyPolicy() {
               key={index}
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 * index, duration: 0.8 }}
-              className='p-6 bg-gray-50 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-200'
+              transition={{ delay: 0.2 * index + 0.2, duration: 0.8, ease: 'easeOut' }}
+              className='p-6 bg-gray-50 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-indigo-300'
             >
-              <h2 className='text-2xl font-semibold text-gray-900'>{item.title}</h2>
-              <p className='text-gray-700 mt-2 text-lg'>{item.content}</p>
+              <h2 className='text-2xl font-semibold text-gray-900 mb-3'>{item.title}</h2>
+              <p className='text-gray-700 text-lg leading-relaxed'>{item.content}</p>
             </motion.div>
           ))}
         </motion.div>

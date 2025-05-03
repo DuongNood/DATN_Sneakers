@@ -39,22 +39,33 @@ class HomeController extends Controller
     }
     public function brandsByProduct($id)
     {
+        try {
+            \Log::info('Fetching products for brand ID: ' . $id);
+            
+            $products = Product::with([
+                'brand',
+                'productVariant' => function ($query) {
+                    $query->with('productSize');
+                },
+                'imageProduct'
+            ])
+                ->where('status', true)
+                ->where('brand_id', $id)
+                ->get();
 
-         $products = Product::with([
-        'Brand',
-        'productVariant' => function ($query) {
-            $query->with('productSize'); // Lấy thông tin kích thước của sản phẩm
-        },
-        'imageProduct' // Lấy thông tin hình ảnh của sản phẩm
-        ])
-            ->where('status', true)
-            ->where('brand_id', $id)
-            ->get();
+            \Log::info('Found ' . $products->count() . ' products for brand ID: ' . $id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $products
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $products
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in brandsByProduct: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
     public function getTopViewedProducts()
     {
