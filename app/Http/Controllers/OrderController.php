@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
@@ -100,11 +99,11 @@ class OrderController extends Controller
                 'promotion' => $promotionAmount,
                 'shipping_fee' => $shippingFee,
                 'payment_method' => $paymentMethod,
-                'payment_status' => 'chua_thanh_toan',
-                'status' => 'cho_xac_nhan',
+                'payment_status' => $paymentMethod === 'cod' ? 'chua_thanh_toan' : 'da_thanh_toan',
+                'status' => $paymentMethod === 'cod' ? 'cho_xac_nhan' : 'dang_chuan_bi',
             ]);
 
-            // Lưu chi tiết đơn hàng
+            // Lưu chi tiết đơn hàng và giảm tồn kho
             foreach ($cartItems as $item) {
                 $productVariant = ProductVariant::where('product_id', $item->product_id)
                     ->where('product_size_id', $item->product_size_id)
@@ -122,17 +121,13 @@ class OrderController extends Controller
                     'price' => $item->discounted_price ?? $item->original_price,
                 ]);
 
-                // Chỉ giảm tồn kho nếu không dùng VNPay
-                if ($paymentMethod !== 'vnpay') {
-                    $productVariant->decrement('quantity', $item->quantity);
-                }
+                // Giảm tồn kho ngay lập tức
+                $productVariant->decrement('quantity', $item->quantity);
             }
 
-            // Xóa giỏ hàng nếu không dùng VNPay
-            if ($paymentMethod !== 'vnpay') {
-                CartItem::where('cart_id', $cart->id)->delete();
-                $cart->delete();
-            }
+            // Xóa giỏ hàng
+            CartItem::where('cart_id', $cart->id)->delete();
+            $cart->delete();
 
             return response()->json([
                 'message' => 'Đặt hàng thành công!',
@@ -148,11 +143,14 @@ class OrderController extends Controller
      */
     public function buyProductByName(Request $request, $product_name): JsonResponse
     {
+        Log::info('buyProductByName Request Data', $request->all());
+
         $request->validate([
             'product_size_id' => 'required|integer',
             'quantity' => 'required|integer|min:1',
             'promotion_name' => 'nullable|string',
             'payment_method' => ['required', Rule::in(['cod', 'momo', 'vnpay'])],
+            'status' => ['required', Rule::in(array_keys(Order::ORDER_STATUS))],
         ]);
 
         $user = Auth::user();
@@ -177,7 +175,7 @@ class OrderController extends Controller
             }
 
             if ($productVariant->quantity < $request->quantity) {
-                return response()->json(['message' => 'Kho không đủ hàng!'], 503);
+                return response()->json(['message' => 'Kho không đủ hàng!'], 400);
             }
 
             $price = $product->discounted_price ?? $product->original_price;
@@ -204,7 +202,7 @@ class OrderController extends Controller
                         $promotionAmount = min($promotion->discount_value, $totalPriceBeforeDiscount);
                     }
                 } else {
-                    return response()->json(["message" => "Mã giảm giá không hợp lệ hoặc đã hết hạn!"], 400);
+                    return response()->json(['message' => 'Mã giảm giá không hợp lệ hoặc đã hết hạn!'], 400);
                 }
             }
 
@@ -222,8 +220,8 @@ class OrderController extends Controller
                 'promotion' => $promotionAmount,
                 'shipping_fee' => $shippingFee,
                 'payment_method' => $request->payment_method,
-                'payment_status' => 'chua_thanh_toan',
-                'status' => 'cho_xac_nhan',
+                'payment_status' => $request->payment_method === 'cod' ? 'chua_thanh_toan' : 'da_thanh_toan',
+                'status' => $request->status,
             ]);
 
             $productSize = ProductSize::find($request->product_size_id);
@@ -235,10 +233,8 @@ class OrderController extends Controller
                 'price' => $price,
             ]);
 
-            // Chỉ giảm tồn kho nếu không dùng VNPay
-            if ($request->payment_method !== 'vnpay') {
-                $productVariant->decrement('quantity', $request->quantity);
-            }
+            // Giảm tồn kho ngay lập tức
+            $productVariant->decrement('quantity', $request->quantity);
 
             return response()->json([
                 'message' => 'Đặt hàng thành công!',
@@ -313,8 +309,6 @@ class OrderController extends Controller
      */
     public function show(Order $order): JsonResponse
     {
-        Gate::authorize('view', $order);
-
         $order->load([
             'user',
             'orderDetails.productVariant.product',
@@ -333,8 +327,6 @@ class OrderController extends Controller
             'cancellation_reason' => ['required', 'string', 'min:10', 'max:500'],
         ]);
 
-        Gate::authorize('view', $order); // Kiểm tra quyền sở hữu
-
         if (!$order->canBeCancelledByUser()) {
             Log::warning('Cancel order: Order cannot be cancelled', [
                 'order_id' => $order->id,
@@ -350,7 +342,6 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            // Lưu trạng thái trước đó
             $order->previous_status = $order->status;
             $order->status = Order::CHO_XAC_NHAN_HUY;
             $order->cancellation_reason = $request->input('cancellation_reason');
@@ -380,9 +371,8 @@ class OrderController extends Controller
                 'error' => $e->getMessage(),
                 'order_id' => $order->id,
                 'user_id' => Auth::id(),
-                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['message' => 'Đã xảy ra lỗi server khi gửi yêu cầu hủy đơn hàng!', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Đã xảy ra lỗi server khi gửi yêu cầu hủy đơn hàng!'], 500);
         }
     }
 
@@ -420,13 +410,5 @@ class OrderController extends Controller
                 ];
             })->all(),
         ];
-    }
-
-    /**
-     * Hàm hỗ trợ lấy text trạng thái
-     */
-    protected function getStatusText(?string $status): string
-    {
-        return Order::ORDER_STATUS[$status] ?? 'Không xác định';
     }
 }

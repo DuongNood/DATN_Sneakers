@@ -79,7 +79,7 @@ const Payment: React.FC = () => {
             quantity: product.quantity,
             product_size_id: selectedSizeObj.product_size_id,
             payment_method: paymentMethod,
-            status: paymentMethod === 'cod' ? 'cho_xac_nhan' : 'pending',
+            status: paymentMethod === 'cod' ? 'cho_xac_nhan' : 'dang_chuan_bi',
             order_id: orderId
           },
           {
@@ -274,20 +274,11 @@ const Payment: React.FC = () => {
                   <p className='font-medium text-gray-900'>{t('cash_on_delivery')}</p>
                   <p className='text-sm text-gray-500'>{t('cod_description')}</p>
                 </div>
-                <svg
-                  className='w-6 h-6 text-gray-400'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-                  />
-                </svg>
+                <img
+                  src='https://cdn.iconscout.com/icon/free/png-256/free-cod-icon-download-in-svg-png-gif-file-formats--credit-debit-bank-payment-methods-vol-2-pack-business-icons-32290.png'
+                  alt='MoMo'
+                  className='w-8 h-8'
+                />
               </div>
               <div
                 className={`p-5 border rounded-xl cursor-pointer transition-all duration-200 flex items-center ${
@@ -309,7 +300,7 @@ const Payment: React.FC = () => {
                   <p className='text-sm text-gray-500'>{t('momo_payment_description')}</p>
                 </div>
                 <img
-                  src='https://developers.momo.vn/v3/assets/images/logo-1-8a1f51b0e2f3c1e4b9f5e6c7d7e8f9a0.png'
+                  src='https://itviec.com/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBM0E3SHc9PSIsImV4cCI6bnVsbCwicHVyIjoiYmxvYl9pZCJ9fQ==--3873048b5c25240e612222d38b001c927993024c/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdCem9MWm05eWJXRjBTU0lJY0c1bkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFJc0FXa0NMQUU9IiwiZXhwIjpudWxsLCJwdXIiOiJ2YXJpYXRpb24ifX0=--15c3f2f3e11927673ae52b71712c1f66a7a1b7bd/MoMo%20Logo.png'
                   alt='MoMo'
                   className='w-6 h-6'
                 />
@@ -339,7 +330,11 @@ const Payment: React.FC = () => {
                   <p className='font-medium text-gray-900'>{t('vnpay_payment')}</p>
                   <p className='text-sm text-gray-500'>{t('vnpay_payment_description')}</p>
                 </div>
-                <img src='https://vnpay.vn/assets/images/logo.png' alt='VNPay' className='w-6 h-6' />
+                <img
+                  src='https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg'
+                  alt='VNPay'
+                  className='w-6 h-6'
+                />
               </div>
               {paymentMethod === 'momo' && (
                 <div className='ml-8 space-y-4'>
@@ -363,7 +358,7 @@ const Payment: React.FC = () => {
                       <p className='text-sm text-gray-500'>{t('atm_card_description')}</p>
                     </div>
                     <img
-                      src='https://developers.momo.vn/v3/assets/images/logo-1-8a1f51b0e2f3c1e4b9f5e6c7d7e8f9a0.png'
+                      src='https://png.pngtree.com/png-vector/20200718/ourmid/pngtree-atm-card-banking-flat-icon-png-image_2307566.jpg'
                       alt='MoMo ATM'
                       className='w-6 h-6'
                     />
