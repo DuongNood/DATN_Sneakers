@@ -12,7 +12,7 @@
 <script src="{{ asset('admins/libs/apexcharts/apexcharts.min.js')}}"></script>
 
 <!-- for basic area chart -->
-<script src="../../../../apexcharts.com/samples/assets/stock-prices.js"></script>
+<script src="https://apexcharts.com/samples/assets/stock-prices.js"></script>
 
 <!-- Widgets Init Js -->
 

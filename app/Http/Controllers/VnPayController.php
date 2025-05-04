@@ -13,7 +13,7 @@ use App\Models\CartItem;
 use App\Models\VnpayTransaction;
 use Illuminate\Support\Facades\Log;
 
-class VnpayController extends Controller
+class VnPayController extends Controller
 {
     /**
      * Tạo URL thanh toán VNPay

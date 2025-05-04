@@ -71,37 +71,48 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
 
-        // Nếu đơn hàng đã bị hủy, không cho cập nhật bất cứ trạng thái nào
+        // Không cho cập nhật đơn hàng đã bị hủy
         if ($order->status === 'huy_don_hang') {
             return redirect()->back()->with('error', 'Không thể cập nhật đơn hàng đã bị hủy!');
         }
 
+        // Validate dữ liệu đầu vào
+        $validated = $request->validate([
+            'recipient_name'    => 'required|string|max:255',
+            'recipient_phone'   => 'required|string|max:20',
+            'recipient_address' => 'required|string|max:500',
+            'status'            => 'nullable|string',
+            'payment_status'    => 'nullable|string',
+        ]);
+
+        // Ghi log request để debug
+        // Log::info("Dữ liệu cập nhật đơn hàng nhận được:", $validated);
+
         DB::beginTransaction();
+
         try {
             // Cập nhật thông tin người nhận
-            $order->recipient_name = $request->input('recipient_name');
-            $order->recipient_phone = $request->input('recipient_phone');
-            $order->recipient_address = $request->input('recipient_address');
+            $order->recipient_name = $validated['recipient_name'];
+            $order->recipient_phone = $validated['recipient_phone'];
+            $order->recipient_address = $validated['recipient_address'];
 
             // Nếu trạng thái đơn hàng thay đổi hợp lệ thì cập nhật
-            if ($request->status && $this->canUpdateShippingStatus($order->status, $request->status)) {
-                // Nếu chuyển sang trạng thái hủy đơn hàng, hoàn lại số lượng sản phẩm
-                if ($request->status === 'huy_don_hang') {
+            if (!empty($validated['status']) && $this->canUpdateShippingStatus($order->status, $validated['status'])) {
+                if ($validated['status'] === 'huy_don_hang') {
                     $this->restoreStock($order);
                 }
-                $order->status = $request->status;
+                $order->status = $validated['status'];
             }
 
-            // Trạng thái thanh toán có thể cập nhật độc lập với trạng thái đơn hàng
-            if ($request->has('payment_status') && $order->payment_status !== 'da_thanh_toan') {
-                $order->payment_status = $request->payment_status;
+            // Cập nhật trạng thái thanh toán nếu chưa thanh toán
+            if (!empty($validated['payment_status']) && $order->payment_status !== 'da_thanh_toan') {
+                $order->payment_status = $validated['payment_status'];
             }
 
-            // Xử lý thay đổi sản phẩm (cần thêm logic tùy theo yêu cầu của bạn)
-            // Ví dụ: thêm, sửa, xóa sản phẩm trong order_details
+            // (Tùy chọn) Cập nhật chi tiết sản phẩm trong đơn nếu có logic thêm ở đây
             // ...
 
-            // Tính toán lại tổng tiền đơn hàng
+            // Tính toán lại tổng tiền
             $order->total_price = $this->calculateTotalPrice($order);
 
             $order->save();
@@ -110,9 +121,15 @@ class OrderController extends Controller
             return redirect()->back()->with('success', 'Đơn hàng đã được cập nhật!');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error("Lỗi cập nhật đơn hàng #{$order->id}: " . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi cập nhật đơn hàng!');
         }
     }
+
 
     private function calculateTotalPrice(Order $order)
     {

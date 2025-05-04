@@ -26,94 +26,104 @@
             <div class="row">
                 {{-- Card Thông tin người đặt --}}
                 <div class="col-md-6 mb-4">
-                    <div class="card">
+                    <div class="card" style="box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.05);">
                         <div class="card-header fw-bold">Thông Tin Người Đặt</div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Khách Hàng</label>
-                                <input type="text" class="form-control" value="{{ $order->user->name }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="text" class="form-control" value="{{ $order->user->email }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" value="{{ $order->user->phone }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Địa chỉ</label>
-                                <input type="text" class="form-control" value="{{ $order->user->address }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Trạng Thái Thanh Toán</label>
-                                <select name="payment_status" class="form-select"
-                                    {{ $order->payment_status == 'da_thanh_toan' ? 'disabled' : '' }}>
-                                    <option value="chua_thanh_toan"
-                                        {{ $order->payment_status == 'chua_thanh_toan' ? 'selected' : '' }}>Chưa thanh toán
-                                    </option>
-                                    <option value="da_thanh_toan"
-                                        {{ $order->payment_status == 'da_thanh_toan' ? 'selected' : '' }}>Đã thanh toán
-                                    </option>
-                                </select>
-                            </div>
+                        <div class="card-body" style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem;">
+                            <label style="font-weight: bold;"><i class="mdi mdi-account me-1"></i> Khách Hàng:</label>
+                            <p style="margin-bottom: 0;">{{ $order->user->name }}</p>
+
+                            <label style="font-weight: bold;"><i class="mdi mdi-email me-1"></i> Email:</label>
+                            <p style="margin-bottom: 0;">{{ $order->user->email }}</p>
+
+                            <label style="font-weight: bold;"><i class="mdi mdi-phone me-1"></i> Số điện thoại:</label>
+                            <p style="margin-bottom: 0;">{{ $order->user->phone }}</p>
+
+                            <label style="font-weight: bold;"><i class="mdi mdi-home me-1"></i> Địa chỉ:</label>
+                            <p style="margin-bottom: 0;">{{ $order->user->address }}</p>
                         </div>
                     </div>
                 </div>
 
                 {{-- Card Thông tin người nhận --}}
                 <div class="col-md-6 mb-4">
-                    <div class="card">
+                    <div class="card" style="box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.05);">
                         <div class="card-header fw-bold d-flex justify-content-between align-items-center">
                             Thông Tin Người Nhận
-                            <a type="button" class="" id="editRecipientButton"><i class="mdi mdi-pencil"></i> Sửa
-                                </aa>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="editRecipientButton">
+                                <i class="mdi mdi-pencil"></i> Sửa
+                            </button>
                         </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Tên Người Nhận</label>
-                                <input type="text" class="form-control" name="recipient_name"
-                                    value="{{ $order->recipient_name }}" disabled id="recipient_name">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Số điện thoại người nhận</label>
-                                <input type="text" class="form-control" name="recipient_phone"
-                                    value="{{ $order->recipient_phone }}" disabled id="recipient_phone">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Địa chỉ người nhận</label>
-                                <input type="text" class="form-control" name="recipient_address"
-                                    value="{{ $order->recipient_address }}" disabled id="recipient_address">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Phương Thức Thanh Toán</label>
-                                <input type="text" class="form-control" value="{{ $order->payment_method }}" disabled>
-                            </div>
-                            {{-- Trạng thái đơn hàng --}}
-                            <div class="mb-3">
-                                <label class="form-label">Trạng Thái Đơn Hàng</label>
-                                <select name="status" class="form-select"
-                                    {{ $order->status === 'huy_don_hang' ? 'disabled' : '' }}>
-                                    <option value="{{ $order->status }}" selected>
-                                        {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'], $order->status) }}
+                        <div class="card-body" style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem;">
+                            <label for="recipient_name_readonly" style="font-weight: bold;"><i
+                                    class="mdi mdi-account me-1"></i> Tên:</label>
+                            <p id="recipient_name_readonly" style="margin-bottom: 0;">{{ $order->recipient_name }}</p>
+                            <input type="text" class="form-control d-none form-control-sm" name="recipient_name"
+                                value="{{ old('recipient_name', $order->recipient_name) }}" id="recipient_name_editable"
+                                style="grid-column: 2;">
+
+                            <label for="recipient_phone_readonly" style="font-weight: bold;"><i
+                                    class="mdi mdi-phone me-1"></i> Điện thoại:</label>
+                            <p id="recipient_phone_readonly" style="margin-bottom: 0;">{{ $order->recipient_phone }}</p>
+                            <input type="text" class="form-control d-none form-control-sm" name="recipient_phone"
+                                value="{{ old('recipient_phone', $order->recipient_phone) }}" id="recipient_phone_editable"
+                                style="grid-column: 2;">
+
+                            <label for="recipient_address_readonly" style="font-weight: bold;"><i
+                                    class="mdi mdi-map-marker me-1"></i> Địa chỉ:</label>
+                            <p id="recipient_address_readonly" style="margin-bottom: 0;">{{ $order->recipient_address }}
+                            </p>
+                            <input type="text" class="form-control d-none form-control-sm" name="recipient_address"
+                                value="{{ old('recipient_address', $order->recipient_address) }}"
+                                id="recipient_address_editable" style="grid-column: 2;">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card Thông tin thanh toán và trạng thái --}}
+                <div class="col mb-4">
+                    <div class="card" style="box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.05);">
+                        <div class="card-header fw-bold">Thông Tin Thanh Toán & Trạng Thái</div>
+                        <div class="card-body" style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem;">
+                            <label for="payment_method" style="font-weight: bold;"><i class="mdi mdi-credit-card me-1"></i>
+                                Thanh toán:</label>
+                            <input type="text" class="form-control form-control-sm" value="{{ $order->payment_method }}"
+                                disabled id="payment_method" style="grid-column: 2;">
+
+                            <label for="payment_status" style="font-weight: bold;"><i class="mdi mdi-cash-check me-1"></i>
+                                Trạng Thái Thanh Toán:</label>
+                            <select name="payment_status" class="form-select form-select-sm" id="payment_status"
+                                style="grid-column: 2;">
+                                <option value="chua_thanh_toan"
+                                    {{ $order->payment_status == 'chua_thanh_toan' ? 'selected' : '' }}>Chưa thanh toán
+                                </option>
+                                <option value="da_thanh_toan"
+                                    {{ $order->payment_status == 'da_thanh_toan' ? 'selected' : '' }}>Đã thanh toán
+                                </option>
+                            </select>
+
+                            <label for="status" style="font-weight: bold;"><i
+                                    class="mdi mdi-package-variant-closed me-1"></i> Trạng Thái Đơn Hàng:</label>
+                            <select name="status" class="form-select form-select-sm"
+                                {{ $order->status === 'huy_don_hang' ? 'disabled' : '' }} style="grid-column: 2;">
+                                <option value="{{ $order->status }}" selected>
+                                    {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'], $order->status) }}
+                                </option>
+
+                                @php
+                                    $validNextStatuses = [
+                                        'cho_xac_nhan' => ['dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang'],
+                                        'dang_chuan_bi' => ['dang_van_chuyen', 'da_giao_hang'],
+                                        'dang_van_chuyen' => ['da_giao_hang'],
+                                        'da_giao_hang' => [],
+                                    ];
+                                @endphp
+
+                                @foreach ($validNextStatuses[$order->status] ?? [] as $nextStatus)
+                                    <option value="{{ $nextStatus }}">
+                                        {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng'], $nextStatus) }}
                                     </option>
-
-                                    @php
-                                        $validNextStatuses = [
-                                            'cho_xac_nhan' => ['dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang'],
-                                            'dang_chuan_bi' => ['dang_van_chuyen', 'da_giao_hang'],
-                                            'dang_van_chuyen' => ['da_giao_hang'],
-                                            'da_giao_hang' => [],
-                                        ];
-                                    @endphp
-
-                                    @foreach ($validNextStatuses[$order->status] ?? [] as $nextStatus)
-                                        <option value="{{ $nextStatus }}">
-                                            {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng'], $nextStatus) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -153,34 +163,35 @@
                 </div>
 
                 {{-- Thông tin đơn hàng --}}
-                <div class="card mt-3">
+                <div class="card mt-3" style="box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.05);">
                     <div class="card-body">
                         <h5 class="fw-bold">Thông Tin Thanh Toán</h5>
-
-                        {{-- Tổng tiền hàng (chưa trừ giảm giá, phí ship) --}}
-                        <div class="d-flex justify-content-between">
-                            <span>Tổng tiền hàng:</span>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: bold;">Tổng tiền hàng:</span>
                             <strong>
                                 {{ number_format($order->orderDetails->sum(fn($detail) => $detail->price), 0, ',', '.') }}
                                 VND
                             </strong>
                         </div>
-
-                        <div class="d-flex justify-content-between">
-                            <span>Giảm giá:</span>
-                            <strong>-{{ number_format($order->promotion, 0, ',', '.') }} VND</strong>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: bold;">Giảm giá:</span>
+                            <strong style="color: green;">-{{ number_format($order->promotion, 0, ',', '.') }}
+                                VND</strong>
                         </div>
-
-                        <div class="d-flex justify-content-between">
-                            <span>Phí vận chuyển:</span>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: bold;">Phí vận chuyển:</span>
                             <strong>{{ number_format($order->shipping_fee, 0, ',', '.') }} VND</strong>
                         </div>
-
-                        <div class="d-flex justify-content-between mt-2 border-top pt-2">
-                            <span class="fw-bold">Tổng Thanh Toán:</span>
-                            <strong class="text-danger">{{ number_format($order->total_price, 0, ',', '.') }} VND</strong>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem;">
+                            <span class="fw-bold" style="font-size: 1.1rem;">Tổng Thanh Toán:</span>
+                            <strong class="text-danger"
+                                style="font-size: 1.1rem;">{{ number_format($order->total_price, 0, ',', '.') }}
+                                VND</strong>
                         </div>
-
                     </div>
                 </div>
 
@@ -232,19 +243,25 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const editButton = document.getElementById('editRecipientButton');
-            const recipientName = document.getElementById('recipient_name');
-            const recipientPhone = document.getElementById('recipient_phone');
-            const recipientAddress = document.getElementById('recipient_address');
+            const readonlyFields = document.querySelectorAll(
+                '#recipient_name_readonly, #recipient_phone_readonly, #recipient_address_readonly');
+            const editableFields = document.querySelectorAll(
+                '#recipient_name_editable, #recipient_phone_editable, #recipient_address_editable');
 
             editButton.addEventListener('click', function() {
-                recipientName.disabled = !recipientName.disabled;
-                recipientPhone.disabled = !recipientPhone.disabled;
-                recipientAddress.disabled = !recipientAddress.disabled;
+                readonlyFields.forEach(field => field.classList.toggle('d-none'));
+                editableFields.forEach(field => field.classList.toggle('d-none'));
 
-                if (recipientName.disabled) {
-                    editButton.innerHTML = '<i class="mdi mdi-pencil"></i> Sửa';
+                if (editButton.querySelector('i').classList.contains('mdi-pencil')) {
+                    editButton.innerHTML = '<i class="mdi mdi-check"></i> Lưu';
+                    editButton.classList.remove('btn-outline-primary');
+                    editButton.classList.add('btn-success');
                 } else {
-                    editButton.innerHTML = '<i class="mdi mdi-delete"></i> Hủy';
+                    editButton.innerHTML = '<i class="mdi mdi-pencil"></i> Sửa';
+                    editButton.classList.remove('btn-success');
+                    editButton.classList.add('btn-outline-primary');
+                    // Ở đây bạn có thể thêm logic để tự động submit form nếu muốn
+                    // document.querySelector('form').submit();
                 }
             });
         });
