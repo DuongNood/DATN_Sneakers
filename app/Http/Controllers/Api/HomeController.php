@@ -79,4 +79,15 @@ class HomeController extends Controller
             'data' => $products
         ]);
     }
+
+    public function productSale(Request $request)
+    {
+        // Lọc các sản phẩm có khuyến mãi >= 30%
+        $products = Product::all()->filter(function ($product) {
+            return $product->getDiscountPercentage() >= 30;
+        });
+
+        // Trả về kết quả dưới dạng JSON Resource
+       return response()->json($products);
+    }
 }

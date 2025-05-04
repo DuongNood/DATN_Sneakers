@@ -115,6 +115,7 @@ Route::prefix('admin')
                     Route::put('update/{id}', [ProductController::class, 'update'])->name('update');
                     Route::delete('destroy/{id}', [ProductController::class, 'destroy'])->name('destroy');
                     Route::get('product_discontinued', [ProductController::class, 'productDiscontinued'])->name('productDiscontinued');
+                    Route::get('show/{id}', [ProductController::class, 'show'])->name('show');
                 });
 
             Route::prefix('product_variants')

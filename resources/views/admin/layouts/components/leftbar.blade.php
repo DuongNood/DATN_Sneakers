@@ -46,18 +46,11 @@
                         <ul class="nav-second-level">
                             <li>
                                 <a class='tp-link' href='{{ route('admin.products.index') }}'>Danh sách sản phẩm</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='{{ route('admin.product_variants.index') }}'>Biến thể sản phẩm</a>
-                            </li>
+                            </li>                           
                             <li>
                                 <a class='tp-link' href='{{ route('admin.products.productDiscontinued') }}'>Sản phẩm ngừng
                                     kinh doanh</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href='{{ route('admin.product_variants.variantDiscontinued') }}'>Biến thể
-                                    đã ngừng kinh doanh</a>
-                            </li>
+                            </li>                           
                             <li>
                                 <a class='tp-link' href='{{ route('admin.sizes.index') }}'>Size</a>
                             </li>

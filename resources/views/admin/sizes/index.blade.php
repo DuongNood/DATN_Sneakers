@@ -55,7 +55,7 @@
                                                         <td>
                                                             <a href="{{ route('admin.sizes.edit', $item->id) }}"><i
                                                                     class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>
-                                                            <form
+                                                            {{-- <form
                                                                 action="{{ route('admin.sizes.destroy', $item->id) }}"
                                                                 method="POST" class="d-inline me-2">
                                                                 @csrf
@@ -64,7 +64,7 @@
                                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
                                                                     <i class="mdi mdi-delete text-muted fs-14"></i>
                                                                 </button>
-                                                            </form>
+                                                            </form> --}}
                                                         </td>
 
                                                     </tr>

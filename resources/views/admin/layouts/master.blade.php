@@ -14,8 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     @include('admin.layouts.partials.css')
-
-    <style>
+    @yield('css')
+    {{-- <style>
         /* Ép hiển thị content và form */
         .content-page {
             display: block !important;
@@ -34,7 +34,7 @@
             visibility: visible !important;
             opacity: 1 !important;
         }
-    </style>
+    </style> --}}
 </head>
 
 <body data-menu-color="light" data-sidebar="default">

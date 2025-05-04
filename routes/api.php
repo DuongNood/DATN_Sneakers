@@ -110,6 +110,7 @@ Route::get('/productbybrand/{id}', [HomeController::class, 'brandsByProduct']);
 Route::get('/products/top-views', [HomeController::class, 'getTopViewedProducts']);
 Route::middleware('auth:sanctum')->post('/review', [ProductReviewController::class, 'store']);
 Route::get('/products/reviews/{id}', [ProductReviewController::class, 'getReviewsByProduct']);
+Route::get('/products/sale', [HomeController::class, 'productSale']);
 
 // mua hàng
 Route::middleware('auth:sanctum')->group(function () {
