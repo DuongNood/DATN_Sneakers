@@ -42,6 +42,12 @@ Route::prefix('admin')
             })->name('index');
 
             Route::get('/dashboard/daily-statistics', [DashboardStatisticsController::class, 'getDailyData'])->name('dashboard.daily_statistics');
+            Route::get('/dashboard/revenue-last-30-days', [DashboardStatisticsController::class, 'getRevenueLast30Days'])->name('dashboard.revenue_last_30_days');
+            Route::get('/dashboard/payment-statuses', [DashboardStatisticsController::class, 'getAllPaymentStatuses'])->name('dashboard.payment_statuses');
+            Route::get('/dashboard/order-statuses', [DashboardStatisticsController::class, 'getAllOrderStatuses'])->name('dashboard.order_statuses');
+            Route::get('/dashboard/combined-statuses', [DashboardStatisticsController::class, 'getCombinedStatuses'])->name('dashboard.combined_statuses');
+            Route::get('/admin/dashboard/all-new-customers', [DashboardStatisticsController::class, 'getAllNewCustomers'])->name('dashboard.all_new_customers');
+            Route::get('/admin/dashboard/all-recent-orders', [DashboardStatisticsController::class, 'getAllRecentOrders'])->name('dashboard.all_recent_orders');
         });
 
 
@@ -77,7 +83,7 @@ Route::prefix('admin')
                 ->as('categories.')
                 ->group(function () {
                     Route::get('/', [CategoryController::class, 'index'])->name('index');
-                    
+
                     Route::get('create', [CategoryController::class, 'create'])->name('create');
                     Route::post('store', [CategoryController::class, 'store'])->name('store');
                     Route::get('{id}/edit', [CategoryController::class, 'edit'])->name('edit');
@@ -155,21 +161,19 @@ Route::prefix('admin')
                     Route::put('update', [SettingController::class, 'update'])->name('update');
                 });
         });
-      
-            Route::get('review', [ReviewController::class,'index'])->name('review.index');
-       
+
+        Route::get('review', [ReviewController::class, 'index'])->name('review.index');
     });
 
-    // bình luận
-    Route::prefix('admin')->middleware(['auth'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
-    
-        Route::get('/comments', [CommentController::class, 'adminIndex'])->name('admin.comments.index');
-        Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('admin.comments.destroy');
-        Route::post('/replies', [ReplyController::class, 'adminStore'])->name('admin.replies.store');
-    });
+// bình luận
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
 
-    Route::get('/api/productbybrand/{id}', [App\Http\Controllers\Api\HomeController::class, 'brandsByProduct']);
-    
+    Route::get('/comments', [CommentController::class, 'adminIndex'])->name('admin.comments.index');
+    Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('admin.comments.destroy');
+    Route::post('/replies', [ReplyController::class, 'adminStore'])->name('admin.replies.store');
+});
+
+Route::get('/api/productbybrand/{id}', [App\Http\Controllers\Api\HomeController::class, 'brandsByProduct']);
