@@ -267,18 +267,23 @@ class OrderController extends Controller
     /**
      * Hiển thị danh sách đơn hàng của user
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
 
-        $ordersPaginator = Order::with([
+        $ordersQuery = Order::with([
             'user',
             'orderDetails.productVariant.product',
             'orderDetails.productVariant.productSize'
         ])
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->where('user_id', $user->id);
+
+        // Thêm lọc theo status nếu có
+        if ($request->has('status') && $request->status !== '') {
+            $ordersQuery->where('status', $request->status);
+        }
+
+        $ordersPaginator = $ordersQuery->orderBy('created_at', 'desc')->paginate(10);
 
         $responseData = [
             'data' => $ordersPaginator->getCollection()->map(function ($order) {

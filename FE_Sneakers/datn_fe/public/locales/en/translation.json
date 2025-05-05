@@ -406,5 +406,11 @@
   "how_to_buy_section3_title": "3. Checkout",
   "how_to_buy_section3_content": "Go to your <strong>Cart</strong>, review your items, and click <strong>Checkout</strong>. Enter shipping information (name, address, phone number). Choose a payment method: <strong>COD</strong>, <strong>MoMo</strong>, <strong>VNPAY</strong>, or bank card. Apply a discount code if available and confirm your order.",
   "how_to_buy_section4_title": "4. Track Your Order",
-  "how_to_buy_section4_content": "After placing an order, you’ll receive an order code via email or in the <strong>Orders</strong> section of your account. Track your delivery status (1-3 days for urban areas, 3-5 days for other regions). Contact <strong>0399922999</strong> for support if needed."
+  "how_to_buy_section4_content": "After placing an order, you’ll receive an order code via email or in the <strong>Orders</strong> section of your account. Track your delivery status (1-3 days for urban areas, 3-5 days for other regions). Contact <strong>0399922999</strong> for support if needed.",
+  "da_giao_hang": "Delivered",
+  "cho_xac_nhan": "Wait for confirmation",
+  "dang_chuan_bi": "Preparing",
+  "dang_van_chuyen": "Shipping",
+  "huy_don_hang": "Canceled",
+  "cho_xac_nhan_huy": "Wait for confirmation of cancellation"
 }

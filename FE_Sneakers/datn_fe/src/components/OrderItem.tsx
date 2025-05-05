@@ -81,6 +81,16 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, onCancel }) => {
             <strong>{t('recipient_address')}:</strong> {order.recipient_address || 'N/A'}
           </p>
           <p className='text-gray-700'>
+            <strong>{t('payment_method')}:</strong>{' '}
+            {order.payment_method === 'cod'
+              ? 'Thanh toán khi nhận hàng (COD)'
+              : order.payment_method === 'momo'
+                ? 'Momo'
+                : order.payment_method === 'vnpay'
+                  ? 'VNPay'
+                  : order.payment_method || 'N/A'}
+          </p>
+          <p className='text-gray-700'>
             <strong>{t('shipping_fee')}:</strong>{' '}
             {order.shipping_fee ? order.shipping_fee.toLocaleString('vi-VN') : '0'} VNĐ
           </p>
