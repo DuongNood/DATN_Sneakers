@@ -23,7 +23,8 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({ name: '', address: '', phone: '', image_user: null })
   const [errors, setErrors] = useState({ name: '', address: '', phone: '' })
 
-  const defaultImage = 'https://i.pinimg.com/474x/2a/f6/cd/2af6cde7dd1c03451c92bdd4deefedc6.jpg'
+  const defaultImage =
+    'https://scontent.fhan2-5.fna.fbcdn.net/v/t39.30808-6/470240080_9009879362413390_5192900267618503646_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHI8THUzzcDJWjGNYQJT8wCzKg5tMNo8SPMqDm0w2jxIwtZkgFSFD1W82UNZtunoCwcjro27A-XqZvSfFoFHPjn&_nc_ohc=-M4IIsHrYQ8Q7kNvwFrJ4Ag&_nc_oc=Adm2Bk-Rc_a649_4PdtnCtekqdYCSxk-yCHqkqtBEUO8SR5vMRZo6eJY6uMzm7MOZcc&_nc_zt=23&_nc_ht=scontent.fhan2-5.fna&_nc_gid=KPV37HOfG2XTbE0amiNBLg&oh=00_AfEfKTl_n5-AfKUiNWS74ijn8IMrJH82LO7gzf-q1xnC0g&oe=681E0564'
 
   const fetchUserData = async () => {
     try {
@@ -236,7 +237,7 @@ const ProfilePage = () => {
                   <img
                     src={defaultImage}
                     alt='Avatar'
-                    className='w-32 h-32 rounded-full object-cover mb-4 border-2 border-gray-300'
+                    className='w-[220px] h-[220px] object-cover mb-4 border-2 border-gray-300'
                   />
                   {/* <input
                     type="file"

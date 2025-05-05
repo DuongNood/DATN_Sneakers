@@ -264,7 +264,10 @@ const Header = () => {
             <div className='relative group'>
               <div className='w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer'>
                 <img
-                  src={user?.image_user || 'https://i.pinimg.com/474x/2a/f6/cd/2af6cde7dd1c03451c92bdd4deefedc6.jpg'}
+                  src={
+                    user?.image_user ||
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfPfNWu0z672Meac-8eA5zGt1T7Oj8scxiLw&s'
+                  }
                   alt='Avatar'
                   className='w-full h-full rounded-full object-cover'
                 />
