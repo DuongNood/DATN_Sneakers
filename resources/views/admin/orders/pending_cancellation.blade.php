@@ -47,8 +47,8 @@
                                             <button type="submit" class="btn btn-success btn-sm">Xác nhận</button>
                                         </form>
 
-                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                            data-target="#rejectModal{{ $order->id }}">
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#rejectModal{{ $order->id }}">
                                             Từ chối
                                         </button>
 
@@ -59,13 +59,10 @@
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="rejectModalLabel">Từ chối yêu cầu
                                                             hủy đơn hàng</h5>
-                                                        <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
                                                     </div>
-                                                    <form
-                                                        action="{{ route('admin.orders.reject_cancellation', $order) }}"
+                                                    <form action="{{ route('admin.orders.reject_cancellation', $order) }}"
                                                         method="POST">
                                                         @csrf
                                                         <div class="modal-body">
@@ -77,7 +74,7 @@
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Đóng</button>
+                                                                data-bs-dismiss="modal">Đóng</button>
                                                             <button type="submit" class="btn btn-primary">Xác nhận từ
                                                                 chối</button>
                                                         </div>
