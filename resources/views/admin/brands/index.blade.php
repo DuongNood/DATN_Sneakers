@@ -35,8 +35,8 @@
                                     <td>{{ $item->id }}</td>
                                     <td class="text-start">{{ $item->brand_name }}</td>
                                     <td>
-                                        <span class="badge {{ $item->status == 'inactive' ? 'bg-danger' : 'bg-success' }}">
-                                            {{ $item->status == 'inactive' ? 'Inactive' : 'Active' }}
+                                        <span class="badge {{ $item->status == '0' ? 'bg-danger' : 'bg-success' }}">
+                                            {{ $item->status == '0' ? 'Inactive' : 'Active' }}
                                         </span>
                                     </td>
                                     <td>
@@ -45,7 +45,7 @@
                                             <i class="mdi mdi-pencil"></i> Sửa
                                         </a>
 
-                                        <form action="{{ route('admin.brands.destroy', $item->id) }}" method="POST"
+                                        {{-- <form action="{{ route('admin.brands.destroy', $item->id) }}" method="POST"
                                             class="d-inline">
                                             @csrf
                                             @method('DELETE')
@@ -53,7 +53,7 @@
                                                 onclick="return confirm('Bạn có chắc chắn muốn xóa?')">
                                                 <i class="mdi mdi-delete"></i> Xóa
                                             </button>
-                                        </form>
+                                        </form> --}}
                                     </td>
                                 </tr>
                             @endforeach

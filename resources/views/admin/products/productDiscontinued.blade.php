@@ -25,15 +25,16 @@
                             <table class="table table-striped table-bordered table-hover table-sm">
                                 <thead>
                                     <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Product code</th>
-                                        <th scope="col">Product name</th>
-                                        <th scope="col">image</th>
-                                        <th scope="col">description</th>
-                                        <th scope="col">Category_id</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Is_show_home</th>
-                                        <th scope="col">Act</th>
+                                        <th scope="col">STT</th>
+                                        <th scope="col">Mã SP</th>
+                                        <th scope="col">Tên sản phẩm</th>
+                                        <th scope="col">Hình ảnh</th>
+                                        <th scope="col">Giá gốc (VND)</th>
+                                        <th scope="col">Giá khuyến mãi (VND)</th>
+                                        <th scope="col">Danh mục</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col">Hiển thị</th>
+                                        <th scope="col">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -42,8 +43,11 @@
                                             <th scope="row">{{$item->id}}</th>
                                             <td>{{$item->product_code}}</td>
                                             <td>{{$item->product_name}}</td>
-                                            <td><img src="{{Storage::url($item->image)}}" alt="" width="150px"></td>
-                                            <td>{{$item->description}}</td>
+                                            <td>
+                                                <img src="{{ $item->image ?? asset('images/default-product.png') }}" alt="Product Image" width="100px">
+                                            </td>
+                                            <td>{{$item->original_price}}</td>
+                                            <td>{{$item->discounted_price}}</td>                                        
                                             <td>{{$item->category->category_name}}</td>
                                             <td class="{{ $item->status == 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ $item->status == 0 ? 'Inactive' : 'Activate' }}
@@ -53,7 +57,10 @@
                                             </td>
                                             <td>
                                                 <a href="{{ route('admin.products.edit', $item->id) }}"><i
-                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>                                              
+                                                        class="mdi mdi-pencil text-muted fs-18 rounded-2 border p-1 me-1"></i></a>     
+                                                <a href="{{ route('admin.products.show', $item->id) }}" title="Xem chi tiết">
+                                                    <i class="mdi mdi-plus text-success fs-18 border p-1"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach

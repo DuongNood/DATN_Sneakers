@@ -32,10 +32,13 @@
             </div>
             <div class="col-lg-2 col-md-6">
                 <div class="input-group shadow-sm">
-                    <select name="status" class="form-select">
-                        <option value="">Chọn trạng thái</option>
-                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
-                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                    <select name="brand_id" class="form-select">
+                        <option value="">Chọn thương hiệu</option>
+                        @foreach ($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->brand_name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -114,7 +117,8 @@
             </div>
             {{-- Pagination --}}
             <div class="d-flex justify-content-center mt-3">
-                {{ $listProduct->links('pagination::bootstrap-5') }}
+                {{ $listProduct->appends(request()->query())->links('pagination::bootstrap-5') }}
+
             </div>
         </div>
     </div>

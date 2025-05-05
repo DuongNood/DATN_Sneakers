@@ -45,7 +45,7 @@ class BrandController extends Controller
             'description' => 'nullable',
         ]);
 
-        $params['status'] = isset($request->status) ? 'active' : 'inactive';
+        $params['status'] = isset($request->status) ? 1 : 0;
 
         Brand::create($params);
 
@@ -85,6 +85,7 @@ class BrandController extends Controller
         ]);
 
         $brand->update($params);
+         $brand->productBrand()->update(['status' => $params['status']]);
 
         return redirect()->route('admin.brands.index')->with('success', 'Cập nhật thương hiệu thành công!');
     }

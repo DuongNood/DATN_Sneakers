@@ -46,20 +46,21 @@ class ProductController extends Controller
             });
         }
 
-        // Xử lý lọc trạng thái (status: 0 = Inactive, 1 = Active)
-        if ($request->has('status') && in_array($request->status, ['0', '1'])) {
-            $query->where('status', $request->status);
-        }
+        
 
         // Lọc theo danh mục
         if ($request->has('category_id') && !empty($request->category_id)) {
             $query->where('category_id', $request->category_id);
         }
+        if ($request->has('brand_id') && !empty($request->brand_id)) {
+            $query->where('brand_id', $request->brand_id);
+        }
 
         $categories = Category::all();
+        $brands = Brand::where('status', true)->get();
         $listProduct = $query->where('status', true)->latest('id')->paginate(10);
 
-        return view('admin.products.index', compact('title', 'listProduct', 'categories'));
+        return view('admin.products.index', compact('title', 'listProduct', 'categories','brands'));
     }
 
     /**
@@ -70,7 +71,7 @@ class ProductController extends Controller
         //
         $title = "Product";
         $listCategories = Category::where('status', true)->get();
-        $listBrand = Brand::where('status', 'active')->get();
+        $listBrand = Brand::where('status', 1)->get();
         $size= ProductSize::get();
         return view('admin.products.create', compact('title', 'listCategories','listBrand','size'));
     }
@@ -188,7 +189,7 @@ class ProductController extends Controller
         $title = "Cap nhat San pham";
         $product = Product::find($id);
         $category = Category::where('status', true)->get();
-        $listBrand = Brand::where('status', 'active')->get();
+        $listBrand = Brand::where('status', true)->get();
         $size= ProductSize::get();
         $listVariant = ProductVariant::where('product_id', $id)->get();
         return view('admin.products.edit', compact('title', 'product', 'category','size','listBrand','listVariant'));
