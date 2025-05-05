@@ -36,7 +36,7 @@
                         <form action="{{ route('admin.brands.store') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="brand_name" class="form-label fw-semibold">Tên Danh Mục</label>
+                                <label for="brand_name" class="form-label fw-semibold">Tên thương hiệu</label>
                                 <input type="text" id="brand_name" name="brand_name"
                                     class="form-control @error('brand_name') is-invalid @enderror"
                                     value="{{ old('brand_name') }}" placeholder="Nhập tên thương hiệu">

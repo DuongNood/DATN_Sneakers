@@ -51,6 +51,15 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <div class="mb-3">
+                                        <label for="example-password" class="form-label"><strong>Trạng thái</strong></label>
+                                        <select class="form-select" aria-label="Default select example" name="status">
+                                            <option value="1" {{ $product->status == 1 ? 'selected' : '' }}>Hoạt động</option>
+                                            <option value="0" {{ $product->status == 0 ? 'selected' : '' }}>Ẩn</option>
+                                        </select>
+                                    </div>
+
                                     <div class="col-lg-3">
                                         <div class="mb-3">
                                             <label for="example-password" class="form-label">Category</label>
@@ -67,7 +76,7 @@
                                             <label for="example-password" class="form-label">Thương hiệu</label>
                                             <select class="form-select @error('brand_id') is-invalid @enderror" name="brand_id">
                                                 @foreach ($listBrand as $item)
-                                                    <option value="{{ $item->id }}" {{ old('brand_id') == $item->brand_id ? 'selected' : '' }}>
+                                                    <option value="{{ $item->id }}" {{ $item->id == $product->brand_id ? 'selected' : '' }}>
                                                         {{ $item->brand_name }}
                                                     </option>
                                                 @endforeach
@@ -83,10 +92,10 @@
                                             <label for="example-password" class="form-label">Giới tính</label>
                                             <select class="form-select @error('gender') is-invalid @enderror" name="gender">
 
-                                                    <option value="0" {{ old('gender') == $item->gender ? 'selected' : '' }}>
+                                                    <option value="0" {{ $product->gender == 0 ? 'selected' : '' }}>
                                                        Nữ
                                                     </option>
-                                                    <option value="1" {{ old('gender') == $item->gender ? 'selected' : '' }}>
+                                                    <option value="1" {{ $product->gender == 1 ? 'selected' : '' }}>
                                                         Nam
                                                     </option>
 
@@ -124,7 +133,7 @@
                                                                 @foreach ($size as $item)
                                                                     <option value="{{ $item->id }}"
                                                                         {{  old("product_variants.$key.product_size_id", $variant->product_size_id)
-                                                                            == $item->id ? 'selected' : '' }}>
+            == $item->id ? 'selected' : '' }}>
                                                                         {{ $item->name }}
                                                                     </option>
                                                                 @endforeach

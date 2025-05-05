@@ -13,9 +13,7 @@
                         <h5 class="mb-0">Chỉnh Sửa Thương Hiệu</h5>
                         <div class="card mt-3">
 
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Update brand</h5>
-                            </div><!-- end card header -->
+                            
 
                             {{-- <div class="card-body">
                                 <div class="row">
@@ -82,7 +80,7 @@
                                     @method('PUT')
 
                                     <div class="mb-3">
-                                        <label for="brand_name" class="form-label fw-semibold">Tên Danh Mục</label>
+                                        <label for="brand_name" class="form-label fw-semibold">Tên thương hiệu</label>
                                         <input type="text" id="brand_name" name="brand_name"
                                             class="form-control @error('brand_name') is-invalid @enderror"
                                             value="{{ old('brand_name', $brand->brand_name) }}"
@@ -98,13 +96,13 @@
                                         <div class="d-flex gap-3">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="status" id="active"
-                                                    value="1" {{ old('status', $brand->status) == 'active' ? 'checked' : '' }}>
+                                                    value="1" {{ old('status', $brand->status) == '1' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="active">Active</label>
                                             </div>
 
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="status" id="inactive"
-                                                    value="0" {{ old('status', $brand->status) == 'inactive' ? 'checked' : '' }}>
+                                                    value="0" {{ old('status', $brand->status) == '0' ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="inactive">Inactive</label>
                                             </div>
                                         </div>
