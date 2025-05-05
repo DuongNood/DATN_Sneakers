@@ -1,133 +1,162 @@
 import { useState, useEffect } from 'react'
-import TitleWithEffect3 from '../components/TitleProducSale'
+import { useTranslation } from 'react-i18next'
+import ProductCard from '../components/ProductCard'
+import Loading from '../components/Loading'
+import ReactPaginate from 'react-paginate'
 
 interface Product {
   id: number
-  name: string
-  price: string
-  salePrice: string
-  imageUrl: string
+  product_name: string
+  original_price: string
+  discounted_price: string
+  image: string
   rating: number
 }
 
 const ProductSale = () => {
+  const { t } = useTranslation()
   const [products, setProducts] = useState<Product[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 12
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [sortBy, setSortBy] = useState('default')
+  const [page, setPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const itemsPerPage = 5
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const data: Product[] = Array.from({ length: 30 }, (_, index) => ({
-        id: index + 1,
-        name: `Sản phẩm ${index + 1}`,
-        price: '1,200,000 đ',
-        salePrice: '700,000 đ',
-        imageUrl:
-          'https://kingshoes.vn/data/upload/thumb/fn7153-101-giay-nike-air-peg-2k5-phantom-and-coconut-milk-gia-tot-den-king-shoes-12jpeg/500_fn7153-101-giay-nike-air-peg-2k5-phantom-and-coconut-milk-gia-tot-den-king-shoes-12.jpeg.webp',
-        rating: 5
-      }))
-      setProducts(data)
+      try {
+        setLoading(true)
+        const response = await fetch('http://localhost:8000/api/home-products')
+        if (!response.ok) throw new Error(t('api_error'))
+        const data = await response.json()
+        const allProducts = Array.isArray(data) ? data : data.data || []
+
+        // Lọc sản phẩm có giảm giá >= 20%
+        const filtered = allProducts.filter((product: Product) => {
+          const originalPrice = Number(product.original_price)
+          const discountedPrice = Number(product.discounted_price)
+          if (isNaN(originalPrice) || isNaN(discountedPrice) || originalPrice <= 0) return false
+          const discountPercentage = ((originalPrice - discountedPrice) / originalPrice) * 100
+          return discountPercentage >= 20
+        })
+
+        setProducts(filtered)
+        setFilteredProducts(filtered)
+        setTotalPages(Math.ceil(filtered.length / itemsPerPage))
+      } catch (error: any) {
+        console.error('Error fetching products:', error)
+        setProducts([])
+        setFilteredProducts([])
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchProducts()
-  }, [])
+  }, [t])
 
-  // Hàm tính toán tỷ lệ giảm giá
-  const calculateDiscount = (price: string, salePrice: string): string => {
-    const originalPrice = parseFloat(price.replace(/[^0-9.-]+/g, ''))
-    const discountedPrice = parseFloat(salePrice.replace(/[^0-9.-]+/g, ''))
-    const discountPercentage = ((originalPrice - discountedPrice) / originalPrice) * 100
-    return discountPercentage.toFixed(0)
+  useEffect(() => {
+    // Sắp xếp sản phẩm khi sortBy thay đổi
+    let sortedProducts = [...products]
+    switch (sortBy) {
+      case 'price-asc':
+        sortedProducts.sort((a, b) => Number(a.discounted_price) - Number(b.discounted_price))
+        break
+      case 'price-desc':
+        sortedProducts.sort((a, b) => Number(b.discounted_price) - Number(a.discounted_price))
+        break
+      case 'newest':
+        sortedProducts.sort((a, b) => b.id - a.id) // Giả sử ID lớn hơn là sản phẩm mới hơn
+        break
+      default:
+        sortedProducts = [...products]
+    }
+    setFilteredProducts(sortedProducts)
+    setPage(0) // Reset về trang đầu khi thay đổi sắp xếp
+  }, [sortBy, products])
+
+  const handlePageChange = ({ selected }: { selected: number }) => {
+    setPage(selected)
   }
 
-  // Xử lý phân trang
-  const indexOfLastProduct = currentPage * itemsPerPage
-  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct)
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value)
+  }
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+  const getCurrentPageProducts = () => {
+    const start = page * itemsPerPage
+    const end = start + itemsPerPage
+    return filteredProducts.slice(start, end)
+  }
 
-  const totalPages = Math.ceil(products.length / itemsPerPage)
+  if (loading) {
+    return <Loading />
+  }
 
   return (
-    <div className=''>
-      <TitleWithEffect3 />
-      <div className='container mx-auto px-4 sm:px-8 md:px-16 my-12'>
-        <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
-          {currentProducts.map((product) => (
-            <div key={product.id} className='bg-white shadow-lg rounded-lg p-4 text-center relative'>
-              {product.salePrice && (
-                <div className='absolute top-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-tr-md z-10'>
-                  -{calculateDiscount(product.price, product.salePrice)}%
-                </div>
-              )}
+    <div className='min-h-screen bg-gray-50'>
+      {/* Banner Section */}
+      <div
+        className='relative h-[100px] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 shadow-lg'
+        style={{ margin: '0 190px' }}
+      >
+        <div className='absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px] opacity-20'></div>
+        <div className='absolute inset-0 flex items-center justify-center'>
+          <h1 className='text-3xl font-bold text-white tracking-wide'>
+            {t('sale_products')} <span className='text-yellow-300 ml-2'>({t('discount_20_percent')})</span>
+          </h1>
+        </div>
+      </div>
 
-              <div className='relative group'>
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className='w-full h-48 object-cover rounded-md mb-4 transition-all duration-300 ease-in-out'
-                />
-                <div className='absolute inset-0 bg-gradient-to-r from-transparent to-transparent group-hover:from-white group-hover:to-white opacity-30 transition-all duration-300 ease-in-out z-0' />
-              </div>
+      {/* Main Content */}
+      <div className='max-w-[1200px] mx-auto px-4 py-8'>
+        {/* Sort Section */}
+        <div className='mb-8 flex justify-start'>
+          <select
+            value={sortBy}
+            onChange={handleSortChange}
+            className='px-4 py-2 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-[200px]'
+          >
+            <option value='default'>{t('sort_by_default')}</option>
+            <option value='price-asc'>{t('sort_by_price_low_to_high')}</option>
+            <option value='price-desc'>{t('sort_by_price_high_to_low')}</option>
+            <option value='newest'>{t('sort_by_newest')}</option>
+          </select>
+        </div>
 
-              <h3 className='text-xl font-semibold mb-2'>{product.name}</h3>
-
-              <div className='flex justify-center items-center mb-2'>
-                <p className='text-gray-500 line-through text-sm mr-2'>{product.price}</p>
-                <p className='text-sm font-semibold text-red-500'>{product.salePrice}</p>
-              </div>
-
-              <div className='my-2'>
-                {Array.from({ length: 5 }, (_, index) => (
-                  <svg
-                    key={index}
-                    xmlns='http://www.w3.org/2000/svg'
-                    fill='yellow'
-                    viewBox='0 0 24 24'
-                    width='20'
-                    height='20'
-                    className='inline'
-                  >
-                    <path d='M12 .587l3.668 7.431 8.232 1.186-5.958 5.759 1.406 8.206-7.348-3.86-7.348 3.86 1.406-8.206-5.958-5.759 8.232-1.186z' />
-                  </svg>
-                ))}
-              </div>
+        {/* Products Grid */}
+        {filteredProducts.length === 0 ? (
+          <div className='text-center py-12'>
+            <h3 className='text-xl font-medium text-gray-600'>{t('no_products_found')}</h3>
+            <p className='text-gray-500 mt-2'>{t('try_different_filters')}</p>
+          </div>
+        ) : (
+          <>
+            <div className='flex flex-wrap gap-6 justify-center'>
+              {getCurrentPageProducts().map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Phân trang */}
-        <div className='flex justify-center mt-8'>
-          <button
-            onClick={() => paginate(currentPage - 1)}
-            className='px-4 py-2 mx-1 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50'
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-
-          {/* Hiển thị các số trang */}
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`px-4 py-2 mx-1 rounded-lg ${
-                currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-
-          <button
-            onClick={() => paginate(currentPage + 1)}
-            className='px-4 py-2 mx-1 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50'
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
+            {/* Pagination */}
+            <div className='mt-8 flex justify-center'>
+              <ReactPaginate
+                previousLabel='Previous'
+                nextLabel='Next'
+                pageCount={totalPages}
+                onPageChange={handlePageChange}
+                forcePage={page}
+                containerClassName='flex items-center gap-2'
+                pageClassName='px-3 py-1 rounded border hover:bg-gray-100'
+                previousClassName='px-3 py-1 rounded border hover:bg-gray-100'
+                nextClassName='px-3 py-1 rounded border hover:bg-gray-100'
+                activeClassName='!bg-blue-500 text-white border-blue-500'
+                disabledClassName='opacity-50 cursor-not-allowed'
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

@@ -7,7 +7,7 @@
   "language_changed_to_vi": "Switched to Vietnamese.",
   "language_changed_to_en": "Switched to English.",
   "home": "Home",
-  "products": "Products",
+  "products": "Brands",
   "men_shoes": "Men's Shoes",
   "women_shoes": "Women's Shoes",
   "sale": "Sale",
@@ -412,5 +412,8 @@
   "dang_chuan_bi": "Preparing",
   "dang_van_chuyen": "Shipping",
   "huy_don_hang": "Canceled",
-  "cho_xac_nhan_huy": "Wait for confirmation of cancellation"
+  "cho_xac_nhan_huy": "Wait for confirmation of cancellation",
+  "sale_products": "Sale Products",
+  "discount_20_percent": "20% off",
+  "api_error": "Serve Error"
 }

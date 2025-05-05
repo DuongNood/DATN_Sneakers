@@ -38,6 +38,7 @@ import CouponPopup from '../components/CouponPopup'
 import ReturnPolicy from '../components/Footer_Components/ReturnPolicy'
 import FAQ from '../components/Footer_Components/FAQ'
 import HowToBuy from '../components/Footer_Components/HowToBuy'
+import ProductByBrand from '../pages/ProductByBrand'
 
 const RoutesConfig = () => {
   return (
@@ -76,6 +77,7 @@ const RoutesConfig = () => {
         <Route path='/orders' element={<OrdersPage />} />
         <Route path='/payment' element={<Payment />} />
         <Route path='*' element={<NotFound />} />
+        <Route path='/productbybrand/:id' element={<ProductByBrand />} />
         <Route path='/search' element={<SearchResults />} />
         <Route path='/return-policy' element={<ReturnPolicy />} />
         <Route path='/faq' element={<FAQ />} />

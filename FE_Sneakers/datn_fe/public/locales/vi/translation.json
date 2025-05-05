@@ -7,7 +7,7 @@
   "language_changed_to_vi": "Đã chuyển sang Tiếng Việt.",
   "language_changed_to_en": "Đã chuyển sang Tiếng Anh.",
   "home": "Trang Chủ",
-  "products": "Sản Phẩm",
+  "products": "Thương Hiệu",
   "men_shoes": "Giày Nam",
   "women_shoes": "Giày Nữ",
   "sale": "Giảm Giá",
@@ -413,5 +413,9 @@
   "dang_chuan_bi": "Đang chuẩn bị",
   "dang_van_chuyen": "Đang vận chuyển",
   "huy_don_hang": "Đã huỷ hàng",
-  "cho_xac_nhan_huy": "Chờ xác nhận huỷ"
+  "cho_xac_nhan_huy": "Chờ xác nhận huỷ",
+
+  "sale_products": "Sản Phẩm Giảm Giá",
+  "discount_20_percent": "Giảm từ 20%",
+  "api_error": "Không thể tải dữ liệu từ server"
 }
