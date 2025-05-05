@@ -55,10 +55,7 @@ Route::prefix('admin')
             Route::resource('banners', BannerController::class);
         });
 
-        Route::middleware(['auth', 'permission:manage_banners'])->group(function () {
-            Route::get('chats', [ChatController::class, 'adminIndex'])->name('chats.index');
-        });
-        Route::middleware(['auth', 'permission:manage_banners'])->group(function () {
+        Route::middleware(['auth', 'permission:manage_comments'])->group(function () {
             Route::get('comments', [CommentController::class, 'adminIndex'])->name('comments.index');
         });
 
@@ -74,8 +71,12 @@ Route::prefix('admin')
             Route::resource('users', UserController::class);
         });
 
-        Route::middleware(['auth', 'permission:manage_users'])->group(function () {
+        Route::middleware(['auth', 'permission:manage_brands'])->group(function () {
             Route::resource('brands', BrandController::class);
+        });
+
+        Route::middleware(['auth', 'permission:manage_reviews'])->group(function () {
+            Route::get('review', [ReviewController::class, 'index'])->name('review.index');
         });
 
         Route::middleware(['auth', 'permission:manage_categories'])->group(function () {
@@ -83,7 +84,6 @@ Route::prefix('admin')
                 ->as('categories.')
                 ->group(function () {
                     Route::get('/', [CategoryController::class, 'index'])->name('index');
-
                     Route::get('create', [CategoryController::class, 'create'])->name('create');
                     Route::post('store', [CategoryController::class, 'store'])->name('store');
                     Route::get('{id}/edit', [CategoryController::class, 'edit'])->name('edit');
@@ -161,8 +161,6 @@ Route::prefix('admin')
                     Route::put('update', [SettingController::class, 'update'])->name('update');
                 });
         });
-
-        Route::get('review', [ReviewController::class, 'index'])->name('review.index');
     });
 
 // bình luận
