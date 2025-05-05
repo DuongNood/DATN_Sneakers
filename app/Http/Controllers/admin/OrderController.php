@@ -33,7 +33,7 @@ class OrderController extends Controller
         }
 
         // Lọc theo phương thức thanh toán (COD hoặc Online)
-        if ($request->has('payment_method') && in_array($request->payment_method, ['COD', 'Online'])) {
+        if ($request->has('payment_method') && in_array($request->payment_method, ['cod', 'momo' , 'vnpay'])) {
             $query->where('payment_method', $request->payment_method);
         }
 
