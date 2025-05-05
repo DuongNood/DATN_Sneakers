@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { useCart } from '../contexts/CartContext'
 import CommentsSection from '../components/CommentsSection'
+import { Helmet } from 'react-helmet'
 
 interface Product {
   id: number
@@ -409,220 +410,230 @@ const ProductDetail: React.FC = () => {
   }
 
   return (
-    <div className='container mx-auto px-2 sm:px-10 md:px-20 py-10 sm:py-20'>
-      <div className='flex flex-col md:flex-row gap-6'>
-        <div className='md:w-1/2 flex flex-col items-center'>
-          <div className='relative w-full h-[400px] max-w-xs sm:max-w-sm md:max-w-md overflow-hidden rounded-lg shadow-md transition-transform duration-400'>
-            <img
-              src={selectedImage || product.imageUrl}
-              alt={product.name}
-              className='w-full h-auto object-cover rounded-lg shadow-md transition-transform duration-300'
-              style={zoomStyle}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-          </div>
-          <div className='flex gap-2 mt-4 flex-wrap justify-center'>
-            {product.images.length > 0 ? (
-              product.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`${product.name} variant ${index + 1}`}
-                  onClick={() => handleImageClick(image)}
-                  className={`w-10 h-10 sm:w-20 sm:h-14 object-cover rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                    selectedImage === image ? 'border-red-500' : 'border-gray-300'
-                  } hover:border-red-500 hover:shadow-md`}
-                />
-              ))
-            ) : (
-              <p className='text-sm text-gray-500'>{t('no_images_to_display')}</p>
-            )}
-          </div>
-        </div>
-
-        <div className='md:w-1/2 px-[30px] md:px-0'>
-          <h1 className='text-xl sm:text-2xl font-bold'>{product.name}</h1>
-          <p className='text-green-600 text-sm mt-1'>{product.quantity ? t('in_stock') : t('out_of_stock')}</p>
-          <div className='flex flex-wrap gap-4 text-sm mt-1'>
-            {/* <span className='text-blue-500'>{t('brand', { brand: product.category.category_name })}</span> | */}
-            <span className='text-blue-500'>{t('product_code', { code: product.product_code })}</span>
-          </div>
-
-          <div className='mt-4 flex items-center gap-2'>
-            {product.original_price && (
-              <p className='text-base sm:text-lg text-gray-500 line-through'>
-                {Number(product.original_price).toLocaleString('vi-VN')}đ
-              </p>
-            )}
-            <p className='text-xl sm:text-2xl font-bold'>{Number(product.discounted_price).toLocaleString('vi-VN')}đ</p>
-            {product.original_price && Number(product.original_price) > Number(product.discounted_price) && (
-              <p className='text-sm text-white bg-red-500 px-2 rounded-md py-1'>
-                -
-                {Math.round(
-                  ((Number(product.original_price) - Number(product.discounted_price)) /
-                    Number(product.original_price)) *
-                    100
-                )}
-                %
-              </p>
-            )}
-          </div>
-
-          <div className='mt-4'>
-            <p className='text-sm font-semibold'>{t('select_shoe_size')}</p>
-            <div className='flex gap-2 mt-2 flex-wrap'>
-              {product.sizes.length > 0 ? (
-                product.sizes.map((sizeObj) => {
-                  const { size, quantity: sizeQuantity, product_size_id } = sizeObj
-                  const isAvailable = sizeQuantity > 0
-                  return (
-                    <button
-                      key={product_size_id}
-                      onClick={() => isAvailable && handleSizeClick(size, sizeQuantity, product_size_id)}
-                      disabled={!isAvailable}
-                      className={`w-10 h-10 rounded-full border flex items-center justify-center text-sm sm:text-base ${
-                        selectedSize === size
-                          ? 'border-blue-500 bg-blue-500 text-white'
-                          : isAvailable
-                            ? 'border-gray-300 hover:border-black hover:bg-gray-100'
-                            : 'border-gray-300 bg-gray-200 opacity-50 cursor-not-allowed'
-                      } transition`}
-                    >
-                      {size}
-                    </button>
-                  )
-                })
+    <>
+      <Helmet>
+        <title>Sản phẩm chi tiết - Pole Sneakers</title>
+        <meta name='description' content='Sản phẩm chi tiết Pole-Sneakers' />
+        <meta property='og:description' content='sản phẩm chi tiết Pole Sneakers.' />
+        <meta property='og:type' content='website' />
+      </Helmet>
+      <div className='container mx-auto px-2 sm:px-10 md:px-20 py-10 sm:py-20'>
+        <div className='flex flex-col md:flex-row gap-6'>
+          <div className='md:w-1/2 flex flex-col items-center'>
+            <div className='relative w-full h-[400px] max-w-xs sm:max-w-sm md:max-w-md overflow-hidden rounded-lg shadow-md transition-transform duration-400'>
+              <img
+                src={selectedImage || product.imageUrl}
+                alt={product.name}
+                className='w-full h-auto object-cover rounded-lg shadow-md transition-transform duration-300'
+                style={zoomStyle}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+              />
+            </div>
+            <div className='flex gap-2 mt-4 flex-wrap justify-center'>
+              {product.images.length > 0 ? (
+                product.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`${product.name} variant ${index + 1}`}
+                    onClick={() => handleImageClick(image)}
+                    className={`w-10 h-10 sm:w-20 sm:h-14 object-cover rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                      selectedImage === image ? 'border-red-500' : 'border-gray-300'
+                    } hover:border-red-500 hover:shadow-md`}
+                  />
+                ))
               ) : (
-                <p className='text-sm text-gray-500'>{t('no_sizes_available')}</p>
+                <p className='text-sm text-gray-500'>{t('no_images_to_display')}</p>
               )}
             </div>
           </div>
 
-          <div className='mt-4 flex items-center gap-2'>
-            <p className='text-sm font-semibold'>{t('quantity')}</p>
-            <input
-              type='number'
-              value={quantity}
-              onChange={handleQuantityChange}
-              min='1'
-              max={selectedSizeQuantity}
-              disabled={!selectedSize}
-              className='w-16 h-8 border rounded-md text-center text-base focus:outline-none focus:ring-2 focus:ring-blue-500'
-            />
-            <p className='text-sm text-gray-600'>
-              {selectedSize
-                ? t('products_available_for_size', { quantity: selectedSizeQuantity, size: selectedSize })
-                : t('please_select_size')}
-            </p>
-          </div>
-
-          <div className='mt-4 flex gap-4 flex-wrap'>
-            <button
-              onClick={handleAddToCart}
-              className='bg-yellow-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-yellow-600 transition text-sm sm:text-base flex items-center gap-2'
-            >
-              <FiShoppingCart />
-              {t('add_to_cart')}
-            </button>
-            <button
-              onClick={handleBuyNow}
-              className='bg-blue-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-blue-600 transition text-sm sm:text-base flex items-center gap-2'
-            >
-              <FiDollarSign />
-              {t('buy_now')}
-            </button>
-            <button
-              onClick={handleToggleFavorite}
-              className={`px-4 sm:px-6 py-2 rounded-md transition text-sm sm:text-base flex items-center gap-2 ${
-                isFavorite ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-red-500 text-white hover:bg-red-600'
-              }`}
-            >
-              <FiHeart className={isFavorite ? 'fill-current' : ''} />
-              {isFavorite ? t('remove_from_wishlist') : t('add_to_wishlist')}
-            </button>
-          </div>
-
-          <div className='mt-4'>
-            <p className='text-sm font-semibold'>{t('product_description')}</p>
-            <div className='text-sm text-gray-600 mt-1' dangerouslySetInnerHTML={{ __html: product.description }} />
-          </div>
-
-          <div className='mt-6 flex flex-col sm:flex-row gap-4'>
-            <div className='flex items-center gap-2'>
-              <FaBox className='text-red-500' />
-              <p className='text-sm'>{t('careful_packaging')}</p>
+          <div className='md:w-1/2 px-[30px] md:px-0'>
+            <h1 className='text-xl sm:text-2xl font-bold'>{product.name}</h1>
+            <p className='text-green-600 text-sm mt-1'>{product.quantity ? t('in_stock') : t('out_of_stock')}</p>
+            <div className='flex flex-wrap gap-4 text-sm mt-1'>
+              {/* <span className='text-blue-500'>{t('brand', { brand: product.category.category_name })}</span> | */}
+              <span className='text-blue-500'>{t('product_code', { code: product.product_code })}</span>
             </div>
-            <div className='flex items-center gap-2'>
-              <FaExchangeAlt className='text-red-500' />
-              <p className='text-sm'>{t('free_returns')}</p>
+
+            <div className='mt-4 flex items-center gap-2'>
+              {product.original_price && (
+                <p className='text-base sm:text-lg text-gray-500 line-through'>
+                  {Number(product.original_price).toLocaleString('vi-VN')}đ
+                </p>
+              )}
+              <p className='text-xl sm:text-2xl font-bold'>
+                {Number(product.discounted_price).toLocaleString('vi-VN')}đ
+              </p>
+              {product.original_price && Number(product.original_price) > Number(product.discounted_price) && (
+                <p className='text-sm text-white bg-red-500 px-2 rounded-md py-1'>
+                  -
+                  {Math.round(
+                    ((Number(product.original_price) - Number(product.discounted_price)) /
+                      Number(product.original_price)) *
+                      100
+                  )}
+                  %
+                </p>
+              )}
             </div>
-            <div className='flex items-center gap-2'>
-              <FaTruck className='text-red-500' />
-              <p className='text-sm'>{t('fast_delivery')}</p>
+
+            <div className='mt-4'>
+              <p className='text-sm font-semibold'>{t('select_shoe_size')}</p>
+              <div className='flex gap-2 mt-2 flex-wrap'>
+                {product.sizes.length > 0 ? (
+                  product.sizes.map((sizeObj) => {
+                    const { size, quantity: sizeQuantity, product_size_id } = sizeObj
+                    const isAvailable = sizeQuantity > 0
+                    return (
+                      <button
+                        key={product_size_id}
+                        onClick={() => isAvailable && handleSizeClick(size, sizeQuantity, product_size_id)}
+                        disabled={!isAvailable}
+                        className={`w-10 h-10 rounded-full border flex items-center justify-center text-sm sm:text-base ${
+                          selectedSize === size
+                            ? 'border-blue-500 bg-blue-500 text-white'
+                            : isAvailable
+                              ? 'border-gray-300 hover:border-black hover:bg-gray-100'
+                              : 'border-gray-300 bg-gray-200 opacity-50 cursor-not-allowed'
+                        } transition`}
+                      >
+                        {size}
+                      </button>
+                    )
+                  })
+                ) : (
+                  <p className='text-sm text-gray-500'>{t('no_sizes_available')}</p>
+                )}
+              </div>
+            </div>
+
+            <div className='mt-4 flex items-center gap-2'>
+              <p className='text-sm font-semibold'>{t('quantity')}</p>
+              <input
+                type='number'
+                value={quantity}
+                onChange={handleQuantityChange}
+                min='1'
+                max={selectedSizeQuantity}
+                disabled={!selectedSize}
+                className='w-16 h-8 border rounded-md text-center text-base focus:outline-none focus:ring-2 focus:ring-blue-500'
+              />
+              <p className='text-sm text-gray-600'>
+                {selectedSize
+                  ? t('products_available_for_size', { quantity: selectedSizeQuantity, size: selectedSize })
+                  : t('please_select_size')}
+              </p>
+            </div>
+
+            <div className='mt-4 flex gap-4 flex-wrap'>
+              <button
+                onClick={handleAddToCart}
+                className='bg-yellow-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-yellow-600 transition text-sm sm:text-base flex items-center gap-2'
+              >
+                <FiShoppingCart />
+                {t('add_to_cart')}
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className='bg-blue-500 text-white px-4 sm:px-6 py-2 rounded-md hover:bg-blue-600 transition text-sm sm:text-base flex items-center gap-2'
+              >
+                <FiDollarSign />
+                {t('buy_now')}
+              </button>
+              <button
+                onClick={handleToggleFavorite}
+                className={`px-4 sm:px-6 py-2 rounded-md transition text-sm sm:text-base flex items-center gap-2 ${
+                  isFavorite ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-red-500 text-white hover:bg-red-600'
+                }`}
+              >
+                <FiHeart className={isFavorite ? 'fill-current' : ''} />
+                {isFavorite ? t('remove_from_wishlist') : t('add_to_wishlist')}
+              </button>
+            </div>
+
+            <div className='mt-4'>
+              <p className='text-sm font-semibold'>{t('product_description')}</p>
+              <div className='text-sm text-gray-600 mt-1' dangerouslySetInnerHTML={{ __html: product.description }} />
+            </div>
+
+            <div className='mt-6 flex flex-col sm:flex-row gap-4'>
+              <div className='flex items-center gap-2'>
+                <FaBox className='text-red-500' />
+                <p className='text-sm'>{t('careful_packaging')}</p>
+              </div>
+              <div className='flex items-center gap-2'>
+                <FaExchangeAlt className='text-red-500' />
+                <p className='text-sm'>{t('free_returns')}</p>
+              </div>
+              <div className='flex items-center gap-2'>
+                <FaTruck className='text-red-500' />
+                <p className='text-sm'>{t('fast_delivery')}</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className='mt-12'>
-        <h2 className='text-xl sm:text-2xl font-bold mb-6'>{t('you_may_like')}</h2>
-        {suggestedLoading ? (
-          <SuggestedSkeleton />
-        ) : suggestedError ? (
-          <p className='text-red-600'>{suggestedError}</p>
-        ) : suggestedProducts.length > 0 ? (
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6'>
-            {suggestedProducts.map((suggestedProduct) => {
-              const discountPercentage =
-                suggestedProduct.original_price &&
-                Number(suggestedProduct.original_price) > Number(suggestedProduct.discounted_price)
-                  ? Math.round(
-                      ((Number(suggestedProduct.original_price) - Number(suggestedProduct.discounted_price)) /
-                        Number(suggestedProduct.original_price)) *
-                        100
-                    )
-                  : 0
+        <div className='mt-12'>
+          <h2 className='text-xl sm:text-2xl font-bold mb-6'>{t('you_may_like')}</h2>
+          {suggestedLoading ? (
+            <SuggestedSkeleton />
+          ) : suggestedError ? (
+            <p className='text-red-600'>{suggestedError}</p>
+          ) : suggestedProducts.length > 0 ? (
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6'>
+              {suggestedProducts.map((suggestedProduct) => {
+                const discountPercentage =
+                  suggestedProduct.original_price &&
+                  Number(suggestedProduct.original_price) > Number(suggestedProduct.discounted_price)
+                    ? Math.round(
+                        ((Number(suggestedProduct.original_price) - Number(suggestedProduct.discounted_price)) /
+                          Number(suggestedProduct.original_price)) *
+                          100
+                      )
+                    : 0
 
-              return (
-                <div
-                  key={suggestedProduct.id}
-                  className='border rounded-lg p-4 hover:shadow-lg transition cursor-pointer relative'
-                  onClick={() => navigate(`/${suggestedProduct.slug}`, { state: { id: suggestedProduct.id } })}
-                >
-                  {discountPercentage > 0 && (
-                    <div className='absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded'>
-                      -{discountPercentage}%
+                return (
+                  <div
+                    key={suggestedProduct.id}
+                    className='border rounded-lg p-4 hover:shadow-lg transition cursor-pointer relative'
+                    onClick={() => navigate(`/${suggestedProduct.slug}`, { state: { id: suggestedProduct.id } })}
+                  >
+                    {discountPercentage > 0 && (
+                      <div className='absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded'>
+                        -{discountPercentage}%
+                      </div>
+                    )}
+                    <img
+                      src={suggestedProduct.imageUrl}
+                      alt={suggestedProduct.name}
+                      className='w-full h-48 object-cover rounded-md mb-2'
+                    />
+                    <h3 className='text-sm font-semibold truncate'>{suggestedProduct.name}</h3>
+                    <div className='flex items-center gap-2 mt-1'>
+                      {suggestedProduct.original_price &&
+                        Number(suggestedProduct.original_price) > Number(suggestedProduct.discounted_price) && (
+                          <p className='text-sm text-gray-500 line-through'>
+                            {Number(suggestedProduct.original_price).toLocaleString('vi-VN')}đ
+                          </p>
+                        )}
+                      <p className='text-sm font-bold text-red-500'>
+                        {Number(suggestedProduct.discounted_price).toLocaleString('vi-VN')}đ
+                      </p>
                     </div>
-                  )}
-                  <img
-                    src={suggestedProduct.imageUrl}
-                    alt={suggestedProduct.name}
-                    className='w-full h-48 object-cover rounded-md mb-2'
-                  />
-                  <h3 className='text-sm font-semibold truncate'>{suggestedProduct.name}</h3>
-                  <div className='flex items-center gap-2 mt-1'>
-                    {suggestedProduct.original_price &&
-                      Number(suggestedProduct.original_price) > Number(suggestedProduct.discounted_price) && (
-                        <p className='text-sm text-gray-500 line-through'>
-                          {Number(suggestedProduct.original_price).toLocaleString('vi-VN')}đ
-                        </p>
-                      )}
-                    <p className='text-sm font-bold text-red-500'>
-                      {Number(suggestedProduct.discounted_price).toLocaleString('vi-VN')}đ
-                    </p>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-        ) : (
-          <p className='text-gray-600'>{t('no_suggested_products')}</p>
-        )}
-      </div>
+                )
+              })}
+            </div>
+          ) : (
+            <p className='text-gray-600'>{t('no_suggested_products')}</p>
+          )}
+        </div>
 
-      <CommentsSection productId={id} user={user} />
-    </div>
+        <CommentsSection productId={id} user={user} />
+      </div>
+    </>
   )
 }
 

@@ -320,21 +320,21 @@ const Checkout: React.FC = () => {
             <div className='space-y-4'>
               <div className='flex justify-between text-base text-gray-700'>
                 <span>{t('subtotal')}</span>
-                <span>₫{calculateSubtotal().toLocaleString('vi-VN')}</span>
+                <span>{calculateSubtotal().toLocaleString('vi-VN')} ₫</span>
               </div>
               <div className='flex justify-between text-base text-gray-700'>
                 <span>{t('shipping_fee')}</span>
-                <span>₫{shippingFee.toLocaleString('vi-VN')}</span>
+                <span>{shippingFee.toLocaleString('vi-VN')} ₫</span>
               </div>
               {couponDiscount > 0 && (
                 <div className='flex justify-between text-base text-green-600'>
                   <span>{t('discount')}</span>
-                  <span>-₫{couponDiscount.toLocaleString('vi-VN')}</span>
+                  <span> {couponDiscount.toLocaleString('vi-VN')} ₫</span>
                 </div>
               )}
               <div className='flex justify-between text-xl font-semibold text-gray-800 pt-4 border-t border-gray-200'>
                 <span>{t('total')}</span>
-                <span>₫{total.toLocaleString('vi-VN')}</span>
+                <span>{total.toLocaleString('vi-VN')} ₫</span>
               </div>
             </div>
           </div>

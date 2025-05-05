@@ -9,6 +9,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
+import { Helmet } from 'react-helmet'
 
 const schema = yup.object().shape({
   name: yup.string().required('name_required'),
@@ -59,151 +60,160 @@ const Register = () => {
       setIsLoading(false)
     }
   }
-  useEffect(() => {
-    // Thay đổi tiêu đề trang để tối ưu SEO nhé
-    document.title = 'Đăng kí - Pole-Sneakers'
+  // useEffect(() => {
+  //   // Thay đổi tiêu đề trang để tối ưu SEO nhé
+  //   document.title = 'Đăng kí - Pole-Sneakers'
 
-    // Thay đổi meta description
-    const metaDescription = document.querySelector('meta[name="description"]')
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'Đăng kí vào tài khoản của bạn để truy cập tất cả các tính năng.')
-    } else {
-      const newMeta = document.createElement('meta')
-      newMeta.name = 'description'
-      newMeta.content = 'đăng kí vào tài khoản của bạn để truy cập tất cả các tính năng.'
-      document.head.appendChild(newMeta)
-    }
-    const link = document.querySelector("link[rel='icon']")
-    if (link) {
-      link.setAttribute(
-        'href',
-        'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
-      )
-    } else {
-      const newLink = document.createElement('link')
-      newLink.rel = 'icon'
-      newLink.href = 'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
-      document.head.appendChild(newLink)
-    }
+  //   // Thay đổi meta description
+  //   const metaDescription = document.querySelector('meta[name="description"]')
+  //   if (metaDescription) {
+  //     metaDescription.setAttribute('content', 'Đăng kí vào tài khoản của bạn để truy cập tất cả các tính năng.')
+  //   } else {
+  //     const newMeta = document.createElement('meta')
+  //     newMeta.name = 'description'
+  //     newMeta.content = 'đăng kí vào tài khoản của bạn để truy cập tất cả các tính năng.'
+  //     document.head.appendChild(newMeta)
+  //   }
+  //   const link = document.querySelector("link[rel='icon']")
+  //   if (link) {
+  //     link.setAttribute(
+  //       'href',
+  //       'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
+  //     )
+  //   } else {
+  //     const newLink = document.createElement('link')
+  //     newLink.rel = 'icon'
+  //     newLink.href = 'https://caodang.fpt.edu.vn/wp-content/uploads/18198154_10208600482868814_3469513_n-234x375.png'
+  //     document.head.appendChild(newLink)
+  //   }
 
-    return () => {
-      document.title = 'Pole Sneakers'
-      const metaDescription = document.querySelector('meta[name="description"]')
-      if (metaDescription) {
-        metaDescription.setAttribute('content', 'Default description')
-      }
-    }
-  }, [])
+  //   return () => {
+  //     document.title = 'Pole Sneakers'
+  //     const metaDescription = document.querySelector('meta[name="description"]')
+  //     if (metaDescription) {
+  //       metaDescription.setAttribute('content', 'Default description')
+  //     }
+  //   }
+  // }, [])
+
   return (
-    <div className='flex justify-center items-center min-h-screen bg-gray-100 px-4'>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeInOut' }}
-        className='w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl bg-white shadow-lg rounded-lg p-6 sm:p-8'
-      >
-        <h2 className='text-2xl font-semibold text-gray-800 mb-6 text-center'>{t('register')}</h2>
+    <>
+      <Helmet>
+        <title>Đăng ký tài khoản - Pole Sneakers</title>
+        <meta name='description' content='Đăng ký tài khoản Pole-Sneakers' />
+        <meta property='og:description' content='Đăng ký tài khoản Pole Sneakers.' />
+        <meta property='og:type' content='website' />
+      </Helmet>
+      <div className='flex justify-center items-center min-h-screen bg-gray-100 px-4'>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
+          className='w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl bg-white shadow-lg rounded-lg p-6 sm:p-8'
+        >
+          <h2 className='text-2xl font-semibold text-gray-800 mb-6 text-center'>{t('register')}</h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
-          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-            <label className='block text-sm font-medium text-gray-700'>{t('name')}</label>
-            <input
-              {...register('name')}
-              type='text'
-              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder={t('name_placeholder') || 'Enter your full name'}
-            />
-            {errors.name && <p className='text-red-500 text-sm'>{t(errors.name.message)}</p>}
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-            <label className='block text-sm font-medium text-gray-700'>{t('email')}</label>
-            <input
-              {...register('email')}
-              type='email'
-              className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-              placeholder={t('email_placeholder')}
-            />
-            {errors.email && <p className='text-red-500 text-sm'>{t(errors.email.message)}</p>}
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-            <label className='block text-sm font-medium text-gray-700'>{t('password')}</label>
-            <div className='relative'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
+            <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
+              <label className='block text-sm font-medium text-gray-700'>{t('name')}</label>
               <input
-                {...register('password')}
-                type={showPassword ? 'text' : 'password'}
+                {...register('name')}
+                type='text'
                 className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-                placeholder={t('password_placeholder')}
+                placeholder={t('name_placeholder') || 'Enter your full name'}
               />
-              <button
-                type='button'
-                className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700'
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
-              </button>
-            </div>
-            {errors.password && <p className='text-red-500 text-sm'>{t(errors.password.message)}</p>}
-          </motion.div>
+              {errors.name && <p className='text-red-500 text-sm'>{t(errors.name.message)}</p>}
+            </motion.div>
 
-          <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-            <label className='block text-sm font-medium text-gray-700'>{t('confirm_password')}</label>
-            <div className='relative'>
+            <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
+              <label className='block text-sm font-medium text-gray-700'>{t('email')}</label>
               <input
-                {...register('confirmPassword')}
-                type={showConfirmPassword ? 'text' : 'password'}
+                {...register('email')}
+                type='email'
                 className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
-                placeholder={t('confirm_password_placeholder')}
+                placeholder={t('email_placeholder')}
               />
-              <button
-                type='button'
-                className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700'
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
-              </button>
-            </div>
-            {errors.confirmPassword && <p className='text-red-500 text-sm'>{t(errors.confirmPassword.message)}</p>}
-          </motion.div>
+              {errors.email && <p className='text-red-500 text-sm'>{t(errors.email.message)}</p>}
+            </motion.div>
 
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ duration: 0.3 }}
-            type='submit'
-            disabled={isLoading}
-            className={`w-full bg-blue-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition flex items-center justify-center ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {isLoading ? (
-              <svg
-                className='animate-spin h-5 w-5 mr-2 text-white'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-              >
-                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                ></path>
-              </svg>
-            ) : null}
-            {isLoading ? t('registering') : t('register_button')}
-          </motion.button>
-        </form>
+            <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
+              <label className='block text-sm font-medium text-gray-700'>{t('password')}</label>
+              <div className='relative'>
+                <input
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
+                  placeholder={t('password_placeholder')}
+                />
+                <button
+                  type='button'
+                  className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700'
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+                </button>
+              </div>
+              {errors.password && <p className='text-red-500 text-sm'>{t(errors.password.message)}</p>}
+            </motion.div>
 
-        <p className='text-gray-600 mt-6 text-center text-sm'>
-          {t('have_account')}{' '}
-          <Link to='/login' className='text-blue-500 hover:underline'>
-            {t('login')}
-          </Link>
-        </p>
-      </motion.div>
-    </div>
+            <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
+              <label className='block text-sm font-medium text-gray-700'>{t('confirm_password')}</label>
+              <div className='relative'>
+                <input
+                  {...register('confirmPassword')}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className='w-full mt-1 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition'
+                  placeholder={t('confirm_password_placeholder')}
+                />
+                <button
+                  type='button'
+                  className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700'
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className='text-red-500 text-sm'>{t(errors.confirmPassword.message)}</p>}
+            </motion.div>
+
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.3 }}
+              type='submit'
+              disabled={isLoading}
+              className={`w-full bg-blue-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition flex items-center justify-center ${
+                isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isLoading ? (
+                <svg
+                  className='animate-spin h-5 w-5 mr-2 text-white'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                >
+                  <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                  <path
+                    className='opacity-75'
+                    fill='currentColor'
+                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                  ></path>
+                </svg>
+              ) : null}
+              {isLoading ? t('registering') : t('register_button')}
+            </motion.button>
+          </form>
+
+          <p className='text-gray-600 mt-6 text-center text-sm'>
+            {t('have_account')}{' '}
+            <Link to='/login' className='text-blue-500 hover:underline'>
+              {t('login')}
+            </Link>
+          </p>
+        </motion.div>
+      </div>
+    </>
   )
 }
 

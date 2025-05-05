@@ -16,8 +16,7 @@ const PurchaseNotification = () => {
       buyerName: 'Bùi Lê Hoàng Anh',
       productName: "Giày Onitsuka Tiger Runspark 'White Silver'",
       productCode: '1183B480-104',
-      imageUrl:
-        'https://scontent.fhan2-4.fna.fbcdn.net/v/t39.30808-6/482022875_629774439804638_5144918694120527923_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeEvOhuKWRVHXFN9JBWxcJTh1_t8k_MqJWfX-3yT8yolZ0MhiCSvnh2xKfyVFnpxwCjGJ1vpUDP2xU7BrcFY_zEG&_nc_ohc=6w-7gkLhURkQ7kNvwGAja-J&_nc_oc=AdlWbPmwzN_6v3V1tVKWBzJ7sHiJuoCRcyWKEYOYn_Dz5aYLbE47x2oz4w_EynrVVFU&_nc_zt=23&_nc_ht=scontent.fhan2-4.fna&_nc_gid=Xu6C_5dLes7rtqcNN7VHkA&oh=00_AfF_6cYUdYmQZwz7x-jl9iVddFgInTleLMKuDKU1qKBRnw&oe=680D4E22', // Thay bằng URL ảnh thực tế
+      imageUrl: 'https://instandeebinhthanh.com/wp-content/uploads/2024/11/hinh-anh-meme-878x1024.jpg', // Thay bằng URL ảnh thực tế
       timeAgo: '20 phút trước'
     },
     {
@@ -26,7 +25,7 @@ const PurchaseNotification = () => {
       productName: 'Giày Nike Air Max 270',
       productCode: 'AH8050-005',
       imageUrl:
-        'https://scontent.fhan2-4.fna.fbcdn.net/v/t39.30808-6/480919772_618912754224140_4071766667382725914_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeFpQaFjRTytxlQh__ExW3HtWJ00j9iGteJYnTSP2Ia14gr_z7T0jPnT7jsxNm6oJpRCu9_6cL0_1FLB7MerEeIk&_nc_ohc=iErft5bQFrgQ7kNvwHck3Zh&_nc_oc=Adla7SUyh_T9-Wv1prsd32VbDUig5FH-K1BXaSJRh3v5Vkf2Y8VJgsxBM622zeLn7Qg&_nc_zt=23&_nc_ht=scontent.fhan2-4.fna&_nc_gid=wrDwIdsJfKSr7qmXpw5I_g&oh=00_AfHaAGIvz2snMdHL_LuXVYALE6r8yfcMqkj9bMh1R38UGQ&oe=680D4A9C',
+        'https://image.dienthoaivui.com.vn/x,webp,q90/https://dashboard.dienthoaivui.com.vn/uploads/dashboard/editor_upload/anh-meme-15.jpg',
       timeAgo: '15 phút trước'
     },
     {
@@ -35,16 +34,15 @@ const PurchaseNotification = () => {
       productName: 'Giày Adidas Ultraboost 21',
       productCode: 'FY0378',
       imageUrl:
-        'https://scontent.fhan2-3.fna.fbcdn.net/v/t39.30808-6/476955548_615781651203917_6796695433879999204_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeHCsxSQXslfWkdxHIAhN27mnFRBU7yCBgmcVEFTvIIGCS8MSBNZw7r1rjaiYHuGbsQsDniyVnc2W58AUCORoegI&_nc_ohc=u4WO8pqxIpIQ7kNvwHUpqD_&_nc_oc=AdnhWAr6ZUeDtqAQKjbyV5Gy8OQrsYpbb5eF-X31rMBnofNWhFg0fUkZVtdOq__NMog&_nc_zt=23&_nc_ht=scontent.fhan2-3.fna&_nc_gid=4GdlqVNO0LKfR-G1HS5kuA&oh=00_AfGnMla9JJebwma_E39h6TjZcjoMdC7n4QE_xU1Jye_OQQ&oe=680D618D',
+        'https://cdn-i.vtcnews.vn/resize/th/upload/2024/11/01/4651573671221205678945064353380396882975175287n-14171688.png',
       timeAgo: '10 phút trước'
     },
     {
       id: 4,
-      buyerName: 'Hoàng Em Bùi LÊ',
+      buyerName: 'Hoàng Em Bùi Lê',
       productName: 'Giày Puma RS-X3',
       productCode: '374665-01',
-      imageUrl:
-        'https://scontent.fhan2-4.fna.fbcdn.net/v/t39.30808-6/481666033_623215200460562_1341137909980728360_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=110&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeHciWly1rxbraqPpcQkWuRQXHmPUuGz2GdceY9S4bPYZ0DC8ar3MoIYqVWINX-Jch9Ep40HUza6AE_8eeGAbs2u&_nc_ohc=q3selpd_sOcQ7kNvwF0-ptD&_nc_oc=AdnqA41-v-6gJ2PugfcmqyxUD1j1W8yf9aFwQAmffw_sZEYflN5AcwsSrGo1mOc-PQw&_nc_zt=23&_nc_ht=scontent.fhan2-4.fna&_nc_gid=30n9iZyYTCRtpFv4TFoIJQ&oh=00_AfFG9Ev8bYCybdg0pE97osju2dAjOm5XkEjvKtJ8WFXKJw&oe=680D667A',
+      imageUrl: 'https://img7.thuthuatphanmem.vn/uploads/2023/08/26/meme-em-be-han-quoc-sieu-hai-huoc_023718487.jpg',
       timeAgo: '5 phút trước'
     }
   ]
@@ -86,7 +84,7 @@ const PurchaseNotification = () => {
 
           <div className='flex-1'>
             <p className='text-sm font-semibold text-gray-800'>{currentNotification.buyerName}</p>
-            <p className='text-xs text-gray-500'>vừa mua</p>
+            <p className='text-xs text-gray-500'>Đã mua</p>
             <p className='text-sm font-semibold text-gray-800'>
               {currentNotification.productName} {currentNotification.productCode}
             </p>
