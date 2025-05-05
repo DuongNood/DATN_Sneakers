@@ -31,7 +31,7 @@ class HomeController extends Controller
         ]);
     }
     public function getBrands(){
-        $brands = Brand::where('status', 'active')->get();
+        $brands = Brand::where('status', true)->get();
         return response()->json([
             'success' => true,
             'data' => $brands
