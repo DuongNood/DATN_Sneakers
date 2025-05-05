@@ -230,7 +230,7 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'product_variant_id' => $productVariant->id,
                 'quantity' => $request->quantity,
-                'price' => $price,
+                'price' => $totalPriceBeforeDiscount,
             ]);
 
             // Giảm tồn kho ngay lập tức
