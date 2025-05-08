@@ -1,0 +1,33 @@
+/* Thêm border dưới các tab khi chúng được chọn */
+.tab-button {
+    border: none; /* Không có border mặc định */
+    position: relative; /* Để thêm đường gạch dưới */
+    padding-bottom: 10px; /* Khoảng cách dưới cùng */
+  }
+  
+  .tab-button:focus {
+    outline: none; /* Xóa outline khi tab được chọn */
+  }
+  
+  .tab-button.btn-success {
+    color: white; /* Màu chữ trắng khi tab được chọn */
+    background-color: #28a745; /* Màu nền khi tab được chọn */
+  }
+  
+  .tab-button.btn-outline-secondary {
+    color: #555; /* Màu chữ mặc định khi tab không được chọn */
+    background-color: transparent; /* Màu nền trong suốt khi tab không được chọn */
+    border-color: #ddd; /* Màu viền khi tab không được chọn */
+  }
+  
+  /* Thêm đường gạch dưới cho tab đang được chọn */
+  .tab-button.btn-success::after {
+    content: ''; 
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #28a745; /* Màu của đường gạch dưới */
+  }
+  
