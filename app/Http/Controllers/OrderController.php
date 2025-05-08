@@ -230,11 +230,29 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'product_variant_id' => $productVariant->id,
                 'quantity' => $request->quantity,
-                'price' => $price,
+                'price' => $totalPriceBeforeDiscount,
             ]);
 
             // Giảm tồn kho ngay lập tức
             $productVariant->decrement('quantity', $request->quantity);
+
+            // Xóa sản phẩm khỏi giỏ hàng nếu có
+            $cart = Cart::where('user_id', $user->id)->first();
+            if ($cart) {
+                $cartItem = CartItem::where('cart_id', $cart->id)
+                    ->where('product_id', $product->id)
+                    ->where('product_size_id', $request->product_size_id)
+                    ->first();
+
+                if ($cartItem) {
+                    $cartItem->delete();
+                }
+
+                // Nếu giỏ hàng trống, xóa giỏ hàng
+                if (!CartItem::where('cart_id', $cart->id)->exists()) {
+                    $cart->delete();
+                }
+            }
 
             return response()->json([
                 'message' => 'Đặt hàng thành công!',

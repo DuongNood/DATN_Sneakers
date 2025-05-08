@@ -63,7 +63,7 @@
                                 <th scope="col">Địa chỉ</th>
                                 <th scope="col">Vai trò</th>
                                 <th scope="col">Thời gian tạo</th>
-                                <th scope="col">Hành động</th>
+                                {{-- <th scope="col">Hành động</th> --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -80,7 +80,7 @@
                                     <td>{{ $user->address }}</td>
                                     <td>{{ $user->role->name }}</td>
                                     <td>{{ $user->created_at->format('d-m-Y H:i') }}</td>
-                                    <td class="">
+                                    {{-- <td class="">
                                         @if (Auth::user()->role->id === 1 && $user->role->id !== 1)
                                             <form action="{{ route('admin.users.destroy', $user) }}" method="post"
                                                   class="d-inline">
@@ -102,7 +102,7 @@
                                                 </button>
                                             </form>
                                         @endif
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @endforeach
                         </tbody>

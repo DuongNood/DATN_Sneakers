@@ -5,7 +5,7 @@
 
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">{{$title}}</h4>
+                <h4 class="fs-18 fw-semibold m-0">Cập nhật sản phẩm</h4>
             </div>
         </div>
 
@@ -19,14 +19,14 @@
                             @method('PUT')
                             <div class="row">                                
                                     <div class="mb-3">
-                                        <label for="simpleinput" class="form-label">Product code</label>
+                                        <label for="simpleinput" class="form-label"><strong>Mã sản phẩm</strong> </label>
                                         <input type="text" id="simpleinput" class="form-control" name="product_code" value="{{$product->product_code}}">
                                         @error('product_code')
                                             <p class="text-danger">{{ $message }}</p>
                                         @enderror
                                     </div>
                                     <div class="mb-3">
-                                        <label for="example-email" class="form-label">Product name</label>
+                                        <label for="example-email" class="form-label"><strong>Tên sản phẩm</strong> </label>
                                         <input type="text" id="example-email" class="form-control  @error('product_name')
                                         is-invalid @enderror" name="product_name" value="{{$product->product_name}}">
                                         @error('product_name')
@@ -35,7 +35,7 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="example-email" class="form-label">Original price</label>
+                                        <label for="example-email" class="form-label"><strong>Giá</strong></label>
                                         <input type="number" id="example-email" class="form-control @error('original_price') is-invalid @enderror"
                                             name="original_price" value="{{$product->original_price}}">
                                         @error('original_price')
@@ -44,7 +44,7 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="example-email" class="form-label">Discounted price</label>
+                                        <label for="example-email" class="form-label"><strong>Giá khuyến mãi</strong></label>
                                         <input type="number" id="example-email" class="form-control @error('discounted_price') is-invalid @enderror"
                                             name="discounted_price" value="{{$product->discounted_price}}">
                                         @error('discounted_price')
@@ -62,7 +62,7 @@
 
                                     <div class="col-lg-3">
                                         <div class="mb-3">
-                                            <label for="example-password" class="form-label">Category</label>
+                                            <label for="example-password" class="form-label"><strong>Danh Mục</strong></label>
                                             <select class="form-select" aria-label="Default select example" name="category_id">
                                                 @foreach ($category as $item)
                                                     <option value="{{$item->id}}" {{ $item->id == $product->category_id ? 'selected' : '' }}>{{$item->category_name}}</option>
@@ -73,7 +73,7 @@
 
                                     <div class="col-lg-3">
                                         <div class="mb-3">
-                                            <label for="example-password" class="form-label">Thương hiệu</label>
+                                            <label for="example-password" class="form-label"><strong>Thương hiệu</strong></label>
                                             <select class="form-select @error('brand_id') is-invalid @enderror" name="brand_id">
                                                 @foreach ($listBrand as $item)
                                                     <option value="{{ $item->id }}" {{ $item->id == $product->brand_id ? 'selected' : '' }}>
@@ -89,7 +89,7 @@
 
                                     <div class="col-lg-3">
                                         <div class="mb-3">
-                                            <label for="example-password" class="form-label">Giới tính</label>
+                                            <label for="example-password" class="form-label"><strong>Giới tính</strong></label>
                                             <select class="form-select @error('gender') is-invalid @enderror" name="gender">
 
                                                     <option value="0" {{ $product->gender == 0 ? 'selected' : '' }}>
@@ -107,7 +107,7 @@
                                     </div>
                                     <div class="col-lg-3">
                                         <div class="mb-3">
-                                            <label for="example-password" class="form-label">Is show home</label>
+                                            <label for="example-password" class="form-label"><strong>Hiển thị trang chủ</strong></label>
                                             <select class="form-select" aria-label="Default select example" name="is_show_home">
                                                 <option value="1">Display</option>
                                                 <option value="0">Hide</option>
@@ -127,9 +127,9 @@
                                                 <div class="variant-row row align-items-end mb-3">    
                                                     @foreach ($listVariant as $key => $variant)                                                                                                                             
                                                         <div class="col-md-1 mb-1">
-                                                            <label for="simpleinput" class="form-label">Size</label>
+                                                            <label for="simpleinput" class="form-label"><strong>Size</strong></label>
                                                             <select class="form-select"
-                                                                name="product_variants[{{ $key }}][product_size_id]">
+                                                                disabled>
                                                                 @foreach ($size as $item)
                                                                     <option value="{{ $item->id }}"
                                                                         {{  old("product_variants.$key.product_size_id", $variant->product_size_id)
@@ -138,11 +138,12 @@
                                                                     </option>
                                                                 @endforeach
                                                             </select>
+                                                            <input type="hidden" name="product_variants[{{ $key }}][product_size_id]" value="{{ $variant->product_size_id }}">
                                                         </div>
 
                                                         <div class="col-md-2 mb-1">
                                                             <label for="simpleinput"
-                                                                class="form-label">Quantity</label>
+                                                                class="form-label"><strong>Quantity</strong></label>
                                                             <input type="number" class="form-control"
                                                                 name="product_variants[{{ $key }}][quantity]"
                                                                 value="{{ old("product_variants.$key.quantity", $variant->quantity) }}"
@@ -157,6 +158,9 @@
                                                         </div> --}}
                                                     @endforeach
                                                 </div>
+                                                @if ($errors->has('product_variants'))
+                                                    <div class="text-danger">{{ $errors->first('product_variants') }}</div>
+                                                @endif
 
                                         </div>
 
@@ -167,25 +171,25 @@
 
 
                                     <div class="mb-3">
-                                        <label for="mo_ta_ngan" class="form-label">Description</label> <br>
+                                        <label for="mo_ta_ngan" class="form-label"><strong>Mô tả</strong></label> <br>
                                         <div id="quill-editor" style="height: 400px;">
                                         </div>
                                         <textarea name="description" id="editor_content" class="d-none">{{$product->description}}</textarea>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="mo_ta_ngan" class="form-label">Hưỡng dẫn bảo quản giày</label> <br>
+                                        <label for="mo_ta_ngan" class="form-label"><strong>Hưỡng dẫn bảo quản giày</strong></label> <br>
                                         <div id="quill-editor1" style="height: 400px;">
                                         </div>
                                         <textarea name="care_instructions" id="editor_content1" class="d-none">{{$product->care_instructions}}</textarea>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="image" class="form-label">Image</label>
+                                        <label for="image" class="form-label"><strong>Hình ảnh</strong></label>
                                         <input type="file" id="image" name="image" class="form-control"
                                             onchange="showIamge(event)">
                                         <img id="img_product" src="{{$product->image}}" alt="hinh anh" style="width:150px">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="hinh_anh" class="form-label">Album product</label>
+                                        <label for="hinh_anh" class="form-label"><strong>Album sản phẩm</strong></label>
                                         <i id="add-row" class="mdi mdi-plus text-muted fs-18 rounded-2 border ms-3 p-1"
                                             style="cursor: pointer"></i>
                                         <table class="table align-middle table-nowrap mb-0">

@@ -33,7 +33,7 @@ class OrderController extends Controller
         }
 
         // Lọc theo phương thức thanh toán (COD hoặc Online)
-        if ($request->has('payment_method') && in_array($request->payment_method, ['COD', 'Online'])) {
+        if ($request->has('payment_method') && in_array($request->payment_method, ['cod', 'momo' , 'vnpay'])) {
             $query->where('payment_method', $request->payment_method);
         }
 
@@ -167,7 +167,7 @@ class OrderController extends Controller
     {
         $data = Order::with('user')
             ->where('status', Order::HUY_DON_HANG)
-            ->orderBy('updated_at', 'asc')
+            ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
         return view('admin.orders.order_cancellation', compact('data'));

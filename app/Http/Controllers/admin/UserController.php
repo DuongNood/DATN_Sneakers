@@ -133,27 +133,27 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
-    {
-        $currentUser = Auth::user();
+    // public function destroy(User $user)
+    // {
+    //     $currentUser = Auth::user();
 
-        // Kiểm tra quyền truy cập
-        if (!$currentUser->hasPermission('manage_users')) {
-            return response()->json(['message' => 'Bạn không có quyền xóa người dùng.'], 403);
-        }
+    //     // Kiểm tra quyền truy cập
+    //     if (!$currentUser->hasPermission('manage_users')) {
+    //         return response()->json(['message' => 'Bạn không có quyền xóa người dùng.'], 403);
+    //     }
 
-        // Kiểm tra vai trò của user cần xóa
-        if ($currentUser->role->id === 1 && $user->role->id === 1) {
-            return response()->json(['message' => 'Bạn không thể xóa tài khoản Admin.'], 403);
-        }
+    //     // Kiểm tra vai trò của user cần xóa
+    //     if ($currentUser->role->id === 1 && $user->role->id === 1) {
+    //         return response()->json(['message' => 'Bạn không thể xóa tài khoản Admin.'], 403);
+    //     }
 
-        if ($currentUser->role->id === 2 && $user->role->id !== 3) {
-            return response()->json(['message' => 'Bạn chỉ có thể xóa tài khoản User thường.'], 403);
-        }
+    //     if ($currentUser->role->id === 2 && $user->role->id !== 3) {
+    //         return response()->json(['message' => 'Bạn chỉ có thể xóa tài khoản User thường.'], 403);
+    //     }
 
-        // Xóa user (xóa mềm)
-        $user->delete();
+    //     // Xóa user (xóa mềm)
+    //     $user->delete();
 
-        return response()->json(['message' => 'Xóa người dùng thành công.']);
-    }
+    //     return response()->json(['message' => 'Xóa người dùng thành công.']);
+    // }
 }

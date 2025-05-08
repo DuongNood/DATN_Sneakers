@@ -18,6 +18,7 @@ use App\Http\Requests\ProductRequest;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -295,6 +296,12 @@ class ProductController extends Controller
 
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
+        } catch (ValidationException $e) {
+        // Nếu có lỗi validate (như trùng size), trả về và hiển thị lại form cùng lỗi
+        return redirect()->back()
+            ->withErrors($e->errors())
+            ->withInput();
+    
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Lỗi khi cập nhật sản phẩm: ' . $e->getMessage());
@@ -320,35 +327,48 @@ class ProductController extends Controller
         return pathinfo($filename, PATHINFO_FILENAME);
     }
 
-    private function handleProductVariants(Request $request, Product $product)
-    {
-        $validatedData = $request->validate([
-            'product_variants' => 'required|array',
-            'product_variants.*.product_size_id' => 'required|exists:product_sizes,id',
-            'product_variants.*.quantity' => 'required|integer|min:0',
-            'product_variants.*.status' => 'nullable|in:0,1'
-        ], [
-            'product_variants.required' => 'Danh sách biến thể không được để trống!',
-            'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có product_size_id!',
-            'product_variants.*.product_size_id.exists' => 'Product size không hợp lệ!',
-            'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
-            'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
-            'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
-        ]);
+   private function handleProductVariants(Request $request, Product $product)
+{
+    $validatedData = $request->validate([
+        'product_variants' => 'required|array',
+        'product_variants.*.product_size_id' => 'required|exists:product_sizes,id',
+        'product_variants.*.quantity' => 'required|integer|min:0',
+        'product_variants.*.status' => 'nullable|in:0,1'
+    ], [
+        'product_variants.required' => 'Danh sách biến thể không được để trống!',
+        'product_variants.*.product_size_id.required' => 'Mỗi biến thể phải có product_size_id!',
+        'product_variants.*.product_size_id.exists' => 'Product size không hợp lệ!',
+        'product_variants.*.quantity.required' => 'Số lượng là bắt buộc!',
+        'product_variants.*.quantity.integer' => 'Số lượng phải là số nguyên!',
+        'product_variants.*.status.in' => 'Trạng thái chỉ được là 0 hoặc 1!',
+    ]);
 
-        foreach ($validatedData['product_variants'] as $variant) {
-            ProductVariant::updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'product_size_id' => $variant['product_size_id']
-                ],
-                [
-                    'quantity' => $variant['quantity'],
-                    'status' => $variant['status'] ?? 1
-                ]
-            );
-        }
+    // ✅ Kiểm tra trùng product_size_id trong mảng
+    $sizeIds = array_column($validatedData['product_variants'], 'product_size_id');
+    $duplicateSizeIds = array_diff_assoc($sizeIds, array_unique($sizeIds));
+
+    if (!empty($duplicateSizeIds)) {
+        // Ném ra lỗi nếu có phần tử trùng
+        throw ValidationException::withMessages([
+            'product_variants' => ['Không được chọn trùng size trong danh sách biến thể!']
+        ]);
     }
+
+    // ✅ Nếu không trùng thì tiến hành updateOrCreate
+    foreach ($validatedData['product_variants'] as $variant) {
+        ProductVariant::updateOrCreate(
+            [
+                'product_id' => $product->id,
+                'product_size_id' => $variant['product_size_id']
+            ],
+            [
+                'quantity' => $variant['quantity'],
+                'status' => $variant['status'] ?? 1
+            ]
+        );
+    }
+}
+
 
 
 

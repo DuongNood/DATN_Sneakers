@@ -25,7 +25,7 @@
             {{-- Danh sách bộ lọc --}}
             @php
                 $filters = [
-                    'payment_method' => ['' => 'Phương thức TT', 'COD' => 'COD', 'Online' => 'Online'],
+                    'payment_method' => ['' => 'Phương thức TT', 'cod' => 'COD', 'momo' => 'Momo', 'vnpay' => 'Vnpay'],
                     'payment_status' => [
                         '' => 'Trạng thái TT',
                         'chua_thanh_toan' => 'Chưa thanh toán',
@@ -38,6 +38,7 @@
                         'dang_van_chuyen' => 'Đang vận chuyển',
                         'da_giao_hang' => 'Đã giao hàng',
                         'huy_don_hang' => 'Hủy đơn hàng',
+                        'cho_xac_nhan_huy' => 'Chờ xác nhận hủy',
                     ],
                 ];
             @endphp
@@ -104,7 +105,8 @@
                                         {{ number_format(round($order->total_price, -3), 0, ',', '.') }} VND
                                     </td>
                                     <td class="text-center small">
-                                        <span class="badge bg-{{ $order->payment_method == 'COD' ? 'warning' : 'info' }}">
+                                        <span
+                                            class="badge bg-{{ $order->payment_method == 'COD' ? 'warning' : ($order->payment_method == 'Vnpay' ? 'info' : 'primary') }}">
                                             {{ $order->payment_method }}
                                         </span>
                                     </td>
@@ -122,10 +124,15 @@
                                                 'dang_van_chuyen' => 'primary',
                                                 'da_giao_hang' => 'success',
                                                 'huy_don_hang' => 'danger',
+                                                'cho_xac_nhan_huy' => 'info',
                                             ];
                                         @endphp
                                         <span class="badge bg-{{ $statusColors[$order->status] ?? 'secondary' }}">
-                                            {{ str_replace(['cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'], ['Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'], $order->status) }}
+                                            {{ str_replace(
+                                                ['cho_xac_nhan_huy', 'cho_xac_nhan', 'dang_chuan_bi', 'dang_van_chuyen', 'da_giao_hang', 'huy_don_hang'],
+                                                ['Chờ xác nhận hủy', 'Chờ xác nhận', 'Đang chuẩn bị', 'Đang vận chuyển', 'Đã giao hàng', 'Hủy đơn hàng'],
+                                                $order->status,
+                                            ) }}
                                         </span>
                                     </td>
                                     <td class="text-center small">{{ $order->created_at->format('d/m/Y H:i') }}</td>
@@ -142,7 +149,7 @@
                 </div>
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-center mt-3">
-                    {{ $orders->links('pagination::bootstrap-5') }}
+                    {{ $orders->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

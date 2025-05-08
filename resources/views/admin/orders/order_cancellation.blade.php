@@ -32,7 +32,7 @@
                             @forelse ($data as $order)
                                 <tr class="align-middle">
                                     <td>{{ $order->order_code }}</td>
-                                    <td>{{ $order->recipient_name }}</td>
+                                    <td>{{ $order->user->name }}</td>
                                     <td class="text-center small">{{ $order->updated_at->format('d/m/Y H:i') }}</td>
                                     <td>{{ $order->cancellation_reason }}</td>
                                     <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }} VND</td>
