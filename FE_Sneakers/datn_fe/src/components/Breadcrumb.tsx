@@ -3,22 +3,20 @@ import { useState, useEffect } from "react";
 
 function Breadcrumb() {
     const location = useLocation();
-    const { id } = useParams(); // Lấy id nếu có
-    const [productName, setProductName] = useState("");
+    const { slug } = useParams(); 
     const pathnames = location.pathname.split("/").filter((x) => x);
 
     useEffect(() => {
-        // Tách tên sản phẩm từ URL
-        if (pathnames.length > 1) {
-            const lastPart = pathnames[pathnames.length - 1]; // Lấy phần cuối (ví dụ: "1-jordan")
-            const namePart = lastPart.split("-").pop() || lastPart; // Lấy phần sau dấu "-" hoặc toàn bộ
-            setProductName(
-                namePart
-                    .replace(/-/g, " ")
-                    .replace(/\b\w/g, (c) => c.toUpperCase())
-            ); // Chuyển thành tên đẹp
+        if (slug) {
+            const formattedName = slug
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
+            setProductName(formattedName);
         }
-    }, [location.pathname]);
+    }, [slug]);
+
+    const [productName, setProductName] = useState("");
 
     return (
         <nav className="p-2">
@@ -37,10 +35,10 @@ function Breadcrumb() {
                         Sản Phẩm
                     </Link>
                 </li>
-                {pathnames.length > 1 && (
+                {slug && (
                     <>
                         <li className="text-gray-700">→</li>
-                        <li className="text-red-600">{productName}</li>
+                        <li className="text-blue-500">Giày {productName}</li>
                     </>
                 )}
             </ol>
