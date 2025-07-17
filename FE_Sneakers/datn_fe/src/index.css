@@ -3,66 +3,80 @@
 @tailwind utilities;
 
 body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    font-weight: 500;
+    min-height: 100vh;
+    font-family: "Poppins", sans-serif;
 }
 
 #root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Add some basic visibility styles */
 .min-h-screen {
-  min-height: 100vh;
+    min-height: 100vh;
 }
 
 .bg-gray-100 {
-  background-color: #f3f4f6;
+    background-color: #f3f4f6;
 }
 
 /* Toast container styles */
 .Toastify__toast-container {
-  z-index: 9999;
+    z-index: 9999;
 }
 
 .nav-link {
-  @apply relative text-gray-900 font-medium transition-colors duration-300 
+    @apply relative text-gray-900 font-medium transition-colors duration-300 
   hover:text-gray-600 after:content-[''] after:block after:h-[3px] 
   after:w-0 after:bg-blue-500 after:rounded-full after:transition-all 
   after:duration-300 hover:after:w-full;
 }
 
 .icon-link {
-  @apply text-gray-600 text-2xl hover:text-gray-900 transition-all duration-300;
+    @apply text-gray-600 text-2xl hover:text-gray-900 transition-all duration-300;
 }
 
 .cart-badge {
-  @apply absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow;
+    @apply absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow;
 }
 
 .dropdown-link {
-  @apply block px-4 py-2 text-gray-600 hover:bg-gray-100 transition;
+    @apply block px-4 py-2 text-gray-600 hover:bg-gray-100 transition;
 }
 
 .mobile-nav-link {
-  @apply text-gray-600 font-medium text-lg transition-colors duration-300 hover:text-gray-900;
+    @apply text-gray-600 font-medium text-lg transition-colors duration-300 hover:text-gray-900;
 }
 /* human ca rô u sel */
 /* App.css */
 /* App.css */
 @keyframes marquee {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }
 
 .animate-marquee {
-  animation: marquee 25s linear infinite;
+    animation: marquee 25s linear infinite;
+}
+
+@theme inline {
+    --animate-line-shadow: line-shadow 15s linear infinite;
+
+    @keyframes line-shadow {
+        0% {
+            background-position: 0 0;
+        }
+        100% {
+            background-position: 100% -100%;
+        }
+    }
 }

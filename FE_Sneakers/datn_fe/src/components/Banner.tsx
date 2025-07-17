@@ -1,118 +1,52 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
-
-interface Banner {
-  id: number
-  image: string
-  title?: string
-  status?: number
-}
+import React, { useState, useEffect } from "react";
 
 const Banner = () => {
-  const location = useLocation()
-  const [banners, setBanners] = useState<Banner[]>([])
-  const [currentImage, setCurrentImage] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+    const [currentSlide, setCurrentSlide] = useState(0);
 
-  const customImage = 'https://intphcm.com/data/upload/poster-giay-den.jpg'
+    const slides = [
+        "https://bizweb.dktcdn.net/100/413/756/collections/jordan-2.jpg?v=1617462460240",
+        "https://cdn.shopify.com/s/files/1/0456/5070/6581/files/top-5-doi-giay-sneaker-hot-trend-2024-10.jpg?v=1703604123",
+        "https://file.hstatic.net/1000008082/file/puma_2_6b9f0cfd4c1c41b1ad017f6b285e8c7d.jpg",
+    ];
 
-  if (location.pathname !== '/') {
-    return null
-  }
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % slides.length);
+        }, 2000);
 
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch('http://localhost:8000/api/banners')
-        if (!response.ok) throw new Error('Không thể tải banners')
-        const data = await response.json()
-        const bannerList = Array.isArray(data) ? data : data.data || []
+        return () => clearInterval(timer);
+    }, [slides.length]);
 
-        const activeBanners = bannerList.filter((banner: Banner) => banner.status === undefined || banner.status === 1)
-
-        const updatedBanners = [
-          ...activeBanners,
-          {
-            id: 9999,
-            image: customImage,
-            title: 'Custom Banner',
-            status: 1
-          }
-        ]
-
-        console.log('Danh sách banners:', updatedBanners)
-        setBanners(updatedBanners)
-      } catch (err: any) {
-        setError(err.message)
-        setBanners([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchBanners()
-  }, [])
-
-  useEffect(() => {
-    if (banners.length === 0) return
-
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % banners.length)
-    }, 2000)
-
-    return () => clearInterval(interval)
-  }, [banners])
-
-  if (loading) {
     return (
-      <div className='relative w-screen h-[70vh] overflow-hidden shadow-lg'>
-        <motion.div
-          className='absolute top-0 left-0 w-full h-full'
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        >
-          <img src={customImage} alt='Loading Banner' className='w-full h-full object-cover' />
-          <div className='absolute inset-0 bg-black bg-opacity-20 animate-pulse' />
-        </motion.div>
-      </div>
-    )
-  }
+        <div className="relative w-full h-[580px] overflow-hidden">
+            {slides.map((slide, index) => (
+                <div
+                    key={index}
+                    className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+                        index === currentSlide ? "opacity-100" : "opacity-0"
+                    }`}
+                >
+                    <img
+                        src={slide}
+                        alt={`Slide ${index + 1}`}
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            ))}
 
-  if (error || banners.length === 0) {
-    return (
-      <div className='relative w-screen h-[70vh] bg-gray-100 shadow-lg'>
-        <div className='absolute inset-0 flex items-center justify-center'>
-          <p className='text-red-500 text-lg font-semibold'>{error || 'Không có banner nào để hiển thị'}</p>
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                {slides.map((_, index) => (
+                    <button
+                        key={index}
+                        className={`w-3 h-3 rounded-full ${
+                            index === currentSlide ? "bg-white" : "bg-gray-400"
+                        }`}
+                        onClick={() => setCurrentSlide(index)}
+                    ></button>
+                ))}
+            </div>
         </div>
-      </div>
-    )
-  }
+    );
+};
 
-  return (
-    <div className='relative w-screen h-[70vh] overflow-hidden shadow-lg'>
-      <AnimatePresence>
-        <motion.div
-          key={currentImage}
-          className='absolute top-0 left-0 w-full h-full'
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.1 }}
-          transition={{ duration: 1, ease: 'easeInOut' }}
-        >
-          <img
-            src={banners[currentImage].image}
-            alt={banners[currentImage].title || 'Banner'}
-            className='w-full h-full object-cover'
-          />
-          <div className='absolute inset-0 bg-black bg-opacity-10' />
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  )
-}
-
-export default Banner
+export default Banner;
