@@ -27,31 +27,32 @@ const products = [
     {
         name: "Giày ADIDAS COURT CLASSIC",
         code: "JH5061",
-        imageUrl: "https://imgnike-a.akamaihd.net/1300x1300/02427551A1.jpg",
+        imageUrl:
+            "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/3/6/1020690/Kim-Seon-Ho-4.jpg",
     },
     {
         name: "Giày Nike Air Max 270",
         code: "AH8050-005",
         imageUrl:
-            "https://static.nike.com/a/images/t_prod_ss/w_960,c_limit,f_auto/c1d22a6e-c94c-4596-b2df-24bbf2a3fdb1/air-max-270-react-se-release-date.jpg",
+            "https://www.elle.vn/wp-content/uploads/2021/10/19/453810/dien-vien-kim-yoo-jung.jpg",
     },
     {
-        name: "Giày Adidas Ultraboost 21",
+        name: "Giày Puma RS-X",
         code: "FY0378",
         imageUrl:
-            "https://assets.adidas.com/images/w_600,f_auto,q_auto/230e9fa9d3d548f88270ad7b00e308b4_9366/Ultraboost_21_Shoes_White_FY0378_01_standard.jpg",
+            "https://giadinh.mediacdn.vn/2018/3/2/photo-0-15199918686881712124565.jpg",
     },
     {
         name: "Giày Puma RS-X3",
         code: "374665-01",
         imageUrl:
-            "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa/global/374666/01/sv01/fnd/PNA/fmt/png",
+            "https://i-giaitri.vnecdn.net/2020/05/17/IMG-5119-JPG-9737-1589707304.jpg",
     },
     {
-        name: "Giày Converse Chuck Taylor",
+        name: "Giày Adidog Classic",
         code: "M7650C",
         imageUrl:
-            "https://cdn.chv.me/images/products/preview/570561cf0e0f4.png",
+            "https://nld.mediacdn.vn/291774122806476800/2022/10/22/img-7815-16664220616861104673336-16664225662431312567739.jpg",
     },
 ];
 

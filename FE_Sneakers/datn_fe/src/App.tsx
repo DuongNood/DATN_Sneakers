@@ -12,7 +12,6 @@ function App() {
             <ProductProvider>
                 <Router>
                     <ToastContainer />
-
                     <RoutesConfig />
                 </Router>
             </ProductProvider>

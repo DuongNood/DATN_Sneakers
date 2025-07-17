@@ -1,0 +1,29 @@
+/* custom hô vờ */
+
+.card-container {
+    position: relative;
+    z-index: 1;
+}
+
+.card-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(
+        229,
+        231,
+        235,
+        0.5
+    ); /* Màu nền xám nhạt, tương tự neutral-200 */
+    border-radius: 1rem; /* rounded-lg */
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+    z-index: -1;
+}
+
+.card-container:hover::before {
+    opacity: 1;
+}

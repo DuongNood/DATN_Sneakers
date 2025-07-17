@@ -7,7 +7,7 @@ const CouponPopup = () => {
     const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
-    const couponCode = "FREESHIP";
+    const couponCode = "HOCCODETAICODEFARM";
     const couponCount = 3;
 
     useEffect(() => {
@@ -57,11 +57,11 @@ const CouponPopup = () => {
         setIsExiting(true);
         setTimeout(() => {
             setIsVisible(false);
-        }, 500);
+        }, 500000);
     };
 
     return (
-        <div className="fixed top-4 right-4 z-50 mt-[200px]">
+        <div className="fixed top-4 right-4 z-50 mt-[180px] ">
             {isVisible && (
                 <div
                     className={`bg-white shadow-lg rounded-lg p-4 max-w-sm ${
