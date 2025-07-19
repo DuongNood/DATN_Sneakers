@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import ScrollToTop from "../components/ScrollToTop";
 import Footer from "../components/Footer";
 import BackToTop from "../components/BackToTop";
+import { MarqueeDemo } from "../components/SlideHuman";
 
 const MainLayout = () => {
     return (
@@ -12,6 +13,7 @@ const MainLayout = () => {
             <Header />
             <ScrollToTop />
             <Outlet />
+            <MarqueeDemo />
             <Footer />
             <BackToTop />
         </>

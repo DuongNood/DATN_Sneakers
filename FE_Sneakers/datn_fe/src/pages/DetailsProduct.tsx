@@ -28,7 +28,7 @@ interface Product {
 interface User {
     id: number;
     name: string;
-    role_id: number; // 1 = Admin, 3 = User
+    role_id: number; // 1    = Admin, 3 = User
 }
 
 const ProductDetail: React.FC = () => {

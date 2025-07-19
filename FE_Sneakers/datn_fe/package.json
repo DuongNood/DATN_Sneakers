@@ -30,6 +30,7 @@
     "i18next-browser-languagedetector": "^8.0.4",
     "i18next-http-backend": "^3.0.2",
     "laravel-echo": "^2.0.2",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.483.0",
     "model": "^6.0.1",
     "motion": "^12.23.6",
